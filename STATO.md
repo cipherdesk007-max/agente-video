@@ -29,7 +29,7 @@ tempi di render vanno rimisurati lì.
 
 | Cosa | Valore |
 |---|---|
-| `npm test` | 58 prove (17 motore, 21 libreria, 20 difetti), 8,7 s |
+| `npm test` | 58 prove (17 motore, 21 libreria, 20 difetti), 8,7 s; in CI su GitHub 34 s con l'installazione |
 | `npm run collaudo` | tutto a posto, 12 s |
 | `npm run prove:lente` | 6 prove superate, 5 min 18 s (pannello dal telefono, 7 modelli, render fermato, durata, fonti, collaudo) |
 | Render `reta-ginocchio` (114,7 s, 3.441 fotogrammi, 1080×1920) | 12 min 36 s con 1 pezzo: 4,6 fotogrammi al secondo; processore usato per il 60% |
@@ -47,8 +47,10 @@ tempi di render vanno rimisurati lì.
 - **`npm install` da zero su questo computer:** la rete verso il registro dei pacchetti era chiusa. Le prove sono
   girate con gli stessi pacchetti alle stesse versioni di `package.json` (d3 7.9.0, esbuild 0.28.2,
   playwright-core 1.63.0, react e react-dom 19.2.8, react-icons 5.7.0, roughjs 4.6.6), già presenti sul computer.
-  L'installazione da zero la fa la CI su GitHub a ogni invio. **Da rifare una volta sul Mac:**
-  `git pull && npm install && npm test && npm run collaudo && npm run prove:lente`.
+  L'installazione da zero l'ha fatta la CI su GitHub (Ubuntu, Node 22): `npm install` e le 58 prove veloci sono
+  verdi sul commit `29e0e88`. Il giro prima era rosso per una prova scritta male (B17 guardava il file creato da
+  `npm install` invece di quello salvato in git): corretta. Collaudo e prove lente la CI non li fa.
+  **Da rifare una volta sul Mac:** `git pull && npm install && npm test && npm run collaudo && npm run prove:lente`.
 - **Il Mac di lavoro** (MacBook Pro 2017, Ventura): niente è stato lanciato lì. Voce del Mac (`say`) e codifica con
   VideoToolbox non si possono provare su Linux.
 - **ElevenLabs:** nessuna chiave e nessun credito speso. La velocità sulla voce è provata con il motore "comando" e
