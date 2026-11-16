@@ -229,7 +229,7 @@ export function bloccoLista({titolo, voci, colore = C.luce}: {titolo?: Testo; vo
             <div
               key={i}
               data-fmlab-zona="testo"
-              style={{position: 'absolute', left: 96, top: y0 + i * passo, width: 880, transform: `translateY(-50%) translateX(${((1 - p) * -46).toFixed(2)}px)`, opacity: rampa(da, 0.16) * (accesa ? 1 : 0.5), display: 'flex', alignItems: 'center', gap: 30}}
+              style={{position: 'absolute', left: 96, top: y0 + i * passo, width: 830, transform: `translateY(-50%) translateX(${((1 - p) * -46).toFixed(2)}px)`, opacity: rampa(da, 0.16) * (accesa ? 1 : 0.5), display: 'flex', alignItems: 'center', gap: 30}}
             >
               <div style={{flex: 'none', width: 92, height: 92, borderRadius: 46, display: 'grid', placeItems: 'center', background: accesa ? colore : alfa(colore, 0.16), border: `3px solid ${colore}`, color: accesa ? C.fondo : colore, fontFamily: stile.font.titoli, fontWeight: 900, fontSize: 50, boxShadow: accesa ? `0 0 46px ${alfa(colore, 0.55)}` : 'none'}}>{i + 1}</div>
               <div style={{fontFamily: stile.font.titoli, fontWeight: 800, fontSize: corpo, lineHeight: 1.1, color: C.testo}}>
@@ -256,8 +256,9 @@ export function bloccoConfronto({sinistra, destra, titolo, fonte}: {sinistra: La
   return function Confronto() {
     const {s, dice, dopo, cifre, tre} = useBlocco();
     const lati = [
-      {...sinistra, x: 300, colore: sinistra.colore ?? C.luce2, da: dopo(sinistra.segno, 0, 2)},
-      {...destra, x: 780, colore: destra.colore ?? C.luce, da: dopo(destra.segno, 1, 2)},
+      // le colonne stanno un po' a sinistra del centro: in basso a destra (da x 940) ci sono le icone dell'app
+      {...sinistra, x: 280, colore: sinistra.colore ?? C.luce2, da: dopo(sinistra.segno, 0, 2)},
+      {...destra, x: 740, colore: destra.colore ?? C.luce, da: dopo(destra.segno, 1, 2)},
     ];
     const massimo = Math.max(sinistra.valore, destra.valore, 0.0001);
     const base = CY + 250;
@@ -448,10 +449,10 @@ export function bloccoPassi({titolo, passi, colore = C.luce}: {titolo?: Testo; p
 function Scheda({cappello, testo, colore, y, da, spenta = 0, barrata = 0}: {cappello: string; testo: string; colore: string; y: number; da: number; spenta?: number; barrata?: number}) {
   if (da <= 0) return null;
   const linee = righeEntro('bloccoMito', testo, 22, 3);
-  const corpo = adatta('x'.repeat(Math.max(...linee.map((r) => r.length))), 720, 58, 34);
+  const corpo = adatta('x'.repeat(Math.max(...linee.map((r) => r.length))), 660, 58, 34);
   const p = molla(da, {rigidita: 200, smorzamento: 18});
   return (
-    <div data-fmlab-zona="testo" style={{position: 'absolute', left: CX, top: y, width: 840, transform: `translate(-50%, -50%) scale(${mix(0.86, 1, p) * mix(1, 0.9, spenta)})`, opacity: rampa(da, 0.16) * mix(1, 0.42, spenta), boxSizing: 'border-box', padding: '34px 40px 38px', borderRadius: 34, background: alfa(colore, 0.1), border: `3px solid ${alfa(colore, 0.75)}`, boxShadow: `0 0 70px ${alfa(colore, 0.22 * (1 - spenta))}`, textAlign: 'center'}}>
+    <div data-fmlab-zona="testo" style={{position: 'absolute', left: CX, top: y, width: 780, transform: `translate(-50%, -50%) scale(${mix(0.86, 1, p) * mix(1, 0.9, spenta)})`, opacity: rampa(da, 0.16) * mix(1, 0.42, spenta), boxSizing: 'border-box', padding: '34px 40px 38px', borderRadius: 34, background: alfa(colore, 0.1), border: `3px solid ${alfa(colore, 0.75)}`, boxShadow: `0 0 70px ${alfa(colore, 0.22 * (1 - spenta))}`, textAlign: 'center'}}>
       <div style={{fontFamily: stile.font.testo, fontWeight: 800, fontSize: 30, letterSpacing: '0.24em', color: colore, marginBottom: 16}}>{cappello}</div>
       <div style={{position: 'relative', display: 'inline-block', fontFamily: stile.font.titoli, fontWeight: 800, fontSize: corpo, lineHeight: 1.12, color: C.testo}}>
         {linee.map((r, i) => (
