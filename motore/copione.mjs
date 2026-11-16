@@ -6,13 +6,23 @@
 //                  (scritto dentro una parola, come dell'[nome]azienda, vale per quella parola)
 //   *parole*       enfasi: nei sottotitoli finiscono nel riquadro
 //   Le righe che iniziano con # o > e i commenti <!-- … --> non vengono pronunciati.
+//   \[ \] \* \# \> \< \\   una barra rovesciata davanti a uno di questi caratteri lo fa leggere come testo
 import crypto from 'node:crypto';
 import {ErroreFmlab} from './percorsi.mjs';
 
 const NOME = /^[a-z0-9][a-z0-9_-]*$/i;
 
+// I caratteri che nel copione sono comandi. Con una barra rovesciata davanti restano testo: durante la lettura
+// vengono messi da parte (in caratteri che nessuno scrive) e rimessi al loro posto nelle parole.
+const COMANDI = '[]*#><\\';
+const DA_PARTE = (c) => String.fromCharCode(0xe000 + COMANDI.indexOf(c));
+const RIMETTI = (t) => t.replace(/[\ue000-\ue006]/g, (c) => COMANDI[c.charCodeAt(0) - 0xe000]);
+
 export function leggiCopione(testo) {
-  let pulito = String(testo).replace(/<!--[\s\S]*?-->/g, ' ');
+  let pulito = String(testo)
+    .replace(/[\ue000-\ue006]/g, '')
+    .replace(/\\([[\]*#><\\])/g, (_, c) => DA_PARTE(c))
+    .replace(/<!--[\s\S]*?-->/g, ' ');
   pulito = pulito
     .split(/\r?\n/)
     .filter((riga) => !/^\s*(#|>)/.test(riga))
@@ -91,6 +101,7 @@ export function leggiCopione(testo) {
   }
   if (!scene.length) scene.push({nome: 'unica', indice: 0});
   scene[0].indice = 0;
+  for (const p of parole) p.testo = RIMETTI(p.testo);
 
   let frase = 0;
   for (const p of parole) {
@@ -222,7 +233,8 @@ export function riallinea(copione, dati) {
     JSON.stringify(nuovi.suoni ?? []) === JSON.stringify(dati.suoni ?? []) &&
     parole.every((p, i) => Boolean(p.enfasi) === Boolean(dati.parole[i].enfasi) && p.frase === dati.parole[i].frase);
   if (uguali) return null;
-  const {suoni: _vecchi, ...senza} = dati;
+  // stesso ordine dei campi di componiDati: così il file cambia solo dove cambia davvero
+  const {suoni: _vecchi, parole: _prima, scene: _scene, segni: _segni, ...senza} = dati;
   return {...senza, scene: nuovi.scene, segni: nuovi.segni, ...(nuovi.suoni ? {suoni: nuovi.suoni} : {}), parole};
 }
 
@@ -261,4 +273,61 @@ export function tempiDaCaratteri(testoParlato, allineamento) {
     );
   }
   return trovate.map((p) => ({inizio: p.inizio, fine: p.fine}));
+}
+
+// ───────────────────────── il testo dato da una persona ─────────────────────────
+
+/** Scrive un testo qualsiasi in modo che il copione lo legga com'è: nessun carattere diventa un comando. */
+export function proteggi(testo) {
+  return String(testo)
+    .replace(/[-]/g, '')
+    .replace(/[\\[\]*]/g, '\\$&')
+    .replace(/^(\s*)([#>])/gm, '$1\\$2')
+    .replace(/<!--/g, '\\<!--');
+}
+
+/**
+ * Il copione di partenza per un testo già scritto: una scena sola, nessun segno, il testo parola per parola.
+ * Chi lavora al reel aggiunge solo [scena:…], [segni], *enfasi* e [suono:…].
+ */
+export function copioneDaTesto(testo, {titolo = '', lingua = 'it', scena = 'testo'} = {}) {
+  const corpo = proteggi(String(testo).replace(/\r\n?/g, '\n').trim());
+  return [
+    `<!-- lingua: ${lingua} -->`,
+    `# ${String(titolo).replace(/\s+/g, ' ').trim()}`,
+    '',
+    '> Il testo qui sotto è quello dato: va pronunciato parola per parola (la copia intatta è in testo.txt).',
+    '> Si aggiungono solo: [scena:nome] · [segno] davanti a una parola · *parola* per l\'enfasi · [suono:nome].',
+    '> Una barra rovesciata davanti a [ ] * # > vuol dire "questo è testo, non un comando": lasciala dov\'è.',
+    '',
+    `[scena:${scena}]`,
+    corpo,
+    '',
+  ].join('\n');
+}
+
+/**
+ * Confronta il testo dato con quello che il copione fa pronunciare, senza contare spazi e a capo.
+ * Restituisce null se sono uguali, altrimenti la prima differenza: {parola, atteso, trovato} (parola conta da 1).
+ */
+export function confrontaTesto(dato, parlato) {
+  const a = String(dato).split(/\s+/).filter(Boolean);
+  const b = String(parlato).split(/\s+/).filter(Boolean);
+  if (a.join('') === b.join('')) return null;
+  // la punteggiatura isolata si attacca alla parola prima: si confronta carattere per carattere, e si risale alla parola
+  const x = a.join('');
+  const y = b.join('');
+  let k = 0;
+  while (k < x.length && k < y.length && x[k] === y[k]) k++;
+  const parolaA = (elenco, posizione) => {
+    let fatti = 0;
+    for (let i = 0; i < elenco.length; i++) {
+      fatti += elenco[i].length;
+      if (posizione < fatti) return {indice: i, testo: elenco[i]};
+    }
+    return {indice: elenco.length, testo: ''};
+  };
+  const pa = parolaA(a, k);
+  const pb = parolaA(b, k);
+  return {parola: pa.indice + 1, atteso: pa.testo || '(fine del testo)', trovato: pb.testo || '(fine del testo)'};
 }

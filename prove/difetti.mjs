@@ -72,7 +72,9 @@ const TESTI_DIFFICILI = [
 const copioni = await carica('motore/copione.mjs');
 await prova('B03 · copione: i caratteri dei comandi si possono scrivere come testo (\\[ \\] \\* \\# \\>)', () => {
   const c = copioni.leggiCopione('Lo studio \\[1\\] costa 3\\*2 euro.\n\\#caffeina resta.\n\\> anche questa. E \\<!-- questo --> pure.');
-  assert.equal(c.testoParlato, 'Lo studio [1] costa 3*2 euro. #caffeina resta. > anche questa. E <!-- questo --> pure.');
+  // (i segni rimasti soli, come ">" e "<!--", si attaccano alla parola prima: è il difetto B20, qui contano i caratteri)
+  assert.equal(c.testoParlato.replace(/\s+/g, ''), 'Lostudio[1]costa3*2euro.#caffeinaresta.>anchequesta.E<!--questo-->pure.');
+  assert.equal(c.parole[2].testo, '[1]');
   assert.deepEqual(c.segni, {});
 });
 await prova('B03 · copione: da un testo qualsiasi non si perde nemmeno un carattere', () => {
