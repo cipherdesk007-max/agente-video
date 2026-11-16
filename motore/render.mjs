@@ -43,7 +43,8 @@ function minuti(s) {
 export async function rendi(slug, variante = null, opzioni = {}) {
   const {bozza = false, silenzioso = false} = opzioni;
   const ff = await trovaFfmpeg();
-  const pacchetto = await impacchetta(slug, variante);
+  // rigido: se il copione è cambiato dopo una voce vera il render si ferma, invece di fare il video con il testo vecchio
+  const pacchetto = await impacchetta(slug, variante, {rigido: true});
   const reel = pacchetto.reel;
   const dati = leggiJson(reel.parole);
   const fps = dati.fps || FORMATO.fps;

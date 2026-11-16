@@ -70,9 +70,32 @@ export async function impacchetta(slug, variante = null, opzioni = {}) {
   if (!fs.existsSync(parole)) {
     throw new ErroreFmlab(`Manca ${rel(parole)}: prima genera voce e tempi con\n  npm run voce ${slug}${reel.variante ? ' ' + reel.variante : ''}`);
   }
-  // segni, scene o enfasi spostati nel copione senza toccare il testo: si rifanno gli agganci, la voce resta quella
   if (fs.existsSync(reel.copione)) {
-    const aggiornati = riallinea(leggiCopione(fs.readFileSync(reel.copione, 'utf8')), leggiJson(parole));
+    const copione = leggiCopione(fs.readFileSync(reel.copione, 'utf8'));
+    let dati = leggiJson(parole);
+    if (dati.impronta !== copione.impronta) {
+      // il testo del copione è cambiato dopo la voce: tempi e sottotitoli sono quelli del testo vecchio
+      const comando = `npm run voce ${slug}${reel.variante ? ' ' + reel.variante : ''}`;
+      if (dati.motore === 'stima') {
+        // tempi stimati: rifarli non costa niente, si rifanno qui
+        const {comandoVoce} = await import('./voce.mjs');
+        const registro = console.log;
+        console.log = () => {};
+        try {
+          await comandoVoce(slug, [...(reel.variante ? [reel.variante] : []), 'stima']);
+        } finally {
+          console.log = registro;
+        }
+        console.log(`Il testo del copione è cambiato: ho rifatto i tempi stimati (${rel(parole)}).`);
+        dati = leggiJson(parole);
+      } else if (opzioni.rigido) {
+        throw new ErroreFmlab(`Il copione è cambiato dopo aver generato la voce: il video uscirebbe con il testo e la voce di prima.\nRigenera la voce (consuma crediti solo se il testo è davvero diverso):\n  ${comando}`);
+      } else {
+        console.log(`Attenzione: il copione è cambiato dopo aver generato la voce. Quello che vedi usa ancora il testo di prima: ${comando}`);
+      }
+    }
+    // segni, scene o enfasi spostati nel copione senza toccare il testo: si rifanno gli agganci, la voce resta quella
+    const aggiornati = riallinea(copione, dati);
     if (aggiornati) {
       scriviJson(parole, aggiornati);
       console.log(`Segni del copione cambiati: ho riallineato ${rel(parole)} senza rigenerare la voce.`);
