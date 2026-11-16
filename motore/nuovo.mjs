@@ -7,6 +7,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {CARTELLA_REELS, ErroreFmlab, RADICE, rel, slugValido} from './percorsi.mjs';
 import {comandoVoce} from './voce.mjs';
+import {copioneDaTesto} from './copione.mjs';
+import {scriviJson} from './percorsi.mjs';
 
 const CARTELLA_MODELLI = path.join(RADICE, 'motore', 'modelli');
 
@@ -79,6 +81,33 @@ export async function creaReel(slug, titolo, opzioni = {}) {
       fs.writeFileSync(path.join(dir, file), testo);
     }
   }
+  // il testo è già scritto (dal pannello, o con --testo): diventa il copione così com'è, in una scena sola, e una
+  // copia intatta resta in testo.txt. Voce e verifica controllano che il copione continui a dire quelle parole.
+  if (typeof opzioni.testo === 'string' && opzioni.testo.trim()) {
+    const testo = opzioni.testo.replace(/\r\n?/g, '\n').trim();
+    fs.writeFileSync(path.join(dir, 'testo.txt'), testo + '\n');
+    fs.writeFileSync(path.join(dir, 'copione.md'), copioneDaTesto(testo, {titolo: nome, lingua}));
+    const scritta = JSON.stringify(nome.replaceAll("'", '’'));
+    fs.writeFileSync(
+      path.join(dir, 'scene.tsx'),
+      [
+        '// Scena di partenza. Il testo è già nel copione, in una scena sola: dividilo con [scena:nome] e disegna qui',
+        '// una scena per ogni nome (le scene pronte sono in SCHEDA.md; un esempio scritto a mano in reels/gps/scene.tsx).',
+        "import {bloccoTitolo, definisciReel} from '../../libreria';",
+        '',
+        'export default definisciReel({',
+        `  titolo: ${scritta},`,
+        '  scene: {',
+        `    testo: bloccoTitolo({titolo: ${scritta}}),`,
+        '  },',
+        '});',
+        '',
+      ].join('\n')
+    );
+  }
+  // un modello pensato per uno stile (l'oggetto che gira è 3D) lo imposta subito, anche da riga di comando (B13)
+  const stileModello = modelli.find((m) => m.id === modello)?.stile;
+  if (stileModello && !opzioni.testo) scriviJson(path.join(dir, 'impostazioni.json'), {stile: stileModello});
   // tempi stimati subito, così foto e anteprima funzionano già
   const registro = console.log;
   if (opzioni.silenzioso) console.log = () => {};

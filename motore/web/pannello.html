@@ -33,6 +33,9 @@
   textarea:focus, input[type="text"]:focus, select:focus { border-color: var(--luce); }
   textarea { resize: vertical; min-height: 110px; }
   .due { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .riga-durata { display: flex; align-items: center; gap: 10px; margin-top: 10px; color: var(--tenue); font-size: 14px; font-weight: 700; }
+  input[type="number"] { width: 96px; background: var(--carta); color: var(--testo); border: 1px solid var(--bordo); border-radius: 14px; font: 700 16px/1.4 "Inter", system-ui; padding: 10px 12px; outline: none; }
+  input[type="number"]:focus { border-color: var(--luce); }
   .scelte { display: flex; flex-wrap: wrap; gap: 8px; }
   .scelta { background: var(--carta); color: var(--testo); border: 1px solid var(--bordo); border-radius: 999px; padding: 9px 16px; font: 700 15px "Inter", system-ui; cursor: pointer; }
   .scelta[aria-pressed="true"] { background: var(--luce); color: #04221b; border-color: var(--luce); }
@@ -111,15 +114,19 @@
 </header>
 <main>
   <section id="vista-nuovo">
-    <h2>Di cosa parla il reel?</h2>
-    <p class="aiuto">Scrivi l'argomento come lo diresti a voce. Più dettagli dai (per chi è, cosa deve restare in testa), meglio viene.</p>
-    <textarea id="richiesta" placeholder="Es. Perché i satelliti GPS non sanno dove sei: il telefono ascolta e basta. Voglio che si capisca la storia dei 38 milionesimi di secondo."></textarea>
+    <h2>Il testo del reel</h2>
+    <div class="scelte" id="tipo" style="margin-bottom: 10px"></div>
+    <p class="aiuto" id="aiuto-testo"></p>
+    <textarea id="richiesta"></textarea>
+    <div class="nota" id="conta"></div>
     <div class="due">
       <div><label class="campo" for="titolo">Titolo (facoltativo)</label><input type="text" id="titolo" maxlength="90" placeholder="Lo ricavo dalla richiesta"></div>
       <div><label class="campo" for="lingua">Lingua</label><select id="lingua"></select></div>
     </div>
-    <label class="campo">Durata</label>
+    <label class="campo" for="durata-libera">Durata</label>
     <div class="scelte" id="durata"></div>
+    <div class="riga-durata"><span>oppure scrivi i secondi</span><input type="number" id="durata-libera" inputmode="numeric" min="15" max="180" step="1"></div>
+    <div class="nota" id="nota-durata">Il reel dura quanto scegli, con al massimo 5 secondi di scarto: se serve si velocizza la voce, il testo non si taglia.</div>
     <label class="campo" for="modello">Tipo di reel</label>
     <select id="modello"></select>
     <div class="nota" id="nota-modello"></div>
@@ -306,11 +313,54 @@ function creaEditor(contenitore, iniziali, opzioni = {}) {
 // ───────── nuovo reel ─────────
 let editorNuovo = null;
 let durataScelta = 45;
+// quello che si scrive è il testo del reel, parola per parola; "argomento" solo se lo si sceglie
+let tipoScelto = 'testo';
+const CODA = 1.4;
+
+/** Il testo sta nella durata scelta? Detto subito, mentre si scrive: 200 parole al minuto, voce velocizzabile fino a 1,4. */
+function contaParole() {
+  const conta = $('#conta');
+  const parole = $('#richiesta').value.trim().split(/\s+/).filter(Boolean).length;
+  if (tipoScelto !== 'testo' || !parole) { conta.textContent = ''; return; }
+  const ritmo = stato.limiti.paroleAlSecondo;
+  const naturale = Math.round(parole / ritmo + CODA);
+  const massime = Math.floor((durataScelta + 5 - CODA) * ritmo * 1.4);
+  conta.innerHTML = '';
+  conta.append(`${parole} parole · a voce normale circa ${naturale} secondi. `);
+  if (parole > massime) conta.append(h('b', {}, `In ${durataScelta} secondi ne entrano al massimo ${massime}, anche velocizzando la voce: togli ${parole - massime} parole oppure scegli almeno ${Math.ceil((parole / (ritmo * 1.4) + CODA - 5) / 5) * 5} secondi.`));
+  else if (naturale > durataScelta + 5) conta.append(`Per stare in ${durataScelta} secondi la voce verrà velocizzata; il testo resta com'è.`);
+  else if (naturale < durataScelta - 5) conta.append(h('b', {}, `È più corto dei ${durataScelta} secondi scelti di oltre 5: la voce non si rallenta. Scegli ${Math.max(stato.limiti.durata.min, Math.round(naturale / 5) * 5)} secondi, oppure aggiungi testo.`));
+  else conta.append(`In ${durataScelta} secondi ci sta.`);
+}
 
 function preparaNuovo() {
   $('#lingua').replaceChildren(...Object.entries(stato.lingue).map(([codice, nome]) => h('option', {value: codice}, nome.charAt(0).toUpperCase() + nome.slice(1))));
-  const durate = () => $('#durata').replaceChildren(...[30, 45, 60, 75].map((d) => h('button', {class: 'scelta', type: 'button', 'aria-pressed': String(durataScelta === d), onclick: () => { durataScelta = d; durate(); }}, `${d} s`)));
+  const libera = $('#durata-libera');
+  libera.min = stato.limiti.durata.min;
+  libera.max = stato.limiti.durata.max;
+  const durate = () => {
+    $('#durata').replaceChildren(...[15, 30, 45, 60, 90, 120, 180].map((d) => h('button', {class: 'scelta', type: 'button', 'aria-pressed': String(durataScelta === d), onclick: () => { durataScelta = d; durate(); }}, `${d} s`)));
+    if (document.activeElement !== libera) libera.value = durataScelta;
+    contaParole();
+  };
+  const daMano = () => {
+    const d = Math.round(Number(libera.value));
+    if (Number.isFinite(d) && d >= stato.limiti.durata.min && d <= stato.limiti.durata.max) { durataScelta = d; durate(); }
+  };
+  libera.addEventListener('input', daMano);
+  libera.addEventListener('change', () => { daMano(); libera.value = durataScelta; });
   durate();
+  const tipi = () => {
+    $('#tipo').replaceChildren(...[['testo', 'È il testo, parola per parola'], ['argomento', 'È solo l\'argomento']].map(([t, nome]) => h('button', {class: 'scelta', type: 'button', 'aria-pressed': String(tipoScelto === t), onclick: () => { tipoScelto = t; tipi(); }}, nome)));
+    $('#aiuto-testo').textContent = tipoScelto === 'testo'
+      ? 'Incolla qui il testo: verrà pronunciato così com\'è, parola per parola. Al reel si aggiungono solo scene, enfasi e suoni.'
+      : 'Scrivi l\'argomento come lo diresti a voce: il testo lo scriverà chi realizza il reel. Più dettagli dai (per chi è, cosa deve restare in testa), meglio viene.';
+    $('#richiesta').placeholder = tipoScelto === 'testo' ? 'Incolla il testo del reel…' : 'Es. Perché i satelliti GPS non sanno dove sei: il telefono ascolta e basta. Voglio che si capisca la storia dei 38 milionesimi di secondo.';
+    $('#nota-modello').parentElement.querySelector('label[for=modello]').textContent = tipoScelto === 'testo' ? 'Tipo di reel (un\'indicazione per le scene)' : 'Tipo di reel';
+    contaParole();
+  };
+  tipi();
+  $('#richiesta').addEventListener('input', contaParole);
   const modello = $('#modello');
   const nomi = {spiegazione: 'Spiegazione', lista: 'Elenco ("3 errori…")', confronto: 'Confronto A contro B', mito: 'Mito e realtà', passi: 'Come funziona, a passi', oggetto: 'Oggetto in 3D', dati: 'Numeri e grafico'};
   modello.replaceChildren(...stato.modelli.map((m) => h('option', {value: m.id}, nomi[m.id] ?? m.id)));
@@ -328,13 +378,14 @@ $('#crea').addEventListener('click', async () => {
   esito.replaceChildren();
   try {
     const scelte = editorNuovo.valori();
-    const r = await chiama('/api/nuovo', {richiesta: $('#richiesta').value, titolo: $('#titolo').value, lingua: $('#lingua').value, durata: durataScelta, modello: $('#modello').value, invito: $('#invito').value, note: $('#note').value, ...scelte});
+    const r = await chiama('/api/nuovo', {tipo: tipoScelto, richiesta: $('#richiesta').value, titolo: $('#titolo').value, lingua: $('#lingua').value, durata: durataScelta, modello: $('#modello').value, invito: $('#invito').value, note: $('#note').value, ...scelte});
     const copia = h('button', {class: 'secondario', type: 'button', onclick: async () => { try { await navigator.clipboard.writeText(r.frase); copia.textContent = 'Copiata'; } catch { copia.textContent = 'Selezionala e copiala a mano'; } }}, 'Copia la frase');
     const avvia = stato.kit.agente ? h('button', {class: 'secondario', type: 'button', onclick: () => esegui(r.slug, 'agente')}, 'Avvia l\'agente adesso') : null;
     esito.replaceChildren(
       h('div', {class: 'avviso ok'},
-        h('b', {}, `Creato: ${r.titolo}`), ` — cartella ${r.cartella}, con la richiesta e le tue scelte.`,
-        h('div', {style: {marginTop: '10px'}}, 'Ora apri la cartella del kit con il tuo agente e dagli questa frase:'),
+        h('b', {}, `Creato: ${r.titolo}`), r.tipo === 'testo' ? ` — cartella ${r.cartella}. Il tuo testo è il copione, parola per parola; durata chiesta ${r.durata} secondi.` : ` — cartella ${r.cartella}, con la richiesta e le tue scelte.`,
+        r.misura ? h('div', {class: 'nota'}, r.misura.entra ? r.misura.testo : h('b', {}, r.misura.testo)) : null,
+        h('div', {style: {marginTop: '10px'}}, r.tipo === 'testo' ? 'Mancano le scene: apri la cartella del kit con il tuo agente e dagli questa frase:' : 'Ora apri la cartella del kit con il tuo agente e dagli questa frase:'),
         h('div', {class: 'frase'}, r.frase),
         h('div', {class: 'azioni'}, copia, avvia, h('button', {class: 'secondario', type: 'button', onclick: () => mostra('reel')}, 'Vai ai miei reel')),
         stato.kit.agente ? null : h('div', {class: 'nota'}, stato.kit.agenteConfigurato ? 'Da questo dispositivo l\'agente non parte da solo: lancialo dal computer, oppure metti FMLAB_AGENTE_RETE=si nel file .env.' : 'Vuoi farlo partire da qui con un tocco? Scrivi il comando del tuo agente nel file .env (riga FMLAB_AGENTE).')
@@ -342,6 +393,7 @@ $('#crea').addEventListener('click', async () => {
     );
     $('#richiesta').value = '';
     $('#titolo').value = '';
+    contaParole();
     await aggiorna();
   } catch (e) {
     esito.replaceChildren(h('div', {class: 'avviso errore'}, e.message));
@@ -428,9 +480,11 @@ function cartaReel(r) {
     const zona = h('div');
     const esito = h('div', {class: 'nota'}, messaggi[r.slug] ?? '');
     const ed = creaEditor(zona, r.impostazioni, {musica: r.musica});
+    const durata = h('input', {type: 'number', inputMode: 'numeric', min: stato.limiti.durata.min, max: stato.limiti.durata.max, step: 1, value: r.impostazioni.durata ?? '', placeholder: 'libera'});
+    zona.append(h('label', {class: 'campo'}, 'Durata chiesta'), h('div', {class: 'riga-durata', style: {marginTop: 0}}, durata, h('span', {}, 'secondi (vuoto = quanto dura la voce). Dopo averla cambiata: "Genera la voce".')));
     const salva = h('button', {class: 'secondario', type: 'button', onclick: async () => {
       try {
-        await chiama('/api/impostazioni', {slug: r.slug, ...ed.valori()});
+        await chiama('/api/impostazioni', {slug: r.slug, ...ed.valori(), durata: durata.value === '' ? null : Number(durata.value)});
         messaggi[r.slug] = 'Salvate. L\'anteprima aperta si aggiorna da sola; per il video serve un nuovo render.';
         await aggiorna(true);
       } catch (e) { esito.textContent = e.message; }
@@ -451,7 +505,9 @@ function cartaReel(r) {
     r.versioni.length > 1 ? h('div', {class: 'scelte', style: {marginTop: '10px'}}, r.versioni.map((x) => h('button', {class: 'scelta', type: 'button', 'aria-pressed': String(x === versione), onclick: () => { linguaScelta[r.slug] = x.lingua; disegnaElenco(); }}, x.nomeLingua))) : null,
     h('div', {class: 'etichette'}, et(`${versione.parole} parole · ${versione.durata.toFixed(1).replace('.', ',')} s`), voce, versione.video ? et('video pronto', 'si') : et('video da fare'), verifica,
       r.impostazioni ? et(r.impostazioni.narratore.chi === 'nessuno' ? 'senza narratore' : `${r.impostazioni.narratore.chi} ${r.impostazioni.narratore.grandezza}%`) : null,
-      r.impostazioni ? et(`stile ${r.impostazioni.stile}`) : null),
+      r.impostazioni ? et(`stile ${r.impostazioni.stile}`) : null,
+      r.impostazioni?.durata ? et(`chiesti ${r.impostazioni.durata} s`, Math.abs(versione.durata - r.impostazioni.durata) <= 5 ? 'si' : 'male') : null,
+      r.testoDato ? et('testo dato: parola per parola', 'si') : null),
     h('div', {class: 'azioni'},
       h('a', {class: 'secondario forte', href: versione.anteprima, target: '_blank'}, versione.conAudio ? 'Anteprima con audio' : 'Anteprima (ancora senza voce)'),
       motore, b('Genera la voce', 'voce', () => ({motore: motore.value})), b('Provini', 'provini', nessuno), b('Bozza veloce', 'bozza', nessuno), b('Video finale', 'render', nessuno), b('Verifica', 'verifica', nessuno),

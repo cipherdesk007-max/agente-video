@@ -23,6 +23,8 @@ import {creaReel, elencoModelli, nomeDaTitolo, nomeLibero} from './nuovo.mjs';
 import {DESCRIZIONI_STILE, suggerisciStile} from './comune/stile.mjs';
 import {assaggioVoceMac, elencoVociElevenLabs, elencoVociMac} from './voce.mjs';
 import {leggiCopione} from './copione.mjs';
+import {DURATA, PAROLE_AL_SECONDO, TOLLERANZA, durataMinima, paroleMassime} from './durata.mjs';
+import {comandoVoce} from './voce.mjs';
 import {CACHE} from './percorsi.mjs';
 
 const BISCOTTO = 'fmlab_chiave';
@@ -122,7 +124,7 @@ function statoReel(slug, personaggi) {
     erroreImpostazioni = e.message;
   }
   const musica = trovaMusica(dir);
-  return {slug, titolo, versioni, impostazioni, erroreImpostazioni, musica: musica ? rel(musica) : null, richiesta: statoFile(path.join(dir, 'richiesta.md')), modificato: fs.statSync(path.join(dir, 'copione.md')).mtimeMs};
+  return {slug, titolo, versioni, impostazioni, erroreImpostazioni, testoDato: fs.existsSync(path.join(dir, 'testo.txt')), musica: musica ? rel(musica) : null, richiesta: statoFile(path.join(dir, 'richiesta.md')), modificato: fs.statSync(path.join(dir, 'copione.md')).mtimeMs};
 }
 
 function elencoPersonaggi(personaggi) {
@@ -173,7 +175,23 @@ export function fraseAgente(slug) {
   return `Leggi SCHEDA.md e realizza il reel "${slug}" seguendo reels/${slug}/richiesta.md, fino al video finale e alla verifica.`;
 }
 
-function testoRichiesta({titolo, richiesta, lingua, durata, impostazioni, personaggi, invito, note, modello}) {
+/**
+ * Il testo dato sta nella durata chiesta? Detto prima di generare qualsiasi voce (regola fissa).
+ * Conta a 200 parole al minuto; la voce si può velocizzare fino a 1,4.
+ */
+export function avvisoDurata(parole, durata, coda = 1.4) {
+  const naturale = Math.round(parole / PAROLE_AL_SECONDO + coda);
+  if (parole > paroleMassime(durata, coda)) {
+    return {entra: false, naturale, testo: `Il testo ha ${parole} parole: a voce normale dura circa ${naturale} secondi. In ${durata} secondi ne entrano al massimo ${paroleMassime(durata, coda)}, anche velocizzando la voce. Togli almeno ${parole - paroleMassime(durata, coda)} parole oppure scegli almeno ${durataMinima(parole, coda)} secondi: il kit non taglia il testo.`};
+  }
+  if (naturale < durata - TOLLERANZA) {
+    const mancano = Math.ceil((durata - TOLLERANZA - coda) * PAROLE_AL_SECONDO) - parole;
+    return {entra: false, naturale, testo: `Il testo ha ${parole} parole: a voce normale dura circa ${naturale} secondi, più corto dei ${durata} chiesti di oltre 5 secondi. La voce non si rallenta: scegli ${Math.max(DURATA.min, Math.round(naturale / 5) * 5)} secondi, oppure aggiungi circa ${mancano} parole.`};
+  }
+  return {entra: true, naturale, testo: naturale > durata + TOLLERANZA ? `${parole} parole: a voce normale circa ${naturale} secondi. Per stare in ${durata} la voce verrà velocizzata; il testo resta com'è.` : `${parole} parole: a voce normale circa ${naturale} secondi. Ci sta.`};
+}
+
+function testoRichiesta({titolo, richiesta, lingua, durata, impostazioni, personaggi, invito, note, modello, tipo = 'argomento'}) {
   const n = impostazioni.narratore;
   const chi = n.chi === 'nessuno' ? 'nessuno: il reel è senza narratore, il palco può usare tutta l\'altezza utile' : `${personaggi[n.chi]?.nome ?? n.chi} (cartella personaggi/${n.chi}), grandezza ${n.grandezza}%, a ${n.lato}${n.alza ? `, alzato di ${n.alza} px` : ''}`;
   const consiglio = suggerisciStile(richiesta);
@@ -186,25 +204,39 @@ function testoRichiesta({titolo, richiesta, lingua, durata, impostazioni, person
     '',
     `> Scritta dal pannello il ${new Date().toISOString().slice(0, 10)}. È il punto di partenza: si legge insieme a SCHEDA.md.`,
     '',
-    '## Cosa deve spiegare il reel',
-    '',
-    richiesta.trim(),
+    ...(tipo === 'testo'
+      ? [
+          '## Il testo del reel',
+          '',
+          'Il testo è già scritto, ed è definitivo: sta in `copione.md` (in una scena sola) e, intatto, in `testo.txt`.',
+          '**Va pronunciato parola per parola.** Nel copione si aggiungono solo `[scena:nome]`, `[segni]`, `*enfasi*` e',
+          '`[suono:nome]`: nessuna parola tolta, aggiunta o cambiata, nemmeno per correggere un dato. I dubbi sui fatti si',
+          'scrivono in `fonti.md` e si dicono alla fine. `npm run voce` e `npm run verifica` si fermano se il copione non',
+          'dice più il testo di `testo.txt`.',
+        ]
+      : ['## Cosa deve spiegare il reel', '', richiesta.trim()]),
     '',
     '## Scelte già fatte',
     '',
     `- **Lingua:** ${LINGUE[lingua] ?? lingua} (\`${lingua}\`)`,
-    `- **Durata:** circa ${durata} secondi`,
+    `- **Durata:** ${durata} secondi, con al massimo 5 di scarto (è salvata in \`impostazioni.json\`). Se la voce è più lunga la velocizza il kit; il testo non si taglia. \`npm run verifica\` dà errore fuori dai 5 secondi.`,
     `- **Narratore:** ${chi}`,
     `- **Stile:** ${stile}`,
-    `- **Modello di partenza:** ${modello ? `\`${modello.id}\` — ${modello.descrizione} In \`scene.tsx\` le scene pronte sono già montate: cambia testi, numeri e segni; aggiungi o togli scene se il racconto lo chiede.` : 'spiegazione'}`,
-    `- **Invito finale:** ${invito ? `"Commenta ${invito.toUpperCase()}" (o l'equivalente nella lingua del reel)` : 'a tua scelta: una parola sola, legata all\'argomento'}`,
+    ...(tipo === 'testo'
+      ? [`- **Scene:** da fare. \`scene.tsx\` ha una sola scena di partenza: dividi il copione in scene e disegnale${modello ? ` (tipo di reel indicato: \`${modello.id}\` — ${modello.descrizione})` : ''}.`]
+      : [
+          `- **Modello di partenza:** ${modello ? `\`${modello.id}\` — ${modello.descrizione} In \`scene.tsx\` le scene pronte sono già montate: cambia testi, numeri e segni; aggiungi o togli scene se il racconto lo chiede.` : 'spiegazione'}`,
+          `- **Invito finale:** ${invito ? `"Commenta ${invito.toUpperCase()}" (o l'equivalente nella lingua del reel)` : 'a tua scelta: una parola sola, legata all\'argomento'}`,
+        ]),
     ...(note ? [`- **Note:** ${note.trim()}`] : []),
     '',
     'Narratore e stile sono salvati in `impostazioni.json` in questa cartella: il kit li applica da solo, non vanno riscritti nelle scene.',
     '',
     '## Cosa consegnare',
     '',
-    'Tutti i passi del giro di SCHEDA.md (fonti, piano, copione, tempi, scene, provini, voce, video, verifica), senza saltarne nessuno.',
+    tipo === 'testo'
+      ? 'I passi del giro di SCHEDA.md, senza riscrivere il testo: fonti (una riga per ogni numero che metti a schermo), piano, scene e segni, provini, voce, video, verifica.'
+      : 'Tutti i passi del giro di SCHEDA.md (fonti, piano, copione, tempi, scene, provini, voce, video, verifica), senza saltarne nessuno.',
     'Alla fine: il video, `verifica.md` senza errori, `fonti.md` con una riga per ogni numero pronunciato, `didascalia.md`.',
     '',
   ].join('\n');
@@ -364,7 +396,7 @@ export async function comandoPannello(argomenti = []) {
           },
           personaggi: elencoPersonaggi(personaggi),
           predefinite: impostazioniKit(personaggi),
-          limiti: {grandezza: GRANDEZZA, stili: STILI, mano2: MANO2},
+          limiti: {grandezza: GRANDEZZA, stili: STILI, mano2: MANO2, durata: DURATA, paroleAlSecondo: PAROLE_AL_SECONDO},
           catalogo: fs.existsSync(path.join(RADICE, 'catalogo.jpg')) ? `/catalogo.jpg?v=${Math.round(fs.statSync(path.join(RADICE, 'catalogo.jpg')).mtimeMs)}` : null,
           prompt: leggiPrompt(),
           descrizioniStile: DESCRIZIONI_STILE,
@@ -407,24 +439,38 @@ export async function comandoPannello(argomenti = []) {
 
       if (url.pathname === '/api/nuovo') {
         const richiesta = String(corpo.richiesta ?? '').trim();
-        if (richiesta.length < 8) throw new ErroreFmlab('Scrivi di cosa deve parlare il reel (almeno una frase).');
-        if (richiesta.length > 6000) throw new ErroreFmlab('La richiesta è troppo lunga: tieniti sotto i 6000 caratteri.');
+        // quello che la persona scrive è il testo del reel, parola per parola; "argomento" solo se lo dice lei
+        const tipo = String(corpo.tipo ?? 'testo').toLowerCase() === 'argomento' ? 'argomento' : 'testo';
+        if (richiesta.length < 8) throw new ErroreFmlab(tipo === 'testo' ? 'Scrivi il testo del reel (almeno una frase).' : 'Scrivi di cosa deve parlare il reel (almeno una frase).');
+        if (richiesta.length > 12000) throw new ErroreFmlab('Il testo è troppo lungo: tieniti sotto i 12000 caratteri (un reel di tre minuti ne ha circa 5000).');
         const titolo = String(corpo.titolo ?? '').trim().slice(0, 90) || titoloDaRichiesta(richiesta);
         const lingua = String(corpo.lingua ?? 'it').toLowerCase();
         const durata = Math.round(Number(corpo.durata ?? 45));
-        if (!Number.isFinite(durata) || durata < 15 || durata > 120) throw new ErroreFmlab('La durata va da 15 a 120 secondi.');
+        if (!Number.isFinite(durata) || durata < DURATA.min || durata > DURATA.max) throw new ErroreFmlab(`La durata va da ${DURATA.min} a ${DURATA.max} secondi.`);
         const modello = elencoModelli().find((m) => m.id === String(corpo.modello ?? 'spiegazione'));
         if (!modello) throw new ErroreFmlab(`Il modello "${corpo.modello}" non esiste.`);
         // un modello fatto per il 3D (l'oggetto che gira) decide lo stile, se era rimasto su "automatico"
         const stileScelto = String(corpo.stile ?? 'auto').toLowerCase() === 'auto' && modello.stile ? modello.stile : corpo.stile;
-        const impostazioni = sistema({narratore: corpo.narratore, stile: stileScelto, musica: corpo.musica}, personaggi, 'Nuovo reel');
+        const impostazioni = sistema({narratore: corpo.narratore, stile: stileScelto, musica: corpo.musica, durata}, personaggi, 'Nuovo reel');
         const slug = nomeLibero(nomeDaTitolo(titolo));
-        await creaReel(slug, titolo, {lingua, silenzioso: true, modello: modello.id});
+        await creaReel(slug, titolo, {lingua, silenzioso: true, modello: modello.id, testo: tipo === 'testo' ? richiesta : undefined});
         scriviImpostazioni(slug, impostazioni, personaggi);
+        // tempi stimati di nuovo, adesso che la durata chiesta è salvata: anteprima e provini partono già giusti
+        let misura = null;
+        if (tipo === 'testo') {
+          const registro = console.log;
+          console.log = () => {};
+          try {
+            const dati = await comandoVoce(slug, ['stima']);
+            misura = avvisoDurata(dati.parole.length, durata);
+          } finally {
+            console.log = registro;
+          }
+        }
         const invito = String(corpo.invito ?? '').trim().replace(/[^\p{L}\p{N}-]/gu, '').slice(0, 24);
         const note = String(corpo.note ?? '').trim().slice(0, 2000);
-        fs.writeFileSync(path.join(CARTELLA_REELS, slug, 'richiesta.md'), testoRichiesta({titolo, richiesta, lingua, durata, impostazioni, personaggi, invito, note, modello}));
-        json(res, 200, {slug, titolo, cartella: `reels/${slug}`, frase: fraseAgente(slug), suggerimento: suggerisciStile(richiesta)});
+        fs.writeFileSync(path.join(CARTELLA_REELS, slug, 'richiesta.md'), testoRichiesta({titolo, richiesta, lingua, durata, impostazioni, personaggi, invito, note, modello, tipo}));
+        json(res, 200, {slug, titolo, tipo, durata, cartella: `reels/${slug}`, frase: fraseAgente(slug), suggerimento: suggerisciStile(richiesta), misura});
         return true;
       }
 
@@ -459,7 +505,7 @@ export async function comandoPannello(argomenti = []) {
         return true;
       }
       if (url.pathname === '/api/impostazioni') {
-        const salvate = scriviImpostazioni(slug, {narratore: corpo.narratore, stile: corpo.stile, musica: corpo.musica, voce: corpo.voce}, personaggi);
+        const salvate = scriviImpostazioni(slug, {narratore: corpo.narratore, stile: corpo.stile, musica: corpo.musica, voce: corpo.voce, ...(corpo.durata !== undefined ? {durata: corpo.durata} : {})}, personaggi);
         json(res, 200, {impostazioni: salvate});
         return true;
       }
