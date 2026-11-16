@@ -1,5 +1,15 @@
 # Novità
 
+## Verso la 2.0 · fase 1: il metro
+
+- **`npm run confronta <video>`** misura un video qualsiasi e stampa una tabella: tagli netti, secondi tra una novità
+  e l'altra, palco occupato e in movimento, sottotitoli (posizione, parole insieme, parole al minuto, contrasto,
+  anticipo sulla voce), narratore (pose, secondi nella stessa posa), volume, musica, effetti, tinte. Usa solo ffmpeg;
+  stesso file, stessi numeri.
+- **`npm run confronta riferimenti`** misura i video di riferimento e scrive `riferimenti/misure.json`: le soglie
+  stanno lì (con il margine, 15%), non nel codice.
+- `riferimenti/ANALISI.md` ha i numeri dei tre riferimenti accanto a quelli del kit, e l'elenco dei lavori che ne esce.
+
 ## Verso la 2.0 · fase 0: i difetti del kit 1.5
 
 L'elenco completo, con i passi per riprodurli, è in `BUG.md`; a che punto è il lavoro, in `STATO.md`.

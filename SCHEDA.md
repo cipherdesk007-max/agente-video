@@ -17,6 +17,9 @@ Per fare un reel basta questa pagina. `FMLAB_AVVIA.md` si apre solo per il detta
 | 8 | Testo del post, consegna | `didascalia.md` |
 | 9 | Riuso: quello che può riservire entra in libreria | `npm run riuso <reel>` |
 
+Il metro: `npm run confronta <reel>` (o un file mp4) misura il video finito e lo confronta con le soglie ricavate dai
+video di riferimento (`riferimenti/misure.json`): tagli, novità, palco, sottotitoli, narratore, audio.
+
 Modelli (`npm run nuovo` li elenca): `spiegazione` · `lista` · `confronto` · `mito` · `passi` · `oggetto` (3D) · `dati`.
 Scelte del reel: `npm run imposta <reel> narratore=dottore|fmlab|nessuno grandezza=40…160 lato=destra|sinistra specchia=si|no mano=auto|aperta|alza|giu stile=2d|3d musica=0…100 voce=auto|mac|elevenlabs|comando durata=15…180|libera`
 (a sinistra va specchiato: guarda verso il centro e il logo resta leggibile).
