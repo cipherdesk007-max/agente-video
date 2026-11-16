@@ -334,8 +334,9 @@ await prova('B16 · verifica: l\'audio viene descritto per quello che contiene',
 
 // ───────────────────────── B17 · B18 ─────────────────────────
 
-await rimandata('B17 · c\'è package-lock.json', 'serve un computer collegato alla rete', () => {
-  assert.ok(fs.existsSync(path.join(K, 'package-lock.json')));
+await rimandata('B17 · package-lock.json è salvato nel repository', 'serve un computer collegato alla rete', () => {
+  // conta quello salvato in git: `npm install` ne crea uno sul momento, ma senza salvarlo ogni installazione fa da sé
+  assert.equal(spawnSync('git', ['ls-files', 'package-lock.json'], {cwd: K, encoding: 'utf8'}).stdout.trim(), 'package-lock.json');
 });
 await rimandata('B18 · nessun nome di assistente fuori dai due file di istruzioni', 'fase 4', () => {
   const nomi = ['clau' + 'de', 'cod' + 'ex', 'chat' + 'gpt', 'open' + 'ai', 'gem' + 'ini', 'copi' + 'lot'].join('\\|');
