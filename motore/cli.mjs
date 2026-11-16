@@ -113,8 +113,26 @@ async function principale() {
   }
 }
 
+// Ctrl+C nel Terminale e "Ferma" dal pannello. Durante un render si esce al prossimo fotogramma, così il browser
+// viene chiuso e i file a metà cancellati; negli altri comandi si esce subito.
+let fermato = false;
+for (const segnale of ['SIGINT', 'SIGTERM']) {
+  process.on(segnale, () => {
+    if (fermato || !globalThis.__fmlabInRender) {
+      console.error('\nFermato.\n');
+      process.exit(130);
+    }
+    fermato = true;
+    globalThis.__fmlabFermato = true;
+    setTimeout(() => process.exit(130), 8000).unref();
+  });
+}
+
 principale().catch((e) => {
-  if (e instanceof ErroreFmlab) {
+  if (fermato) {
+    console.error('\nFermato.\n');
+    process.exitCode = 130;
+  } else if (e instanceof ErroreFmlab) {
     console.error(`\n✖ ${e.message}\n`);
   } else {
     console.error('\n✖ Errore imprevisto:\n', e);

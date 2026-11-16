@@ -19,6 +19,15 @@ function quantiLavoratori(totale) {
   return Math.max(1, Math.min(4, Math.ceil(nuclei / 2), Math.ceil(totale / 60)));
 }
 
+let lanci = 0;
+/**
+ * La cartella dove un render tiene i suoi pezzi: una per ogni lancio, così due comandi sullo stesso reel (un render
+ * e il collaudo, il pannello e il Terminale) non si scrivono addosso. Alla fine viene cancellata.
+ */
+export function cartellaLavoro(nome) {
+  return path.join(CACHE, nome, `render-${process.pid}-${++lanci}`);
+}
+
 /** La musica di sottofondo di un reel: musica.mp3 (o .m4a, .wav, .aac) nella sua cartella, altrimenti quella in stile/. */
 export function trovaMusica(cartellaReel) {
   for (const cartella of [cartellaReel, path.join(RADICE, 'stile')]) {
@@ -56,8 +65,10 @@ export async function rendi(slug, variante = null, opzioni = {}) {
   const intero = primo === 0 && ultimo === totaleReel;
   const uscita = opzioni.uscita ?? (bozza ? reel.video.replace(/\.mp4$/, '.bozza.mp4') : reel.video);
 
-  const cartella = path.join(CACHE, reel.nome, 'render');
+  const cartella = cartellaLavoro(reel.nome);
   fs.mkdirSync(cartella, {recursive: true});
+  const provvisorio = uscita.replace(/\.mp4$/, '.tmp.mp4');
+  const fileEffetti = uscita.replace(/\.mp4$/, '.suoni.tmp.wav');
   const n = quantiLavoratori(totale);
   const pezzi = Array.from({length: n}, (_, k) => {
     const da = primo + Math.floor((totale * k) / n);
@@ -82,6 +93,7 @@ export async function rendi(slug, variante = null, opzioni = {}) {
   };
 
   try {
+    globalThis.__fmlabInRender = true;
     browser = await avviaBrowser();
     if (!silenzioso) {
       console.log(`Render di "${reel.nome}"${bozza ? ' (bozza a metà risoluzione)' : ''}: ${totale} fotogrammi, ${pezzi.length} ${pezzi.length === 1 ? 'pezzo' : 'pezzi in parallelo'}`);
@@ -99,6 +111,8 @@ export async function rendi(slug, variante = null, opzioni = {}) {
         ]);
         codifiche.push(codifica);
         for (let f = pezzo.da; f < pezzo.a; f++) {
+          // "Ferma" dal pannello o Ctrl+C: si esce puliti, senza lasciare pezzi in giro
+          if (globalThis.__fmlabFermato) throw new ErroreFmlab('Fermato.');
           await pagina.vai(f);
           await codifica.scrivi(await pagina.jpeg(92));
           avanza();
@@ -120,7 +134,6 @@ export async function rendi(slug, variante = null, opzioni = {}) {
     }
 
     // audio: la voce (portata a volume standard) oppure una traccia di silenzio
-    const provvisorio = uscita.replace(/\.mp4$/, '.tmp.mp4');
     const fileVoce = dati.voce ? path.join(reel.dir, dati.voce) : null;
     const conVoce = intero && fileVoce && fs.existsSync(fileVoce);
     if (dati.voce && intero && !conVoce) {
@@ -138,7 +151,7 @@ export async function rendi(slug, variante = null, opzioni = {}) {
     let effetti = null;
     const eventi = intero ? suoniDelReel(dati, reel.dir) : [];
     const volumeEffetti = Number(process.env.FMLAB_VOLUME_SUONI ?? 60);
-    if (eventi.length && volumeEffetti > 0) effetti = await tracciaSuoni(ff, eventi, totale / fps, uscita.replace(/\.mp4$/, '.suoni.tmp.wav'));
+    if (eventi.length && volumeEffetti > 0) effetti = await tracciaSuoni(ff, eventi, totale / fps, fileEffetti);
     const audio = argomentiAudio({voce: conVoce ? fileVoce : null, musica: fileMusica, volume, durata: totale / fps, effetti, volumeEffetti, velocita: dati.velocita ?? 1});
     await esegui(ff, ['-i', muto, ...audio, '-movflags', '+faststart', '-y', provvisorio]);
     if (effetti) fs.rmSync(effetti, {force: true});
@@ -155,10 +168,17 @@ export async function rendi(slug, variante = null, opzioni = {}) {
     return {uscita, secondi, fotogrammi: totale, conVoce: Boolean(conVoce), conMusica};
   } catch (e) {
     for (const c of codifiche) c.interrompi();
+    // fermato mentre il browser o ffmpeg lavoravano: l'errore che arriva è solo la conseguenza
+    if (globalThis.__fmlabFermato) throw new ErroreFmlab('Fermato.');
     throw e;
   } finally {
+    globalThis.__fmlabInRender = false;
     if (browser) await browser.close().catch(() => {});
     await server.chiudi();
+    // i pezzi servono solo durante il lavoro: via la cartella, il video a metà e la traccia degli effetti
+    fs.rmSync(cartella, {recursive: true, force: true});
+    fs.rmSync(provvisorio, {force: true});
+    fs.rmSync(fileEffetti, {force: true});
   }
 }
 

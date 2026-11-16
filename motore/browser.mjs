@@ -67,6 +67,10 @@ export async function avviaBrowser() {
     return await chromium.launch({
       executablePath: eseguibile,
       headless: true,
+      // Ctrl+C e "Ferma" li gestisce il kit (motore/cli.mjs): chiude lui il browser e pulisce i file a metà
+      handleSIGINT: false,
+      handleSIGTERM: false,
+      handleSIGHUP: false,
       args: [
         '--force-color-profile=srgb',
         '--hide-scrollbars',
