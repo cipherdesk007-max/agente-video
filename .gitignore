@@ -3,7 +3,14 @@ node_modules/
 .env
 *.tmp.mp4
 *.bozza.mp4
+# quello che il kit rifà da solo per ogni reel: foto di controllo, foglio dei provini, video, rapporto di verifica
 reels/*/provini/
+reels/*/provini.jpg
+reels/*/provini.*.jpg
+reels/*/*.mp4
+reels/*/verifica.md
+reels/*/verifica.*.md
+*.tmp.wav
 .DS_Store
 
 # video di riferimento: sono di altri, restano solo sul computer
