@@ -10,7 +10,8 @@
   "scripts": {
     "pannello": "node motore/cli.mjs pannello",
     "stato": "node motore/cli.mjs stato",
-    "test": "node prove/motore.mjs && node prove/libreria.mjs",
+    "test": "node prove/motore.mjs && node prove/libreria.mjs && node prove/difetti.mjs",
+    "prove:lente": "node prove/lente.mjs",
     "collaudo": "node motore/cli.mjs collaudo",
     "nuovo": "node motore/cli.mjs nuovo",
     "imposta": "node motore/cli.mjs imposta",
