@@ -18,8 +18,22 @@ Per fare un reel basta questa pagina. `FMLAB_AVVIA.md` si apre solo per il detta
 | 9 | Riuso: quello che può riservire entra in libreria | `npm run riuso <reel>` |
 
 Modelli (`npm run nuovo` li elenca): `spiegazione` · `lista` · `confronto` · `mito` · `passi` · `oggetto` (3D) · `dati`.
-Scelte del reel: `npm run imposta <reel> narratore=dottore|fmlab|nessuno grandezza=40…160 lato=destra|sinistra specchia=si|no mano=auto|aperta|alza|giu stile=2d|3d musica=0…100 voce=auto|mac|elevenlabs|comando`
+Scelte del reel: `npm run imposta <reel> narratore=dottore|fmlab|nessuno grandezza=40…160 lato=destra|sinistra specchia=si|no mano=auto|aperta|alza|giu stile=2d|3d musica=0…100 voce=auto|mac|elevenlabs|comando durata=15…180|libera`
 (a sinistra va specchiato: guarda verso il centro e il logo resta leggibile).
+
+## Testo dato e durata chiesta (regole fisse)
+
+- **Se nella cartella c'è `testo.txt`, il testo è già scritto e non si tocca.** Sta in `copione.md` in una scena
+  sola: si aggiungono `[scena:nome]`, `[segni]`, `*enfasi*`, `[suono:nome]`, e nient'altro. Nessuna parola tolta,
+  aggiunta o corretta: i dubbi sui fatti vanno in `fonti.md` e si dicono alla fine. `npm run voce` e
+  `npm run verifica` si fermano alla prima parola diversa. Una barra rovesciata davanti a `[ ] * # >` nel copione
+  vuol dire "è testo, non un comando": resta dov'è.
+- **La durata chiesta** (`durata` in `impostazioni.json`, dal pannello o con `npm run imposta <reel> durata=45`)
+  si rispetta con al massimo 5 secondi di scarto. Se la voce è più lunga `npm run voce` la velocizza (fino a 1,4:
+  voce e tempi insieme, l'audio sul disco resta quello naturale). Se non basta, con una voce a pagamento si ferma
+  **prima** di generarla e dice quante parole togliere o quale durata chiedere. La verifica dà errore fuori dai 5 secondi.
+- **Ogni numero a schermo sta in `fonti.md`**, scritto come compare (anche arrotondato: si spiega sotto "Calcoli").
+  La verifica li cerca uno per uno.
 
 ## Copione
 
@@ -37,6 +51,8 @@ un segno ogni 2-3 secondi. Segni ed enfasi si spostano senza rifare la voce: il 
 
 ## Scene pronte (`libreria/Blocchi.tsx`)
 
+Quello che non entra in una scena pronta (una voce in più del massimo, una scritta troppo lunga) ferma la scena
+con un errore che dice cosa fare: niente viene tagliato in silenzio.
 Ogni testo: `'scritta'` oppure `{it: '…', en: '…'}`. Ogni `segno`: nome di un `[segno]`, oppure secondi dall'inizio
 della scena, oppure niente (si distribuiscono da soli).
 

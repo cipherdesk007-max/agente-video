@@ -1,5 +1,7 @@
-# Prove veloci a ogni modifica: solo logica (copione, tempi, gesti, 3D, impostazioni), senza browser e senza render.
-# Il controllo completo, con il render di prova, si fa sul proprio computer:  npm run collaudo
+# Prove veloci a ogni modifica: solo logica (copione, tempi, gesti, 3D, impostazioni, una prova per ogni difetto di
+# BUG.md), senza browser e senza render: una decina di secondi.
+# Le prove lente (browser, render, pannello) si lanciano a fine fase sul proprio computer:
+#   npm run collaudo        npm run prove:lente
 name: prove
 on:
   push:

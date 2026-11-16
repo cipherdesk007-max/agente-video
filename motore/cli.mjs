@@ -9,6 +9,7 @@ FMLAB Reel Kit — comandi
                                            (con "rete" si apre anche dal telefono, sulla stessa Wi-Fi)
   npm run stato [reel]                     a che punto è ogni reel e qual è il prossimo passo
   npm run collaudo                         controlla che il kit funzioni su questo computer
+  npm test · npm run prove:lente [nome]    le prove: veloci (a ogni modifica) e lente (browser e render, a fine lavoro)
   npm run nuovo <reel> "Titolo" [modello]  crea un nuovo reel da un modello (senza niente: elenco dei modelli)
   npm run imposta <reel> [chiave=valore…]  le scelte del reel: narratore=dottore|fmlab|nessuno  grandezza=40…160
                                            lato=destra|sinistra  specchia=si|no  alza=0…600  stile=auto|2d|3d

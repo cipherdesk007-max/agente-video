@@ -1,5 +1,24 @@
 # Novità
 
+## Verso la 2.0 · fase 0: i difetti del kit 1.5
+
+L'elenco completo, con i passi per riprodurli, è in `BUG.md`; a che punto è il lavoro, in `STATO.md`.
+
+- **Il testo scritto nel pannello è il testo del reel**, parola per parola: diventa il copione e resta intatto in
+  `testo.txt`. Voce e verifica si fermano se il copione dice altro. "È solo l'argomento" si sceglie a parte.
+- **La durata chiesta si rispetta**: da 15 a 180 secondi, salvata in `impostazioni.json`
+  (`npm run imposta <reel> durata=45`). La voce troppo lunga viene velocizzata fino a 1,4; se non basta il kit lo
+  dice prima di spendere, con le parole da togliere. La verifica dà errore oltre i 5 secondi di scarto.
+- **Il render non usa più un testo vecchio**: copione cambiato dopo la voce → tempi stimati rifatti da soli, voce
+  vera da rigenerare (il render si ferma e lo dice).
+- **Niente tagli in silenzio** nelle scene pronte: quello che non entra dà un errore chiaro.
+- **Numeri e fonti**: la verifica cerca in `fonti.md` ogni numero che compare a schermo.
+- Nel copione `\[ \] \* \# \>` scrivono quei caratteri come testo.
+- Lista, mito e confronto non finiscono più sotto le icone dell'app. "Ferma" e Ctrl+C chiudono il render puliti.
+  I pezzi del render non restano sul disco. `git` ignora provini, video e rapporti di verifica.
+- **Prove**: `npm test` ha una prova per ogni difetto (`prove/difetti.mjs`); `npm run prove:lente` fa quelle con il
+  browser e i render (pannello dal telefono, modelli, durata con una voce finta, numeri e fonti).
+
 ## 1.5
 
 - **Braccia conserte**: il Dottore PEPTMAP ha una posa in più, `conserte`, fatta con un secondo disegno dello

@@ -58,8 +58,11 @@ Con Codex la cartella deve essere un repository Git: una volta sola, nel Termina
 
 **Nuovo reel**
 
-- scrivi di cosa deve parlare;
-- scegli lingua, durata e **tipo di reel** (spiegazione, elenco, confronto, mito e realtà, passi, oggetto in 3D,
+- incolli **il testo del reel**: verrà detto così com'è, parola per parola (se vuoi dare solo l'argomento e far
+  scrivere il testo a chi realizza il reel, tocca "È solo l'argomento");
+- scegli la **durata**, da 15 a 180 secondi: il reel la rispetta con al massimo 5 secondi di scarto, e mentre
+  scrivi il pannello ti dice se il testo ci sta;
+- scegli lingua e **tipo di reel** (spiegazione, elenco, confronto, mito e realtà, passi, oggetto in 3D,
   numeri e grafico): l'agente parte da un reel già montato e riempie il contenuto;
 - scegli il **narratore**: il tuo dottore, il Dottore disegnato dal kit, oppure **nessuno**;
 - regola **grandezza**, lato e altezza: lo vedi subito nel telefono disegnato, con le zone che l'app copre;
