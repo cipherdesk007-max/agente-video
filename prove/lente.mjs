@@ -131,6 +131,47 @@ await prova('B02 · B10 · durata: testo lungo, 20 secondi chiesti → il video 
   assert.match(verifica.testo, /✓ Durata .*chiesti 20/);
 });
 
+// ───────────────────────── il metro (fase 1) ─────────────────────────
+
+await prova('metro: lo stesso video misurato due volte dà gli stessi numeri; sul reel del kit ritrova parole e pagine vere', async () => {
+  const slug = nuovo('metro');
+  assert.equal(kit(['render', slug, 'bozza']).codice, 0);
+  const video = path.join(REELS, slug, `${slug}.bozza.mp4`);
+  const a = kit(['confronta', video, 'json']);
+  const b = kit(['confronta', video, 'json']);
+  assert.equal(a.codice, 0, a.testo);
+  assert.equal(a.testo, b.testo, 'due misure dello stesso file sono diverse');
+  const m = JSON.parse(a.testo).misura;
+  // il video viene dal kit: parole e pagine dei sottotitoli sono note, il metro deve ritrovarle (entro una su dieci)
+  const dati = JSON.parse(fs.readFileSync(path.join(REELS, slug, 'parole.json'), 'utf8'));
+  assert.ok(Math.abs(m.sottotitoli.paroleContate - dati.parole.length) <= Math.ceil(dati.parole.length * 0.1), `parole contate ${m.sottotitoli.paroleContate}, vere ${dati.parole.length}`);
+  assert.equal(m.tagli.quanti, 0);
+  assert.equal(m.narratore.presente, true);
+  assert.ok(m.sottotitoli.posizioneY > 0.17 && m.sottotitoli.posizioneY < 0.2);
+  // senza narratore il metro lo dice e non inventa pose
+  assert.equal(kit(['imposta', slug, 'narratore=nessuno']).codice, 0);
+  assert.equal(kit(['render', slug, 'bozza']).codice, 0);
+  const senza = JSON.parse(kit(['confronta', video, 'json']).testo).misura;
+  assert.equal(senza.narratore.presente, false);
+});
+
+await prova('metro: rimisurando i video di riferimento escono le soglie salvate in riferimenti/misure.json', () => {
+  const cartella = path.join(K, 'riferimenti');
+  const video = fs.readdirSync(cartella).filter((f) => /\.(mp4|mov|m4v)$/i.test(f));
+  if (video.length < 3) {
+    console.log('       (saltata: i video di riferimento non sono in riferimenti/ su questo computer)');
+    return;
+  }
+  const file = path.join(cartella, 'misure.json');
+  const prima = fs.readFileSync(file, 'utf8');
+  try {
+    assert.equal(kit(['confronta', 'riferimenti', 'json']).codice, 0);
+    assert.equal(fs.readFileSync(file, 'utf8'), prima, 'le misure dei riferimenti sono cambiate: lo strumento non è più lo stesso');
+  } finally {
+    fs.writeFileSync(file, prima);
+  }
+});
+
 // ───────────────────────── B11 · numeri e fonti sui reel veri ─────────────────────────
 
 await prova('B11 · fonti: nei due reel del kit ogni numero a schermo è in fonti.md; tolta una riga, la verifica lo dice', async () => {

@@ -344,6 +344,33 @@ await rimandata('B18 · nessun nome di assistente fuori dai due file di istruzio
   assert.equal(r.stdout.trim(), '');
 });
 
+// ───────────────────────── il metro (fase 1) ─────────────────────────
+
+await prova('metro: le soglie si ricavano dai riferimenti con il margine scritto nel file, e stanno nel file', async () => {
+  const {calcolaSoglie, giudica, tabella, VOCI, FILE_MISURE} = await carica('motore/confronta.mjs');
+  const rif = (novita, occupato, lufs) => ({formato: {larghezza: 576, altezza: 1024, fps: 30, durata: 50}, tagli: {quanti: 0}, novita: {intervalloMediano: novita}, palco: {occupato}, colori: {tinte: []}, sottotitoli: {presenti: false}, narratore: {presente: false}, audio: {presente: true, muto: false, lufs}});
+  const soglie = calcolaSoglie([rif(1.5, 0.4, -14), rif(2, 0.6, -15)], 0.1);
+  assert.deepEqual(soglie['tagli.quanti'], {max: 0});
+  assert.deepEqual(soglie['novita.intervalloMediano'], {max: 2.2});
+  assert.deepEqual(soglie['palco.occupato'], {min: 0.36});
+  assert.deepEqual(soglie['audio.lufs'], {min: -16.5, max: -12.6});
+  const righe = giudica(rif(2.5, 0.5, -14.5), soglie);
+  const esito = (chiave) => righe.find((r) => r.chiave === chiave).esito;
+  assert.equal(esito('novita.intervalloMediano'), 'NO');
+  assert.equal(esito('palco.occupato'), 'ok');
+  assert.equal(esito('audio.lufs'), 'ok');
+  assert.equal(esito('narratore.poseDiverse'), '—'); // non misurabile: non c'è il narratore
+  assert.match(tabella('prova.mp4', rif(2.5, 0.5, -14.5), soglie), /3 misure dentro le soglie, 1 fuori/);
+  assert.equal(new Set(VOCI.map((v) => v[0])).size, VOCI.length);
+  // il file delle soglie del kit: se c'è, le soglie sono proprio quelle che escono dalle misure salvate
+  if (fs.existsSync(FILE_MISURE)) {
+    const salvato = JSON.parse(fs.readFileSync(FILE_MISURE, 'utf8'));
+    assert.ok(Object.keys(salvato.riferimenti).length >= 3, 'servono almeno tre riferimenti');
+    assert.deepEqual(salvato.soglie, calcolaSoglie(Object.values(salvato.riferimenti), salvato.margine), 'le soglie di misure.json non corrispondono alle misure: rifalle con  npm run confronta riferimenti');
+    assert.equal(salvato.soglie['tagli.quanti'].max, 0);
+  }
+});
+
 if (pannello) await pannello.server.chiudi();
 cancella();
 const falliti = esiti.filter((e) => !e.ok);
