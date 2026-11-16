@@ -21,6 +21,8 @@ Ogni numero e ogni affermazione del copione ha una riga qui. Controllate il 15 n
   Con il satellite basso sull'orizzonte la distanza sale a circa 25.800 km, cioè 0,086 s. "Circa settanta millesimi" sta in mezzo.
   La velocità della luce (299.792,458 km/s) è un valore esatto, fissato dalla definizione del metro.
 - **Dieci chilometri al giorno.** 38 milionesimi di secondo × 299.792 km/s = 11,4 km. Il copione dice "circa dieci", come la fonte.
+- **Numeri arrotondati a schermo.** "≈ 20.000 km" è la quota di 20.200 km (riga 2) arrotondata, come la dice la voce
+  ("ventimila"). "0,07 s" è 0,067 s arrotondato a due decimali. "OLTRE 30": i satelliti in orbita sono 31-32 (riga 3).
 
 ## Sfumature lasciate fuori dal copione
 

@@ -22,6 +22,8 @@ declare global {
       misura: () => Rettangolo[];
       /** Nomi delle scene che in questo fotogramma mostrano oggetti 3D. */
       tre: () => string[];
+      /** Le scritte con dei numeri visibili sul palco in questo fotogramma. */
+      scritte: () => {testo: string; scena: string | null}[];
     };
   }
 }
@@ -73,6 +75,22 @@ function misura(): Rettangolo[] {
       };
     })
     .filter((r) => r.larghezza > 1 && r.altezza > 1);
+}
+
+/** Le scritte visibili sul palco in questo fotogramma (non i sottotitoli), una per ogni pezzo di testo: servono a cercare i numeri nelle fonti. */
+function scritte(): {testo: string; scena: string | null}[] {
+  const esito: {testo: string; scena: string | null}[] = [];
+  for (const el of Array.from(document.querySelectorAll('[data-fmlab-zona]'))) {
+    if (el.getAttribute('data-fmlab-zona') === 'sottotitoli') continue;
+    const scena = el.closest('[data-fmlab-scena]')?.getAttribute('data-fmlab-scena') ?? null;
+    const giro = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let nodo = giro.nextNode(); nodo; nodo = giro.nextNode()) {
+      const testo = (nodo.textContent ?? '').trim();
+      if (!testo || !/\d/.test(testo) || !nodo.parentElement) continue;
+      if (opacitaEffettiva(nodo.parentElement) > 0.6) esito.push({testo: testo.slice(0, 80), scena});
+    }
+  }
+  return esito;
 }
 
 /** Scene che in questo momento mostrano oggetti 3D (disegnati con Scena3D). */
@@ -127,7 +145,7 @@ export function avvia({modulo, dati, slug, impostazioni = IMPOSTAZIONI_BASE, per
   if (!reel || !reel.scene) {
     const errore = 'scene.tsx deve finire con:  export default definisciReel({ scene: { … } })';
     contenitore.textContent = errore;
-    window.__fmlab = {info, pronto: Promise.resolve(), vai: async () => ({errore}), misura: () => [], tre: () => []};
+    window.__fmlab = {info, pronto: Promise.resolve(), vai: async () => ({errore}), misura: () => [], tre: () => [], scritte: () => []};
     return;
   }
 
@@ -161,10 +179,11 @@ export function avvia({modulo, dati, slug, impostazioni = IMPOSTAZIONI_BASE, per
       },
       misura,
       tre,
+      scritte,
     };
     return;
   }
 
-  window.__fmlab = {info, pronto: Promise.resolve(), vai: async () => ({ok: true}), misura, tre};
+  window.__fmlab = {info, pronto: Promise.resolve(), vai: async () => ({ok: true}), misura, tre, scritte};
   radice.render(<Player reel={reel} dati={dati} slug={slug} totale={totale} impostazioni={impostazioni} personaggi={personaggi} />);
 }

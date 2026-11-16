@@ -30,6 +30,7 @@ la verifica blocca il reel finché non è sistemata.
   TRIUMPH-4: 3,96 - 2,12 = 1,84 · 3,74 - 2,12 = 1,62.
   TRIUMPH-1-OA: 3,22 - 1,87 = 1,35 · 3,48 - 1,87 = 1,61 · 3,64 - 1,87 = 1,77.
 - Nelle grafiche: "fino a -4,0" è -3,96 arrotondato; "-2,0" per il placebo è la media di -2,12 e -1,87.
+  Sotto la barra del placebo, "−2,1 e −1,9 nei due studi" sono -2,12 e -1,87 arrotondati a un decimale.
 - Colonne della scena "differenza": Reta 3,9 (media dei due bracci di TRIUMPH-4: 3,96 e 3,74 = 3,85, arrotondata),
   placebo 2,1; la parte in evidenza è la differenza, circa 1,7.
 

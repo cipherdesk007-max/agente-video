@@ -7,6 +7,7 @@ import {ErroreFmlab, leggiJson, rel, sec} from './percorsi.mjs';
 import {estraiVariante} from './reel.mjs';
 import {confrontaTesto, leggiCopione} from './copione.mjs';
 import {giudicaDurata} from './durata.mjs';
+import {numeriSenzaFonte} from './fonti.mjs';
 import {avvisiNarratore, leggiImpostazioni} from './impostazioni.mjs';
 import {impagina} from './comune/pagine.mjs';
 import {apriReelNelBrowser} from './foto.mjs';
@@ -150,6 +151,7 @@ export async function comandoVerifica(slug, argomenti = []) {
     const fuori = new Map();
     const coperte = new Map();
     const sceneTre = new Set();
+    const numeriVisti = new Map();
     // il corpo del narratore: il suo riquadro senza il margine vuoto di lato (a sinistra; a destra se è specchiato)
     const girato = info.impostazioni?.narratore?.specchia === true;
     const corpo = info.narratore
@@ -167,7 +169,13 @@ export async function comandoVerifica(slug, argomenti = []) {
         erroreScena = {n, ...esito};
         break;
       }
-      const {rettangoli, tre} = await sessione.pagina.pagina.evaluate(() => ({rettangoli: window.__fmlab.misura(), tre: window.__fmlab.tre()}));
+      const {rettangoli, tre, scritte} = await sessione.pagina.pagina.evaluate(() => ({rettangoli: window.__fmlab.misura(), tre: window.__fmlab.tre(), scritte: window.__fmlab.scritte()}));
+      // i numeri a schermo: conta una scritta vista ferma in almeno due fotogrammi (un conto che scorre cambia ogni volta)
+      for (const sc of new Map(scritte.map((x) => [x.testo, x])).values()) {
+        const gia = numeriVisti.get(sc.testo);
+        if (gia) gia.volte++;
+        else numeriVisti.set(sc.testo, {volte: 1, t: n / fps, scena: sc.scena});
+      }
       for (const nome of tre) sceneTre.add(nome);
       // nel passaggio tra due scene quella vecchia viene attraversata dalla camera: per pochi fotogrammi le sue
       // scritte si ingrandiscono e sfilano via. Lì non conta dove finiscono: si controlla la scena che c'è adesso.
@@ -233,6 +241,20 @@ export async function comandoVerifica(slug, argomenti = []) {
       else R.ok('Stile 2D: nessun oggetto 3D, come scelto');
     } else {
       R.avviso(`Stile ancora su "auto"${conTre.length ? ` (di fatto 3D: ${conTre.join(', ')})` : ' (di fatto 2D)'}`, `Fissalo, così resta scritto: npm run imposta ${slug} stile=${conTre.length ? '3d' : '2d'}`);
+    }
+    // ogni numero mostrato ha la sua riga in fonti.md?
+    if (fs.existsSync(fileFonti) && !erroreScena) {
+      const fermi = [...numeriVisti.entries()].filter(([, v]) => v.volte >= 2);
+      const mancanti = numeriSenzaFonte(fermi.map(([testo]) => testo), fs.readFileSync(fileFonti, 'utf8'));
+      if (mancanti.length) {
+        const dove = (m) => {
+          const v = numeriVisti.get(m.testo);
+          return `"${m.testo}"${v?.scena ? `, scena ${v.scena}` : ''} a ${sec(v?.t ?? 0, 1)}`;
+        };
+        R.errore(`${mancanti.length} ${mancanti.length === 1 ? 'numero a schermo' : 'numeri a schermo'} senza riga in fonti.md: ${mancanti.slice(0, 6).map(dove).join(' · ')}${mancanti.length > 6 ? ` · e altri ${mancanti.length - 6}` : ''}`, 'Ogni numero mostrato deve avere la sua riga in fonti.md, scritto come compare a schermo (anche se è arrotondato o calcolato: spiegalo sotto "Calcoli"). Oppure toglilo dalla scena.');
+      } else {
+        R.ok(`Numeri a schermo: ${fermi.length} scritte con numeri, tutti presenti in fonti.md`);
+      }
     }
     const avvisiBrowser = [...new Set(sessione.pagina.errori)];
     if (avvisiBrowser.length) R.avviso('Messaggi dal browser', avvisiBrowser.slice(0, 5).join(' · '));
