@@ -112,6 +112,32 @@
     "essenziali": 110.695,
     "composti": 112.801
   },
+  "suoni": [
+    {
+      "nome": "pop",
+      "t": 22.04
+    },
+    {
+      "nome": "ding",
+      "t": 36.761
+    },
+    {
+      "nome": "ding",
+      "t": 43.185
+    },
+    {
+      "nome": "errore",
+      "t": 77.614
+    },
+    {
+      "nome": "successo",
+      "t": 90.072
+    },
+    {
+      "nome": "whoosh",
+      "t": 105.891
+    }
+  ],
   "parole": [
     {
       "testo": "Nei",
@@ -1868,32 +1894,6 @@
       "inizio": 112.801,
       "fine": 113.3,
       "frase": 17
-    }
-  ],
-  "suoni": [
-    {
-      "nome": "pop",
-      "t": 22.04
-    },
-    {
-      "nome": "ding",
-      "t": 36.761
-    },
-    {
-      "nome": "ding",
-      "t": 43.185
-    },
-    {
-      "nome": "errore",
-      "t": 77.614
-    },
-    {
-      "nome": "successo",
-      "t": 90.072
-    },
-    {
-      "nome": "whoosh",
-      "t": 105.891
     }
   ]
 }
