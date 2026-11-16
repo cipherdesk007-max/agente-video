@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#04070a">
+<title>FMLAB Reel Kit · pannello</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/stile/font/font.css">
+<style>
+  :root {
+    --fondo: #04070a; --carta: #0c1219; --carta2: #111a23; --bordo: #1e2a36; --testo: #e8eef5; --tenue: #9fb0bd;
+    --luce: #5cf2c8; --luce2: #5aa8ff; --accento: #ffd23f; --rosso: #ff4d5e; --verde: #7cf26b;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--fondo); color: var(--testo); font: 500 16px/1.45 "Inter", system-ui, sans-serif; padding-bottom: 120px; }
+  header { position: sticky; top: 0; z-index: 5; background: rgba(4, 7, 10, 0.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--bordo); padding: 12px 16px 0; }
+  .marchio { font: 900 20px/1 "Inter Display", "Inter", system-ui; letter-spacing: 0.02em; }
+  .marchio span { color: var(--luce); font-weight: 700; }
+  nav { display: flex; gap: 4px; margin-top: 10px; }
+  nav button { flex: 1; background: none; border: 0; border-bottom: 3px solid transparent; color: var(--tenue); font: 700 15px "Inter", system-ui; padding: 10px 4px; cursor: pointer; }
+  nav button[aria-selected="true"] { color: var(--testo); border-bottom-color: var(--luce); }
+  main { max-width: 760px; margin: 0 auto; padding: 16px; }
+  h2 { font: 800 19px/1.2 "Inter Display", "Inter", system-ui; margin: 26px 0 10px; }
+  h2:first-child { margin-top: 6px; }
+  .aiuto { color: var(--tenue); font-size: 14px; margin: -4px 0 10px; }
+  label.campo { display: block; font-weight: 700; font-size: 14px; color: var(--tenue); margin: 14px 0 6px; }
+  textarea, input[type="text"], select {
+    width: 100%; background: var(--carta); color: var(--testo); border: 1px solid var(--bordo); border-radius: 14px;
+    font: 500 16px/1.4 "Inter", system-ui; padding: 12px 14px; outline: none;
+  }
+  textarea:focus, input[type="text"]:focus, select:focus { border-color: var(--luce); }
+  textarea { resize: vertical; min-height: 110px; }
+  .due { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .scelte { display: flex; flex-wrap: wrap; gap: 8px; }
+  .scelta { background: var(--carta); color: var(--testo); border: 1px solid var(--bordo); border-radius: 999px; padding: 9px 16px; font: 700 15px "Inter", system-ui; cursor: pointer; }
+  .scelta[aria-pressed="true"] { background: var(--luce); color: #04221b; border-color: var(--luce); }
+  .carte { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 10px; }
+  .carta { background: var(--carta); border: 2px solid var(--bordo); border-radius: 16px; padding: 8px 8px 10px; text-align: center; cursor: pointer; color: var(--testo); font: 700 13px/1.25 "Inter", system-ui; }
+  .carta[aria-pressed="true"] { border-color: var(--luce); background: var(--carta2); }
+  .carta .foto { height: 92px; display: grid; place-items: end center; overflow: hidden; margin-bottom: 6px; }
+  .carta .foto img { max-width: 100%; max-height: 92px; display: block; }
+  .carta .vuoto { width: 56px; height: 56px; border-radius: 50%; border: 3px dashed #3a4a5a; margin-bottom: 14px; position: relative; }
+  .carta .vuoto::after { content: ""; position: absolute; left: 50%; top: -6px; bottom: -6px; width: 3px; background: #3a4a5a; transform: rotate(45deg); }
+  .misure { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; margin-top: 14px; }
+  @media (max-width: 520px) { .misure { grid-template-columns: 1fr; } .telefono { margin: 0 auto; } }
+  .cursore { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; margin-bottom: 12px; }
+  .cursore span { font-weight: 700; font-size: 14px; color: var(--tenue); }
+  .cursore b { font-variant-numeric: tabular-nums; }
+  .cursore input { grid-column: 1 / -1; width: 100%; accent-color: var(--luce); height: 28px; }
+  .spunta { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--tenue); margin-top: 6px; }
+  .spunta input { width: 20px; height: 20px; accent-color: var(--luce); flex: none; margin-top: 1px; }
+  .telefono { position: relative; width: 190px; aspect-ratio: 9 / 16; border-radius: 16px; overflow: hidden; border: 1px solid var(--bordo); background: radial-gradient(120% 70% at 50% 40%, #0d2a3a 0%, #04070a 70%); flex: none; }
+  .telefono .zona { position: absolute; background: rgba(255, 77, 94, 0.2); border: 1px dashed rgba(255, 77, 94, 0.55); font: 700 8px/1 "Inter", system-ui; color: #ffb4bd; display: grid; place-items: center; text-align: center; }
+  .telefono .palco { position: absolute; border: 1px dashed rgba(92, 242, 200, 0.5); border-radius: 10px; font: 700 9px "Inter", system-ui; color: rgba(92, 242, 200, 0.8); display: grid; place-items: center; }
+  .telefono .parole { position: absolute; left: 0; right: 0; text-align: center; font: 800 10px "Inter Display", "Inter", system-ui; transform: translateY(-50%); }
+  .telefono img { position: absolute; display: block; }
+  .telefono .sagoma { position: absolute; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 8px; }
+  .nota { color: var(--tenue); font-size: 13.5px; margin-top: 8px; min-height: 1.4em; }
+  .nota b { color: var(--accento); }
+  button.principale { width: 100%; margin-top: 22px; background: var(--luce); color: #04221b; border: 0; border-radius: 16px; padding: 16px; font: 800 17px "Inter Display", "Inter", system-ui; cursor: pointer; }
+  button.principale:disabled { opacity: 0.5; }
+  .secondario { display: inline-block; background: var(--carta2); color: var(--testo); border: 1px solid var(--bordo); border-radius: 12px; padding: 10px 14px; font: 700 14px/1.2 "Inter", system-ui; cursor: pointer; text-decoration: none; }
+  a.secondario.forte { background: rgba(92, 242, 200, 0.14); border-color: rgba(92, 242, 200, 0.5); color: var(--luce); }
+  .secondario:disabled { opacity: 0.45; }
+  .avviso { border-radius: 14px; padding: 12px 14px; margin-top: 14px; font-size: 14.5px; }
+  .avviso.ok { background: rgba(92, 242, 200, 0.1); border: 1px solid rgba(92, 242, 200, 0.4); }
+  .avviso.errore { background: rgba(255, 77, 94, 0.12); border: 1px solid rgba(255, 77, 94, 0.5); color: #ffc7cd; }
+  .frase { background: #05090d; border: 1px solid var(--bordo); border-radius: 12px; padding: 12px; margin: 10px 0; font: 500 14px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; user-select: all; word-break: break-word; }
+  .reel { background: var(--carta); border: 1px solid var(--bordo); border-radius: 18px; padding: 14px; margin-bottom: 14px; }
+  .reel h3 { margin: 0; font: 800 17px/1.25 "Inter Display", "Inter", system-ui; }
+  .reel .nome { color: var(--tenue); font: 500 13px ui-monospace, monospace; }
+  .etichette { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+  .etichetta { font: 700 12px "Inter", system-ui; padding: 5px 9px; border-radius: 999px; background: var(--carta2); border: 1px solid var(--bordo); color: var(--tenue); }
+  .etichetta.si { color: var(--luce); border-color: rgba(92, 242, 200, 0.4); }
+  .etichetta.no { color: var(--accento); border-color: rgba(255, 210, 63, 0.4); }
+  .etichetta.male { color: #ff8f9a; border-color: rgba(255, 77, 94, 0.5); }
+  .azioni { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .azioni select { width: auto; padding: 9px 10px; border-radius: 12px; font-size: 14px; }
+  .collegamenti { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 13.5px; }
+  a { color: var(--luce2); }
+  video { width: 100%; max-width: 270px; border-radius: 14px; margin-top: 12px; display: block; background: #000; }
+  details { margin-top: 10px; }
+  summary { cursor: pointer; font-weight: 700; font-size: 14px; color: var(--tenue); padding: 6px 0; }
+  #registro { position: fixed; left: 0; right: 0; bottom: 0; z-index: 8; background: #070b10; border-top: 1px solid var(--bordo); padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); max-height: 46vh; display: flex; flex-direction: column; }
+  #registro .riga { display: flex; align-items: center; gap: 10px; }
+  #registro .titolo { font-weight: 800; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #registro .barra { height: 6px; border-radius: 3px; background: var(--carta2); overflow: hidden; margin: 8px 0; }
+  #registro .barra i { display: block; height: 100%; background: var(--luce); width: 0; transition: width 0.4s; }
+  #registro pre { margin: 0; overflow: auto; font: 500 12px/1.45 ui-monospace, Menlo, monospace; color: #b9c6d2; white-space: pre-wrap; word-break: break-word; flex: 1; }
+  .punto { width: 10px; height: 10px; border-radius: 50%; background: var(--tenue); flex: none; }
+  .punto.corso { background: var(--accento); animation: batti 1s infinite; }
+  .punto.finito { background: var(--verde); }
+  .punto.errore { background: var(--rosso); }
+  @keyframes batti { 50% { opacity: 0.3; } }
+  [hidden] { display: none !important; }
+  details.prompt { background: var(--carta); border: 1px solid var(--bordo); border-radius: 14px; padding: 10px 14px; margin: 8px 0; }
+  details.prompt summary { cursor: pointer; }
+  details.prompt pre { white-space: pre-wrap; font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--testo); background: rgba(0,0,0,0.25); border-radius: 10px; padding: 12px; margin: 10px 0 6px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="marchio">FMLAB <span>Reel Kit</span></div>
+  <nav role="tablist">
+    <button role="tab" data-vista="nuovo" aria-selected="true">Nuovo reel</button>
+    <button role="tab" data-vista="reel" aria-selected="false">I miei reel</button>
+    <button role="tab" data-vista="catalogo" aria-selected="false">Catalogo e prompt</button>
+  </nav>
+</header>
+<main>
+  <section id="vista-nuovo">
+    <h2>Di cosa parla il reel?</h2>
+    <p class="aiuto">Scrivi l'argomento come lo diresti a voce. Più dettagli dai (per chi è, cosa deve restare in testa), meglio viene.</p>
+    <textarea id="richiesta" placeholder="Es. Perché i satelliti GPS non sanno dove sei: il telefono ascolta e basta. Voglio che si capisca la storia dei 38 milionesimi di secondo."></textarea>
+    <div class="due">
+      <div><label class="campo" for="titolo">Titolo (facoltativo)</label><input type="text" id="titolo" maxlength="90" placeholder="Lo ricavo dalla richiesta"></div>
+      <div><label class="campo" for="lingua">Lingua</label><select id="lingua"></select></div>
+    </div>
+    <label class="campo">Durata</label>
+    <div class="scelte" id="durata"></div>
+    <label class="campo" for="modello">Tipo di reel</label>
+    <select id="modello"></select>
+    <div class="nota" id="nota-modello"></div>
+
+    <h2>Narratore</h2>
+    <p class="aiuto">Scegli chi parla, oppure nessuno. Grandezza e posizione si vedono subito nel telefono qui sotto.</p>
+    <div id="editor-nuovo"></div>
+
+    <h2>Per chiudere</h2>
+    <div class="due">
+      <div><label class="campo" for="invito">Commenta… (una parola)</label><input type="text" id="invito" maxlength="24" placeholder="GPS"></div>
+      <div><label class="campo" for="note">Note per l'agente</label><input type="text" id="note" maxlength="400" placeholder="Facoltative"></div>
+    </div>
+    <button class="principale" id="crea">Crea il reel</button>
+    <div id="esito-nuovo"></div>
+  </section>
+
+  <section id="vista-catalogo" hidden>
+    <h2>Prompt pronti</h2>
+    <div class="nota">Frasi da incollare all'agente AI aperto nella cartella del kit. Cambia solo le parti tra &lt;…&gt;.</div>
+    <div id="prompt"></div>
+    <h2>Tutto quello che c'è già pronto</h2>
+    <div class="nota">Scene, oggetti 3D, grafici, icone: i nomi sono quelli che l'agente scrive nelle scene. Come si usano è in CATALOGO.md.</div>
+    <div class="azioni"><button class="secondario" id="rifai-catalogo" type="button">Ridisegna il catalogo</button></div>
+    <div id="catalogo"></div>
+  </section>
+
+  <section id="vista-reel" hidden>
+    <div id="elenco"></div>
+  </section>
+</main>
+
+<aside id="registro" hidden>
+  <div class="riga">
+    <i class="punto" id="reg-punto"></i>
+    <div class="titolo" id="reg-titolo"></div>
+    <button class="secondario" id="reg-ferma">Ferma</button>
+    <button class="secondario" id="reg-chiudi">Chiudi</button>
+  </div>
+  <div class="barra"><i id="reg-barra"></i></div>
+  <pre id="reg-testo"></pre>
+</aside>
+
+<script type="module">
+import {suggerisciStile} from '/motore/comune/stile.mjs';
+
+const $ = (s, el = document) => el.querySelector(s);
+function h(tag, props = {}, ...figli) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(props ?? {})) {
+    if (v === false || v === null || v === undefined) continue;
+    if (k === 'class') el.className = v;
+    else if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else if (k in el && k !== 'list') el[k] = v;
+    else el.setAttribute(k, v);
+  }
+  for (const f of figli.flat()) if (f !== null && f !== undefined && f !== false) el.append(f);
+  return el;
+}
+async function chiama(percorso, corpo) {
+  const r = await fetch(percorso, corpo ? {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(corpo)} : {cache: 'no-store'});
+  let dati = {};
+  try { dati = await r.json(); } catch { /* risposta non leggibile */ }
+  if (r.status === 401) { location.reload(); throw new Error('Serve di nuovo il codice del pannello.'); }
+  if (!r.ok) throw new Error(dati.errore ?? `Errore ${r.status}`);
+  return dati;
+}
+const quando = (ms) => new Date(ms).toLocaleString('it-IT', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'});
+const megabyte = (b) => (b / 1048576).toFixed(1).replace('.', ',') + ' MB';
+
+let stato = null;
+
+// ───────── narratore, grandezza, lato, stile: lo stesso editor per i reel nuovi e per quelli esistenti ─────────
+const VIDEO = {larghezza: 1080, altezza: 1920};
+const ZONE = {alto: 220, basso: 1560, icone: {x: 940, y: 1040}, palco: {alto: 470, basso: 1320}, parole: 356};
+
+function ingombro(p, n) {
+  const larghezza = Math.round((p.video.larghezza * n.grandezza) / 100);
+  const altezza = Math.round(larghezza / p.proporzione);
+  const x = n.lato === 'sinistra' ? -p.video.rientro : VIDEO.larghezza - larghezza + p.video.rientro;
+  const y = VIDEO.altezza - Math.round(altezza * (1 - p.video.sborda)) - n.alza;
+  return {x, y, larghezza, altezza};
+}
+
+function creaEditor(contenitore, iniziali, opzioni = {}) {
+  const v = {narratore: {mano2: 'auto', ...iniziali.narratore}, stile: iniziali.stile, musica: iniziali.musica ?? 30};
+  const cambia = () => { disegna(); opzioni.alCambio?.(v); };
+  const pc = (x, tot) => `${(x / tot) * 100}%`;
+
+  const carte = h('div', {class: 'carte'});
+  const misure = h('div', {class: 'misure'});
+  const comandi = h('div');
+  const telefono = h('div', {class: 'telefono'});
+  const notaNarratore = h('div', {class: 'nota'});
+  const stili = h('div', {class: 'scelte'});
+  const notaStile = h('div', {class: 'nota'});
+  misure.append(comandi, telefono);
+  contenitore.replaceChildren(carte, misure, notaNarratore, h('label', {class: 'campo'}, 'Stile delle scene'), stili, notaStile);
+  const dopoStile = () => { if (!rigaMusica.isConnected) contenitore.append(rigaMusica); };
+
+  function cursore(etichetta, chiave, min, max, passo, unita) {
+    const valore = h('b');
+    const input = h('input', {type: 'range', min, max, step: passo, value: v.narratore[chiave], oninput: () => { v.narratore[chiave] = Number(input.value); cambia(); }});
+    return {riga: h('div', {class: 'cursore'}, h('span', {}, etichetta), valore, input), aggiorna: () => { input.value = v.narratore[chiave]; valore.textContent = `${v.narratore[chiave]}${unita}`; }};
+  }
+  const grandezza = cursore('Grandezza', 'grandezza', stato.limiti.grandezza.min, stato.limiti.grandezza.max, 5, '%');
+  const alza = cursore('Più in alto', 'alza', 0, 600, 10, ' px');
+  const lati = h('div', {class: 'scelte', style: {marginBottom: '12px'}});
+  const specchiaInput = h('input', {type: 'checkbox', onchange: () => { v.narratore.specchia = specchiaInput.checked; cambia(); }});
+  const specchiaTesto = h('span');
+  // la seconda mano: solo per i personaggi che ce l'hanno su un livello suo
+  const NOMI_MANO = {auto: 'Da sola', aperta: 'Aperta', alza: 'Alzata', giu: 'Giù'};
+  const mani = h('div', {class: 'scelte', style: {marginBottom: '12px'}});
+  const rigaMani = h('div', {}, h('div', {class: 'cursore', style: {marginBottom: '6px'}}, h('span', {}, 'Seconda mano')), mani);
+  comandi.append(grandezza.riga, h('div', {class: 'cursore', style: {marginBottom: '6px'}}, h('span', {}, 'Lato')), lati, alza.riga, rigaMani, h('label', {class: 'spunta'}, specchiaInput, specchiaTesto));
+  // la musica di sottofondo
+  const volumeValore = h('b');
+  const volumeInput = h('input', {type: 'range', min: 0, max: 100, step: 5, value: v.musica, oninput: () => { v.musica = Number(volumeInput.value); cambia(); }});
+  const notaMusica = h('div', {class: 'nota'});
+  const rigaMusica = h('div', {}, h('label', {class: 'campo'}, 'Musica di sottofondo'), h('div', {class: 'cursore'}, h('span', {}, 'Volume'), volumeValore, volumeInput), notaMusica);
+
+  function disegna() {
+    const scelto = stato.personaggi.find((p) => p.id === v.narratore.chi) ?? null;
+    carte.replaceChildren(
+      ...stato.personaggi.map((p) =>
+        h('button', {class: 'carta', type: 'button', 'aria-pressed': String(p.id === v.narratore.chi), onclick: () => { v.narratore.chi = p.id; cambia(); }},
+          h('div', {class: 'foto'}, p.immagine ? h('img', {src: p.immagine, alt: ''}) : h('div', {class: 'vuoto'})), p.nome)
+      ),
+      h('button', {class: 'carta', type: 'button', 'aria-pressed': String(v.narratore.chi === 'nessuno'), onclick: () => { v.narratore.chi = 'nessuno'; cambia(); }},
+        h('div', {class: 'foto'}, h('div', {class: 'vuoto'})), 'Nessuno')
+    );
+    comandi.hidden = !scelto;
+    grandezza.aggiorna();
+    alza.aggiorna();
+    lati.replaceChildren(...['destra', 'sinistra'].map((l) => h('button', {class: 'scelta', type: 'button', 'aria-pressed': String(v.narratore.lato === l), onclick: () => { v.narratore.lato = l; cambia(); }}, l === 'destra' ? 'A destra' : 'A sinistra')));
+    const stati = scelto?.seconde ?? [];
+    rigaMani.hidden = !stati.length;
+    if (!stati.length || (v.narratore.mano2 !== 'auto' && !stati.includes(v.narratore.mano2))) v.narratore.mano2 = 'auto';
+    mani.replaceChildren(...['auto', ...stati].map((m) => h('button', {class: 'scelta', type: 'button', 'aria-pressed': String(v.narratore.mano2 === m), onclick: () => { v.narratore.mano2 = m; cambia(); }}, NOMI_MANO[m] ?? m)));
+    dopoStile();
+    volumeInput.value = v.musica;
+    volumeValore.textContent = v.musica ? `${v.musica}` : 'spenta';
+    notaMusica.textContent = opzioni.musica ? `Uso ${opzioni.musica}. La voce resta sempre sopra: la musica si abbassa da sola mentre parla.` : 'Per averla metti un file musica.mp3 (tuo, o di cui hai i diritti) nella cartella del reel. Senza file il video resta senza musica.';
+    specchiaInput.checked = v.narratore.specchia;
+    specchiaTesto.textContent = scelto && !scelto.specchiabile ? 'Specchialo (attenzione: ha delle scritte addosso, si leggerebbero al contrario)' : scelto && scelto.scritteDritte ? 'Specchialo (guarda dall\'altra parte; il logo resta leggibile)' : 'Specchialo (guarda dall\'altra parte)';
+
+    // il telefono: zone coperte dall'app, palco, parole, narratore
+    const pezzi = [
+      h('div', {class: 'zona', style: {left: 0, right: 0, top: 0, height: pc(ZONE.alto, VIDEO.altezza)}}, 'nome e pulsanti dell\'app'),
+      h('div', {class: 'zona', style: {left: 0, right: 0, top: pc(ZONE.basso, VIDEO.altezza), bottom: 0}}, 'didascalia'),
+      h('div', {class: 'zona', style: {left: pc(ZONE.icone.x, VIDEO.larghezza), right: 0, top: pc(ZONE.icone.y, VIDEO.altezza), height: pc(ZONE.basso - ZONE.icone.y, VIDEO.altezza)}}),
+      h('div', {class: 'palco', style: {left: '8%', right: '8%', top: pc(ZONE.palco.alto, VIDEO.altezza), height: pc(ZONE.palco.basso - ZONE.palco.alto, VIDEO.altezza)}}, 'palco'),
+      h('div', {class: 'parole', style: {top: pc(ZONE.parole, VIDEO.altezza)}}, 'le parole qui'),
+    ];
+    if (scelto) {
+      const b = ingombro(scelto, v.narratore);
+      const posto = {left: pc(b.x, VIDEO.larghezza), top: pc(b.y, VIDEO.altezza), width: pc(b.larghezza, VIDEO.larghezza), height: pc(b.altezza, VIDEO.altezza), transform: v.narratore.specchia ? 'scaleX(-1)' : ''};
+      pezzi.push(scelto.immagine ? h('img', {src: scelto.immagine, alt: '', style: posto}) : h('div', {class: 'sagoma', style: posto}));
+      const testa = Math.round(b.y);
+      notaNarratore.innerHTML = '';
+      notaNarratore.append(`${scelto.nome}: largo ${b.larghezza} px su 1080, la testa parte a ${testa} px dall'alto. `);
+      if (testa < ZONE.palco.basso - 60) notaNarratore.append(h('b', {}, 'Copre parte del palco: le scene dovranno tenerne conto.'));
+    } else {
+      notaNarratore.textContent = 'Reel senza narratore: restano parole, immagini e voce.';
+    }
+    telefono.replaceChildren(...pezzi);
+
+    stili.replaceChildren(...stato.limiti.stili.map((s) => h('button', {class: 'scelta', type: 'button', 'aria-pressed': String(v.stile === s), onclick: () => { v.stile = s; cambia(); }}, s === 'auto' ? 'Automatico' : s.toUpperCase())));
+    notaStile.innerHTML = '';
+    notaStile.append(stato.descrizioniStile[v.stile]);
+    if (v.stile === 'auto' && opzioni.testo) {
+      const testo = opzioni.testo();
+      if (testo.trim().length > 12) {
+        const c = suggerisciStile(testo);
+        notaStile.append(' Per questa richiesta il suggerimento è ', h('b', {}, c.stile.toUpperCase()), c.parole.length ? ` (${c.parole.join(', ')}).` : '.');
+      }
+    }
+  }
+  disegna();
+  return {valori: () => ({narratore: {...v.narratore}, stile: v.stile, musica: v.musica}), ridisegna: disegna};
+}
+
+// ───────── nuovo reel ─────────
+let editorNuovo = null;
+let durataScelta = 45;
+
+function preparaNuovo() {
+  $('#lingua').replaceChildren(...Object.entries(stato.lingue).map(([codice, nome]) => h('option', {value: codice}, nome.charAt(0).toUpperCase() + nome.slice(1))));
+  const durate = () => $('#durata').replaceChildren(...[30, 45, 60, 75].map((d) => h('button', {class: 'scelta', type: 'button', 'aria-pressed': String(durataScelta === d), onclick: () => { durataScelta = d; durate(); }}, `${d} s`)));
+  durate();
+  const modello = $('#modello');
+  const nomi = {spiegazione: 'Spiegazione', lista: 'Elenco ("3 errori…")', confronto: 'Confronto A contro B', mito: 'Mito e realtà', passi: 'Come funziona, a passi', oggetto: 'Oggetto in 3D', dati: 'Numeri e grafico'};
+  modello.replaceChildren(...stato.modelli.map((m) => h('option', {value: m.id}, nomi[m.id] ?? m.id)));
+  const notaModello = () => { $('#nota-modello').textContent = stato.modelli.find((m) => m.id === modello.value)?.descrizione ?? ''; };
+  modello.addEventListener('change', notaModello);
+  notaModello();
+  editorNuovo = creaEditor($('#editor-nuovo'), stato.predefinite, {testo: () => $('#richiesta').value});
+  $('#richiesta').addEventListener('input', () => editorNuovo.ridisegna());
+}
+
+$('#crea').addEventListener('click', async () => {
+  const esito = $('#esito-nuovo');
+  const bottone = $('#crea');
+  bottone.disabled = true;
+  esito.replaceChildren();
+  try {
+    const scelte = editorNuovo.valori();
+    const r = await chiama('/api/nuovo', {richiesta: $('#richiesta').value, titolo: $('#titolo').value, lingua: $('#lingua').value, durata: durataScelta, modello: $('#modello').value, invito: $('#invito').value, note: $('#note').value, ...scelte});
+    const copia = h('button', {class: 'secondario', type: 'button', onclick: async () => { try { await navigator.clipboard.writeText(r.frase); copia.textContent = 'Copiata'; } catch { copia.textContent = 'Selezionala e copiala a mano'; } }}, 'Copia la frase');
+    const avvia = stato.kit.agente ? h('button', {class: 'secondario', type: 'button', onclick: () => esegui(r.slug, 'agente')}, 'Avvia l\'agente adesso') : null;
+    esito.replaceChildren(
+      h('div', {class: 'avviso ok'},
+        h('b', {}, `Creato: ${r.titolo}`), ` — cartella ${r.cartella}, con la richiesta e le tue scelte.`,
+        h('div', {style: {marginTop: '10px'}}, 'Ora apri la cartella del kit con il tuo agente e dagli questa frase:'),
+        h('div', {class: 'frase'}, r.frase),
+        h('div', {class: 'azioni'}, copia, avvia, h('button', {class: 'secondario', type: 'button', onclick: () => mostra('reel')}, 'Vai ai miei reel')),
+        stato.kit.agente ? null : h('div', {class: 'nota'}, stato.kit.agenteConfigurato ? 'Da questo dispositivo l\'agente non parte da solo: lancialo dal computer, oppure metti FMLAB_AGENTE_RETE=si nel file .env.' : 'Vuoi farlo partire da qui con un tocco? Scrivi il comando del tuo agente nel file .env (riga FMLAB_AGENTE).')
+      )
+    );
+    $('#richiesta').value = '';
+    $('#titolo').value = '';
+    await aggiorna();
+  } catch (e) {
+    esito.replaceChildren(h('div', {class: 'avviso errore'}, e.message));
+  } finally {
+    bottone.disabled = false;
+  }
+});
+
+// ───────── i miei reel ─────────
+const linguaScelta = {};
+const aperti = new Set();
+const messaggi = {};
+
+function cartaReel(r) {
+  const versione = r.versioni.find((x) => x.lingua === linguaScelta[r.slug]) ?? r.versioni[0];
+  const occupato = stato.lavoro && stato.lavoro.stato === 'in corso';
+  const et = (testo, classe = '') => h('span', {class: `etichetta ${classe}`}, testo);
+  const voce = !versione.motore ? et('voce: da generare', 'no') : versione.motore === 'stima' ? et('tempi stimati, senza voce', 'no') : et(`voce: ${versione.motore}${versione.conAudio ? '' : ' (manca il file audio)'}`, versione.conAudio ? 'si' : 'male');
+  const verifica = !versione.verifica ? et('mai verificato') : et(`verifica: ${versione.verifica.esito}`, /^TUTTO OK|^OK/.test(versione.verifica.esito) ? 'si' : 'male');
+  const salvata = r.impostazioni?.voce ?? {motore: 'auto', elevenlabs: {}, mac: {}, comando: {}};
+  const motore = h('select', {'aria-label': 'Motore della voce'},
+    h('option', {value: 'auto'}, salvata.motore === 'auto' ? 'Voce: la migliore disponibile' : `Voce: quella scelta (${salvata.motore})`),
+    h('option', {value: 'elevenlabs', disabled: !stato.kit.elevenlabs}, stato.kit.elevenlabs ? 'ElevenLabs' : 'ElevenLabs (manca la chiave in .env)'),
+    h('option', {value: 'mac', disabled: !stato.kit.mac}, stato.kit.mac ? 'Voce del Mac (gratis)' : 'Voce del Mac (solo su Mac)'),
+    stato.kit.comando ? h('option', {value: 'comando'}, 'Il tuo servizio (FMLAB_VOCE_COMANDO)') : null,
+    h('option', {value: 'stima'}, 'Solo tempi stimati (muto, gratis)')
+  );
+  // la scelta della voce: quale motore e quale voce, per questo reel e per la lingua selezionata
+  const corpoVoce = h('div');
+  const apertaVoce = `${r.slug}|voce`;
+  const dettagliVoce = h('details', {open: aperti.has(apertaVoce), ontoggle: () => { dettagliVoce.open ? aperti.add(apertaVoce) : aperti.delete(apertaVoce); if (dettagliVoce.open && !corpoVoce.childElementCount) montaVoce(); }}, h('summary', {}, 'Scegli la voce'), corpoVoce);
+  async function montaVoce() {
+    corpoVoce.replaceChildren(h('div', {class: 'nota'}, 'Cerco le voci…'));
+    let voci;
+    try { voci = await chiama(`/api/voci?lingua=${versione.lingua}`); } catch (e) { corpoVoce.replaceChildren(h('div', {class: 'avviso errore'}, e.message)); return; }
+    const scelta = {motore: salvata.motore, elevenlabs: {...salvata.elevenlabs}, mac: {...salvata.mac}, comando: {...salvata.comando}};
+    const motori = h('div', {class: 'scelte'});
+    const disegnaMotori = () => motori.replaceChildren(...[['auto', 'Automatico'], ['elevenlabs', 'ElevenLabs'], ['mac', 'Mac'], ['comando', 'Il mio servizio'], ['stima', 'Nessuna (muto)']]
+      .filter(([m]) => m !== 'comando' || stato.kit.comando)
+      .map(([m, nome]) => h('button', {class: 'scelta', type: 'button', 'aria-pressed': String(scelta.motore === m), onclick: () => { scelta.motore = m; disegnaMotori(); }}, nome)));
+    disegnaMotori();
+    const pezzi = [h('label', {class: 'campo'}, `Motore (${versione.nomeLingua})`), motori];
+    if (voci.elevenlabs.length) {
+      const ascolto = h('audio', {controls: true, preload: 'none', style: {width: '100%', marginTop: '8px'}});
+      const sel = h('select', {onchange: () => { scelta.elevenlabs[versione.lingua] = sel.value; const v = voci.elevenlabs.find((x) => x.id === sel.value); ascolto.hidden = !v?.assaggio; if (v?.assaggio) ascolto.src = v.assaggio; }},
+        h('option', {value: ''}, 'Quella del file .env'),
+        ...voci.elevenlabs.map((v) => h('option', {value: v.id, selected: scelta.elevenlabs[versione.lingua] === v.id}, v.descrizione ? `${v.nome} — ${v.descrizione}` : v.nome)));
+      const ora = voci.elevenlabs.find((x) => x.id === scelta.elevenlabs[versione.lingua]);
+      ascolto.hidden = !ora?.assaggio;
+      if (ora?.assaggio) ascolto.src = ora.assaggio;
+      pezzi.push(h('label', {class: 'campo'}, 'Voce ElevenLabs'), sel, ascolto, h('div', {class: 'nota'}, 'Ascoltare l\'assaggio non costa crediti. Generare la voce sì, ma una volta sola: se non cambi il testo, viene riusata.'));
+    } else if (stato.kit.elevenlabs) {
+      pezzi.push(h('div', {class: 'nota'}, 'ElevenLabs: non sono riuscito a leggere l\'elenco delle voci; vale quella scritta nel file .env.'));
+    }
+    if (voci.mac.length) {
+      const lettore = h('audio', {controls: true, hidden: true, style: {width: '100%', marginTop: '8px'}});
+      const sel = h('select', {onchange: () => { scelta.mac[versione.lingua] = sel.value; }},
+        h('option', {value: ''}, 'La migliore installata'),
+        ...voci.mac.map((nome) => h('option', {value: nome, selected: scelta.mac[versione.lingua] === nome}, nome)));
+      const prova = h('button', {class: 'secondario', type: 'button', onclick: async () => {
+        prova.disabled = true;
+        try { const a = await chiama('/api/assaggio', {slug: r.slug, lingua: versione.lingua, voce: sel.value || voci.mac[0]}); lettore.hidden = false; lettore.src = `${a.audio}?v=${Date.now()}`; lettore.play().catch(() => {}); }
+        catch (e) { messaggi[apertaVoce] = e.message; nota.textContent = e.message; }
+        prova.disabled = false;
+      }}, 'Ascolta questa voce');
+      pezzi.push(h('label', {class: 'campo'}, 'Voce del Mac (gratis)'), sel, h('div', {class: 'azioni'}, prova), lettore);
+    }
+    for (const avviso of voci.avvisi) pezzi.push(h('div', {class: 'nota'}, avviso));
+    const nota = h('div', {class: 'nota'}, messaggi[apertaVoce] ?? '');
+    const salva = h('button', {class: 'secondario', type: 'button', onclick: async () => {
+      for (const m of ['elevenlabs', 'mac']) if (!scelta[m][versione.lingua]) delete scelta[m][versione.lingua];
+      try { await chiama('/api/impostazioni', {slug: r.slug, voce: scelta}); messaggi[apertaVoce] = 'Voce salvata: "Genera la voce" userà questa.'; await aggiorna(true); }
+      catch (e) { nota.textContent = e.message; }
+    }}, 'Salva la voce');
+    corpoVoce.replaceChildren(...pezzi, h('div', {class: 'azioni'}, salva), nota);
+  }
+  if (dettagliVoce.open) montaVoce();
+  const b = (testo, azione, extra = {}) => h('button', {class: 'secondario', type: 'button', disabled: occupato, onclick: () => esegui(r.slug, azione, {lingua: versione.lingua, ...extra()})}, testo);
+  const nessuno = () => ({});
+  const corpoImpostazioni = h('div');
+  const dettagli = h('details', {open: aperti.has(r.slug), ontoggle: () => { dettagli.open ? aperti.add(r.slug) : aperti.delete(r.slug); if (dettagli.open && !corpoImpostazioni.childElementCount) monta(); }}, h('summary', {}, 'Narratore, grandezza e stile'), corpoImpostazioni);
+  function monta() {
+    if (!r.impostazioni) { corpoImpostazioni.replaceChildren(h('div', {class: 'avviso errore'}, r.erroreImpostazioni ?? 'Impostazioni non leggibili.')); return; }
+    const zona = h('div');
+    const esito = h('div', {class: 'nota'}, messaggi[r.slug] ?? '');
+    const ed = creaEditor(zona, r.impostazioni, {musica: r.musica});
+    const salva = h('button', {class: 'secondario', type: 'button', onclick: async () => {
+      try {
+        await chiama('/api/impostazioni', {slug: r.slug, ...ed.valori()});
+        messaggi[r.slug] = 'Salvate. L\'anteprima aperta si aggiorna da sola; per il video serve un nuovo render.';
+        await aggiorna(true);
+      } catch (e) { esito.textContent = e.message; }
+    }}, 'Salva le scelte');
+    corpoImpostazioni.replaceChildren(zona, h('div', {class: 'azioni'}, salva), esito);
+  }
+  if (dettagli.open) monta();
+  const collegamenti = [
+    versione.video ? h('a', {href: versione.video.indirizzo, target: '_blank'}, `Video finale (${megabyte(versione.video.peso)}, ${quando(versione.video.quando)})`) : null,
+    versione.bozza ? h('a', {href: versione.bozza.indirizzo, target: '_blank'}, `Bozza (${quando(versione.bozza.quando)})`) : null,
+    versione.provini ? h('a', {href: versione.provini.indirizzo, target: '_blank'}, 'Provini') : null,
+    versione.verifica ? h('a', {href: versione.verifica.indirizzo, target: '_blank'}, 'Rapporto di verifica') : null,
+    r.richiesta ? h('a', {href: r.richiesta.indirizzo, target: '_blank'}, 'Richiesta') : null,
+  ].filter(Boolean);
+  const filmato = versione.video ?? versione.bozza;
+  return h('div', {class: 'reel'},
+    h('h3', {}, r.titolo), h('div', {class: 'nome'}, `reels/${r.slug}`),
+    r.versioni.length > 1 ? h('div', {class: 'scelte', style: {marginTop: '10px'}}, r.versioni.map((x) => h('button', {class: 'scelta', type: 'button', 'aria-pressed': String(x === versione), onclick: () => { linguaScelta[r.slug] = x.lingua; disegnaElenco(); }}, x.nomeLingua))) : null,
+    h('div', {class: 'etichette'}, et(`${versione.parole} parole · ${versione.durata.toFixed(1).replace('.', ',')} s`), voce, versione.video ? et('video pronto', 'si') : et('video da fare'), verifica,
+      r.impostazioni ? et(r.impostazioni.narratore.chi === 'nessuno' ? 'senza narratore' : `${r.impostazioni.narratore.chi} ${r.impostazioni.narratore.grandezza}%`) : null,
+      r.impostazioni ? et(`stile ${r.impostazioni.stile}`) : null),
+    h('div', {class: 'azioni'},
+      h('a', {class: 'secondario forte', href: versione.anteprima, target: '_blank'}, versione.conAudio ? 'Anteprima con audio' : 'Anteprima (ancora senza voce)'),
+      motore, b('Genera la voce', 'voce', () => ({motore: motore.value})), b('Provini', 'provini', nessuno), b('Bozza veloce', 'bozza', nessuno), b('Video finale', 'render', nessuno), b('Verifica', 'verifica', nessuno),
+      stato.kit.agente && r.richiesta ? b('Avvia l\'agente', 'agente', nessuno) : null),
+    collegamenti.length ? h('div', {class: 'collegamenti'}, collegamenti) : null,
+    filmato ? h('video', {src: `${filmato.indirizzo}?v=${Math.round(filmato.quando)}`, controls: true, playsInline: true, preload: 'metadata'}) : null,
+    dettagliVoce,
+    dettagli
+  );
+}
+
+function disegnaElenco() {
+  const elenco = $('#elenco');
+  if (!stato.reel.length) { elenco.replaceChildren(h('p', {class: 'aiuto'}, 'Ancora nessun reel: creane uno dalla scheda "Nuovo reel".')); return; }
+  elenco.replaceChildren(...stato.reel.map(cartaReel));
+}
+
+// ───────── lavori e registro ─────────
+let seguito = null;
+let righeLette = 0;
+let giro = null;
+
+async function esegui(slug, azione, extra = {}) {
+  try {
+    const r = await chiama('/api/esegui', {slug, azione, ...extra});
+    segui(r.lavoro);
+    await aggiorna(true);
+  } catch (e) {
+    mostraRegistro({titolo: e.message, stato: 'errore', righe: [], percento: null});
+  }
+}
+
+function mostraRegistro(l, aggiungi = false) {
+  $('#registro').hidden = false;
+  $('#reg-titolo').textContent = `${l.titolo}${l.stato === 'in corso' ? ` · ${l.secondi ?? 0} s` : l.stato === 'finito' ? ' · fatto' : l.stato === 'fermato' ? ' · fermato' : l.stato === 'errore' ? ' · non riuscito' : ''}`;
+  $('#reg-punto').className = `punto ${l.stato === 'in corso' ? 'corso' : l.stato}`;
+  $('#reg-ferma').hidden = l.stato !== 'in corso';
+  $('#reg-barra').style.width = l.stato === 'finito' ? '100%' : l.percento !== null && l.percento !== undefined ? `${l.percento}%` : l.stato === 'in corso' ? '8%' : '0';
+  const pre = $('#reg-testo');
+  const inFondo = pre.scrollTop + pre.clientHeight >= pre.scrollHeight - 30;
+  if (!aggiungi) pre.textContent = '';
+  if (l.righe?.length) pre.append(l.righe.join('\n') + '\n');
+  if (inFondo) pre.scrollTop = pre.scrollHeight;
+}
+
+function segui(lavoro) {
+  seguito = lavoro.id;
+  righeLette = lavoro.totaleRighe ?? lavoro.righe.length;
+  mostraRegistro(lavoro);
+  clearInterval(giro);
+  giro = setInterval(async () => {
+    try {
+      const {lavoro: l} = await chiama(`/api/lavoro?id=${seguito}&da=${righeLette}`);
+      if (!l) return;
+      righeLette = l.totaleRighe;
+      mostraRegistro(l, true);
+      if (l.stato !== 'in corso') { clearInterval(giro); await aggiorna(true); }
+    } catch { /* il pannello è stato chiuso dal Terminale */ }
+  }, 1000);
+}
+$('#reg-ferma').addEventListener('click', () => chiama('/api/ferma', {}).catch(() => {}));
+$('#reg-chiudi').addEventListener('click', () => { $('#registro').hidden = true; });
+
+// ───────── catalogo e prompt pronti ─────────
+function disegnaCatalogo() {
+  if (!stato) return;
+  $('#prompt').replaceChildren(
+    ...(stato.prompt ?? []).map((p) => {
+      const copia = h('button', {class: 'secondario', type: 'button', onclick: async () => {
+        try { await navigator.clipboard.writeText(p.testo); copia.textContent = 'Copiato'; }
+        catch { const area = h('textarea', {}, p.testo); document.body.append(area); area.select(); document.execCommand('copy'); area.remove(); copia.textContent = 'Copiato'; }
+        setTimeout(() => { copia.textContent = 'Copia'; }, 1600);
+      }}, 'Copia');
+      return h('details', {class: 'prompt'}, h('summary', {}, h('b', {}, p.titolo), p.nota ? h('span', {class: 'nota'}, ' — ' + p.nota) : null), h('pre', {}, p.testo), h('div', {class: 'azioni'}, copia));
+    })
+  );
+  $('#catalogo').replaceChildren(stato.catalogo ? h('img', {src: stato.catalogo, alt: 'Catalogo delle scene pronte, degli oggetti e dei grafici', style: {width: '100%', borderRadius: '14px', display: 'block'}}) : h('div', {class: 'nota'}, 'Il catalogo non è ancora stato disegnato: premi "Ridisegna il catalogo".'));
+}
+$('#rifai-catalogo').addEventListener('click', async () => {
+  try { segui((await chiama('/api/catalogo', {})).lavoro); }
+  catch (e) { $('#catalogo').replaceChildren(h('div', {class: 'avviso errore'}, e.message)); }
+});
+
+// ───────── schede e avvio ─────────
+function mostra(vista) {
+  for (const b of document.querySelectorAll('nav button')) b.setAttribute('aria-selected', String(b.dataset.vista === vista));
+  $('#vista-nuovo').hidden = vista !== 'nuovo';
+  $('#vista-reel').hidden = vista !== 'reel';
+  $('#vista-catalogo').hidden = vista !== 'catalogo';
+  if (vista === 'reel') aggiorna(true);
+  if (vista === 'catalogo') disegnaCatalogo();
+  history.replaceState(null, '', vista === 'reel' ? '#reel' : vista === 'catalogo' ? '#catalogo' : '#');
+}
+for (const b of document.querySelectorAll('nav button')) b.addEventListener('click', () => mostra(b.dataset.vista));
+
+async function aggiorna(soloElenco = false) {
+  stato = await chiama('/api/stato');
+  document.querySelector('nav button[data-vista="reel"]').textContent = `I miei reel (${stato.reel.length})`;
+  if (!soloElenco && !editorNuovo) preparaNuovo();
+  disegnaElenco();
+  if (!$('#vista-catalogo').hidden) disegnaCatalogo();
+  if (stato.lavoro && stato.lavoro.stato === 'in corso' && seguito !== stato.lavoro.id) segui(stato.lavoro);
+}
+
+aggiorna().then(() => { if (location.hash === '#reel') mostra('reel'); else if (location.hash === '#catalogo') mostra('catalogo'); }).catch((e) => { $('main').prepend(h('div', {class: 'avviso errore'}, e.message)); });
+</script>
+</body>
+</html>

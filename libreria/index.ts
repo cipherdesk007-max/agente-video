@@ -1,0 +1,24 @@
+// FMLAB Reel Kit — tutto quello che una scena può usare, da un'unica porta:
+//   import {useScena, rampa, Camera, Cifra, Bagliore} from '../../libreria';
+export * from './tempo';
+export * from './anim';
+export * from './colore';
+export * from './reel';
+export * from './Camera';
+export * from './Luce';
+export * from './Testi';
+export * from './Globo';
+export * from './Oggetti';
+export * from './Tre';
+export * from './Modelli';
+export * from './Blocchi';
+export * from './Grafici';
+export * from './Icone';
+export * from './Schizzo';
+export * from './Media';
+export * from './Marchio';
+export {Atmosfera} from './Atmosfera';
+export type {Posa, Regia} from './Personaggio';
+export type {Gesto} from './gesti';
+export type {Impostazioni, Ingombro, StileVideo} from './impostazioni';
+export {stile} from '../stile/stile';

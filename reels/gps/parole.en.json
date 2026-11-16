@@ -1,0 +1,896 @@
+{
+  "versione": 1,
+  "lingua": "en",
+  "motore": "stima",
+  "precisione": "stimata",
+  "voce": null,
+  "durataVoce": 46.096,
+  "coda": 1.4,
+  "durata": 47.5,
+  "fps": 30,
+  "impronta": "58c6e6034bd3",
+  "scene": [
+    {
+      "nome": "aggancio",
+      "inizio": 0,
+      "fine": 6.242
+    },
+    {
+      "nome": "orbita",
+      "inizio": 6.242,
+      "fine": 14.762
+    },
+    {
+      "nome": "distanza",
+      "inizio": 14.762,
+      "fine": 22.643
+    },
+    {
+      "nome": "cerchi",
+      "inizio": 22.643,
+      "fine": 29.175
+    },
+    {
+      "nome": "tempo",
+      "inizio": 29.175,
+      "fine": 43.552
+    },
+    {
+      "nome": "chiusura",
+      "inizio": 43.552,
+      "fine": 47.5
+    }
+  ],
+  "segni": {
+    "nonsa": 1.544,
+    "niente": 4.694,
+    "ascolta": 5.691,
+    "sopra": 6.422,
+    "km": 7.264,
+    "sat": 9.713,
+    "due": 11.996,
+    "dove": 12.642,
+    "ora": 13.602,
+    "parte": 15.145,
+    "ms": 18.358,
+    "ritardo": 20.29,
+    "dist": 21.944,
+    "uno": 22.823,
+    "tre": 25.364,
+    "punto": 26.878,
+    "quarto": 27.664,
+    "orologio": 28.218,
+    "veloce": 30.648,
+    "micro": 32.59,
+    "poco": 35.74,
+    "luce": 36.84,
+    "dieci": 38.003,
+    "percio": 40.193,
+    "einstein": 41.8,
+    "commenta": 43.732,
+    "fonti": 45.542
+  },
+  "parole": [
+    {
+      "testo": "GPS",
+      "inizio": 0.25,
+      "fine": 0.897,
+      "frase": 0,
+      "enfasi": true
+    },
+    {
+      "testo": "satellites",
+      "inizio": 0.897,
+      "fine": 1.544,
+      "frase": 0
+    },
+    {
+      "testo": "have",
+      "inizio": 1.544,
+      "fine": 1.895,
+      "frase": 0
+    },
+    {
+      "testo": "no",
+      "inizio": 1.895,
+      "fine": 2.098,
+      "frase": 0
+    },
+    {
+      "testo": "idea",
+      "inizio": 2.098,
+      "fine": 2.449,
+      "frase": 0
+    },
+    {
+      "testo": "where",
+      "inizio": 2.449,
+      "fine": 2.8,
+      "frase": 0
+    },
+    {
+      "testo": "you",
+      "inizio": 2.8,
+      "fine": 3.003,
+      "frase": 0
+    },
+    {
+      "testo": "are.",
+      "inizio": 3.003,
+      "fine": 3.354,
+      "frase": 0
+    },
+    {
+      "testo": "Your",
+      "inizio": 3.734,
+      "fine": 3.937,
+      "frase": 1
+    },
+    {
+      "testo": "phone",
+      "inizio": 3.937,
+      "fine": 4.288,
+      "frase": 1
+    },
+    {
+      "testo": "sends",
+      "inizio": 4.288,
+      "fine": 4.491,
+      "frase": 1
+    },
+    {
+      "testo": "them",
+      "inizio": 4.491,
+      "fine": 4.694,
+      "frase": 1
+    },
+    {
+      "testo": "nothing:",
+      "inizio": 4.694,
+      "fine": 5.045,
+      "frase": 1
+    },
+    {
+      "testo": "it",
+      "inizio": 5.285,
+      "fine": 5.488,
+      "frase": 1
+    },
+    {
+      "testo": "just",
+      "inizio": 5.488,
+      "fine": 5.691,
+      "frase": 1
+    },
+    {
+      "testo": "listens.",
+      "inizio": 5.691,
+      "fine": 6.042,
+      "frase": 1,
+      "enfasi": true
+    },
+    {
+      "testo": "Above",
+      "inizio": 6.422,
+      "fine": 6.921,
+      "frase": 2
+    },
+    {
+      "testo": "you,",
+      "inizio": 6.921,
+      "fine": 7.124,
+      "frase": 2
+    },
+    {
+      "testo": "twenty",
+      "inizio": 7.264,
+      "fine": 7.615,
+      "frase": 2,
+      "enfasi": true
+    },
+    {
+      "testo": "thousand",
+      "inizio": 7.615,
+      "fine": 7.966,
+      "frase": 2
+    },
+    {
+      "testo": "kilometers",
+      "inizio": 7.966,
+      "fine": 8.613,
+      "frase": 2
+    },
+    {
+      "testo": "up,",
+      "inizio": 8.613,
+      "fine": 8.816,
+      "frase": 2
+    },
+    {
+      "testo": "fly",
+      "inizio": 8.956,
+      "fine": 9.159,
+      "frase": 2
+    },
+    {
+      "testo": "more",
+      "inizio": 9.159,
+      "fine": 9.51,
+      "frase": 2
+    },
+    {
+      "testo": "than",
+      "inizio": 9.51,
+      "fine": 9.713,
+      "frase": 2
+    },
+    {
+      "testo": "thirty",
+      "inizio": 9.713,
+      "fine": 10.064,
+      "frase": 2,
+      "enfasi": true
+    },
+    {
+      "testo": "satellites.",
+      "inizio": 10.064,
+      "fine": 10.711,
+      "frase": 2
+    },
+    {
+      "testo": "Each",
+      "inizio": 11.091,
+      "fine": 11.294,
+      "frase": 3
+    },
+    {
+      "testo": "one",
+      "inizio": 11.294,
+      "fine": 11.645,
+      "frase": 3
+    },
+    {
+      "testo": "repeats",
+      "inizio": 11.645,
+      "fine": 11.996,
+      "frase": 3
+    },
+    {
+      "testo": "two",
+      "inizio": 11.996,
+      "fine": 12.199,
+      "frase": 3,
+      "enfasi": true
+    },
+    {
+      "testo": "things:",
+      "inizio": 12.199,
+      "fine": 12.402,
+      "frase": 3
+    },
+    {
+      "testo": "where",
+      "inizio": 12.642,
+      "fine": 12.993,
+      "frase": 3
+    },
+    {
+      "testo": "it",
+      "inizio": 12.993,
+      "fine": 13.196,
+      "frase": 3
+    },
+    {
+      "testo": "is",
+      "inizio": 13.196,
+      "fine": 13.399,
+      "frase": 3
+    },
+    {
+      "testo": "and",
+      "inizio": 13.399,
+      "fine": 13.602,
+      "frase": 3
+    },
+    {
+      "testo": "what",
+      "inizio": 13.602,
+      "fine": 13.805,
+      "frase": 3
+    },
+    {
+      "testo": "time",
+      "inizio": 13.805,
+      "fine": 14.156,
+      "frase": 3
+    },
+    {
+      "testo": "it",
+      "inizio": 14.156,
+      "fine": 14.359,
+      "frase": 3
+    },
+    {
+      "testo": "is.",
+      "inizio": 14.359,
+      "fine": 14.562,
+      "frase": 3
+    },
+    {
+      "testo": "The",
+      "inizio": 14.942,
+      "fine": 15.145,
+      "frase": 4
+    },
+    {
+      "testo": "signal",
+      "inizio": 15.145,
+      "fine": 15.496,
+      "frase": 4
+    },
+    {
+      "testo": "travels",
+      "inizio": 15.496,
+      "fine": 15.847,
+      "frase": 4
+    },
+    {
+      "testo": "at",
+      "inizio": 15.847,
+      "fine": 16.05,
+      "frase": 4
+    },
+    {
+      "testo": "the",
+      "inizio": 16.05,
+      "fine": 16.253,
+      "frase": 4
+    },
+    {
+      "testo": "speed",
+      "inizio": 16.253,
+      "fine": 16.456,
+      "frase": 4
+    },
+    {
+      "testo": "of",
+      "inizio": 16.456,
+      "fine": 16.659,
+      "frase": 4
+    },
+    {
+      "testo": "light:",
+      "inizio": 16.659,
+      "fine": 16.862,
+      "frase": 4,
+      "enfasi": true
+    },
+    {
+      "testo": "it",
+      "inizio": 17.102,
+      "fine": 17.305,
+      "frase": 4
+    },
+    {
+      "testo": "arrives",
+      "inizio": 17.305,
+      "fine": 17.804,
+      "frase": 4
+    },
+    {
+      "testo": "in",
+      "inizio": 17.804,
+      "fine": 18.007,
+      "frase": 4
+    },
+    {
+      "testo": "about",
+      "inizio": 18.007,
+      "fine": 18.358,
+      "frase": 4
+    },
+    {
+      "testo": "seventy",
+      "inizio": 18.358,
+      "fine": 18.857,
+      "frase": 4,
+      "enfasi": true
+    },
+    {
+      "testo": "milliseconds.",
+      "inizio": 18.857,
+      "fine": 19.504,
+      "frase": 4
+    },
+    {
+      "testo": "From",
+      "inizio": 19.884,
+      "fine": 20.087,
+      "frase": 5
+    },
+    {
+      "testo": "that",
+      "inizio": 20.087,
+      "fine": 20.29,
+      "frase": 5
+    },
+    {
+      "testo": "delay,",
+      "inizio": 20.29,
+      "fine": 20.641,
+      "frase": 5
+    },
+    {
+      "testo": "your",
+      "inizio": 20.781,
+      "fine": 20.984,
+      "frase": 5
+    },
+    {
+      "testo": "phone",
+      "inizio": 20.984,
+      "fine": 21.335,
+      "frase": 5
+    },
+    {
+      "testo": "works",
+      "inizio": 21.335,
+      "fine": 21.538,
+      "frase": 5
+    },
+    {
+      "testo": "out",
+      "inizio": 21.538,
+      "fine": 21.741,
+      "frase": 5
+    },
+    {
+      "testo": "the",
+      "inizio": 21.741,
+      "fine": 21.944,
+      "frase": 5
+    },
+    {
+      "testo": "distance.",
+      "inizio": 21.944,
+      "fine": 22.443,
+      "frase": 5,
+      "enfasi": true
+    },
+    {
+      "testo": "One",
+      "inizio": 22.823,
+      "fine": 23.174,
+      "frase": 6
+    },
+    {
+      "testo": "satellite",
+      "inizio": 23.174,
+      "fine": 23.821,
+      "frase": 6
+    },
+    {
+      "testo": "puts",
+      "inizio": 23.821,
+      "fine": 24.024,
+      "frase": 6
+    },
+    {
+      "testo": "you",
+      "inizio": 24.024,
+      "fine": 24.227,
+      "frase": 6
+    },
+    {
+      "testo": "on",
+      "inizio": 24.227,
+      "fine": 24.43,
+      "frase": 6
+    },
+    {
+      "testo": "a",
+      "inizio": 24.43,
+      "fine": 24.633,
+      "frase": 6
+    },
+    {
+      "testo": "circle.",
+      "inizio": 24.633,
+      "fine": 24.984,
+      "frase": 6,
+      "enfasi": true
+    },
+    {
+      "testo": "Three",
+      "inizio": 25.364,
+      "fine": 25.567,
+      "frase": 7
+    },
+    {
+      "testo": "circles",
+      "inizio": 25.567,
+      "fine": 25.918,
+      "frase": 7
+    },
+    {
+      "testo": "cross",
+      "inizio": 25.918,
+      "fine": 26.121,
+      "frase": 7
+    },
+    {
+      "testo": "at",
+      "inizio": 26.121,
+      "fine": 26.324,
+      "frase": 7
+    },
+    {
+      "testo": "a",
+      "inizio": 26.324,
+      "fine": 26.527,
+      "frase": 7
+    },
+    {
+      "testo": "single",
+      "inizio": 26.527,
+      "fine": 26.878,
+      "frase": 7
+    },
+    {
+      "testo": "point.",
+      "inizio": 26.878,
+      "fine": 27.081,
+      "frase": 7,
+      "enfasi": true
+    },
+    {
+      "testo": "The",
+      "inizio": 27.461,
+      "fine": 27.664,
+      "frase": 8
+    },
+    {
+      "testo": "fourth",
+      "inizio": 27.664,
+      "fine": 27.867,
+      "frase": 8,
+      "enfasi": true
+    },
+    {
+      "testo": "corrects",
+      "inizio": 27.867,
+      "fine": 28.218,
+      "frase": 8
+    },
+    {
+      "testo": "your",
+      "inizio": 28.218,
+      "fine": 28.421,
+      "frase": 8
+    },
+    {
+      "testo": "phone's",
+      "inizio": 28.421,
+      "fine": 28.772,
+      "frase": 8
+    },
+    {
+      "testo": "clock.",
+      "inizio": 28.772,
+      "fine": 28.975,
+      "frase": 8
+    },
+    {
+      "testo": "One",
+      "inizio": 29.355,
+      "fine": 29.706,
+      "frase": 9
+    },
+    {
+      "testo": "absurd",
+      "inizio": 29.706,
+      "fine": 30.057,
+      "frase": 9,
+      "enfasi": true
+    },
+    {
+      "testo": "detail:",
+      "inizio": 30.057,
+      "fine": 30.408,
+      "frase": 9
+    },
+    {
+      "testo": "up",
+      "inizio": 30.648,
+      "fine": 30.851,
+      "frase": 9
+    },
+    {
+      "testo": "there,",
+      "inizio": 30.851,
+      "fine": 31.202,
+      "frase": 9
+    },
+    {
+      "testo": "time",
+      "inizio": 31.342,
+      "fine": 31.693,
+      "frase": 9
+    },
+    {
+      "testo": "runs",
+      "inizio": 31.693,
+      "fine": 31.896,
+      "frase": 9
+    },
+    {
+      "testo": "faster,",
+      "inizio": 31.896,
+      "fine": 32.247,
+      "frase": 9,
+      "enfasi": true
+    },
+    {
+      "testo": "by",
+      "inizio": 32.387,
+      "fine": 32.59,
+      "frase": 9
+    },
+    {
+      "testo": "thirty-eight",
+      "inizio": 32.59,
+      "fine": 33.089,
+      "frase": 9,
+      "enfasi": true
+    },
+    {
+      "testo": "millionths",
+      "inizio": 33.089,
+      "fine": 33.44,
+      "frase": 9
+    },
+    {
+      "testo": "of",
+      "inizio": 33.44,
+      "fine": 33.643,
+      "frase": 9
+    },
+    {
+      "testo": "a",
+      "inizio": 33.643,
+      "fine": 33.846,
+      "frase": 9
+    },
+    {
+      "testo": "second",
+      "inizio": 33.846,
+      "fine": 34.197,
+      "frase": 9
+    },
+    {
+      "testo": "a",
+      "inizio": 34.197,
+      "fine": 34.4,
+      "frase": 9
+    },
+    {
+      "testo": "day.",
+      "inizio": 34.4,
+      "fine": 34.603,
+      "frase": 9
+    },
+    {
+      "testo": "It",
+      "inizio": 34.983,
+      "fine": 35.186,
+      "frase": 10
+    },
+    {
+      "testo": "sounds",
+      "inizio": 35.186,
+      "fine": 35.389,
+      "frase": 10
+    },
+    {
+      "testo": "like",
+      "inizio": 35.389,
+      "fine": 35.74,
+      "frase": 10
+    },
+    {
+      "testo": "nothing,",
+      "inizio": 35.74,
+      "fine": 36.091,
+      "frase": 10
+    },
+    {
+      "testo": "but",
+      "inizio": 36.231,
+      "fine": 36.434,
+      "frase": 10
+    },
+    {
+      "testo": "at",
+      "inizio": 36.434,
+      "fine": 36.637,
+      "frase": 10
+    },
+    {
+      "testo": "the",
+      "inizio": 36.637,
+      "fine": 36.84,
+      "frase": 10
+    },
+    {
+      "testo": "speed",
+      "inizio": 36.84,
+      "fine": 37.043,
+      "frase": 10
+    },
+    {
+      "testo": "of",
+      "inizio": 37.043,
+      "fine": 37.246,
+      "frase": 10
+    },
+    {
+      "testo": "light",
+      "inizio": 37.246,
+      "fine": 37.449,
+      "frase": 10
+    },
+    {
+      "testo": "that's",
+      "inizio": 37.449,
+      "fine": 37.652,
+      "frase": 10
+    },
+    {
+      "testo": "about",
+      "inizio": 37.652,
+      "fine": 38.003,
+      "frase": 10
+    },
+    {
+      "testo": "ten",
+      "inizio": 38.003,
+      "fine": 38.206,
+      "frase": 10,
+      "enfasi": true
+    },
+    {
+      "testo": "kilometers",
+      "inizio": 38.206,
+      "fine": 38.853,
+      "frase": 10
+    },
+    {
+      "testo": "of",
+      "inizio": 38.853,
+      "fine": 39.056,
+      "frase": 10
+    },
+    {
+      "testo": "error",
+      "inizio": 39.056,
+      "fine": 39.407,
+      "frase": 10
+    },
+    {
+      "testo": "per",
+      "inizio": 39.407,
+      "fine": 39.61,
+      "frase": 10
+    },
+    {
+      "testo": "day.",
+      "inizio": 39.61,
+      "fine": 39.813,
+      "frase": 10
+    },
+    {
+      "testo": "That's",
+      "inizio": 40.193,
+      "fine": 40.396,
+      "frase": 11
+    },
+    {
+      "testo": "why",
+      "inizio": 40.396,
+      "fine": 40.599,
+      "frase": 11
+    },
+    {
+      "testo": "satellite",
+      "inizio": 40.599,
+      "fine": 41.246,
+      "frase": 11
+    },
+    {
+      "testo": "clocks",
+      "inizio": 41.246,
+      "fine": 41.449,
+      "frase": 11
+    },
+    {
+      "testo": "are",
+      "inizio": 41.449,
+      "fine": 41.8,
+      "frase": 11
+    },
+    {
+      "testo": "corrected",
+      "inizio": 41.8,
+      "fine": 42.299,
+      "frase": 11
+    },
+    {
+      "testo": "with",
+      "inizio": 42.299,
+      "fine": 42.502,
+      "frase": 11
+    },
+    {
+      "testo": "Einstein's",
+      "inizio": 42.502,
+      "fine": 42.853,
+      "frase": 11,
+      "enfasi": true
+    },
+    {
+      "testo": "equations.",
+      "inizio": 42.853,
+      "fine": 43.352,
+      "frase": 11
+    },
+    {
+      "testo": "Comment",
+      "inizio": 43.732,
+      "fine": 44.083,
+      "frase": 12
+    },
+    {
+      "testo": "GPS",
+      "inizio": 44.083,
+      "fine": 44.73,
+      "frase": 12,
+      "enfasi": true
+    },
+    {
+      "testo": "and",
+      "inizio": 44.73,
+      "fine": 44.933,
+      "frase": 12
+    },
+    {
+      "testo": "I'll",
+      "inizio": 44.933,
+      "fine": 45.136,
+      "frase": 12
+    },
+    {
+      "testo": "send",
+      "inizio": 45.136,
+      "fine": 45.339,
+      "frase": 12
+    },
+    {
+      "testo": "you",
+      "inizio": 45.339,
+      "fine": 45.542,
+      "frase": 12
+    },
+    {
+      "testo": "the",
+      "inizio": 45.542,
+      "fine": 45.745,
+      "frase": 12
+    },
+    {
+      "testo": "sources.",
+      "inizio": 45.745,
+      "fine": 46.096,
+      "frase": 12
+    }
+  ]
+}

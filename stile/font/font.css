@@ -1,0 +1,30 @@
+/* Font del kit. Per cambiarli: metti i file in questa cartella, aggiorna queste regole
+   e i nomi in stile/stile.ts. Licenza dei font inclusi: vedi LICENZA-Inter.txt. */
+@font-face {
+  font-family: "Inter Display";
+  src: url("/stile/font/InterDisplay-Black.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Inter Display";
+  src: url("/stile/font/InterDisplay-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Inter Display";
+  src: url("/stile/font/InterDisplay-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/stile/font/Inter-SemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: block;
+}

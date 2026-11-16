@@ -1,0 +1,12 @@
+node_modules/
+.fmlab/
+.env
+*.tmp.mp4
+*.bozza.mp4
+reels/*/provini/
+.DS_Store
+
+# video di riferimento: sono di altri, restano solo sul computer
+riferimenti/*.mp4
+riferimenti/*.MP4
+riferimenti/*.mov

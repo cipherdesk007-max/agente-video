@@ -1,0 +1,18 @@
+# Prove veloci a ogni modifica: solo logica (copione, tempi, gesti, 3D, impostazioni), senza browser e senza render.
+# Il controllo completo, con il render di prova, si fa sul proprio computer:  npm run collaudo
+name: prove
+on:
+  push:
+  pull_request:
+jobs:
+  prove:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # --ignore-scripts: non scarica il programma ffmpeg (qui non serve) e l'installazione dura pochi secondi
+      - run: npm install --no-audit --no-fund --ignore-scripts
+      - run: npm test

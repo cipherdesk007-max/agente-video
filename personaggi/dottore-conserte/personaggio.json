@@ -1,0 +1,316 @@
+{
+  "nome": "Dottore PEPTMAP a braccia conserte",
+  "tipo": "pupazzo",
+  "immagine": "base.png",
+  "misure": [
+    1230,
+    1278
+  ],
+  "video": {
+    "larghezza": 580,
+    "sborda": 0.05,
+    "rientro": 24
+  },
+  "pezzi": {
+    "bocca-chiusa": {
+      "file": "bocca-chiusa.png",
+      "x": 541,
+      "y": 334
+    },
+    "bocca-3": {
+      "file": "bocca-3.png",
+      "x": 542,
+      "y": 337
+    },
+    "bocca-2": {
+      "file": "bocca-2.png",
+      "x": 542,
+      "y": 337
+    },
+    "bocca-1": {
+      "file": "bocca-1.png",
+      "x": 542,
+      "y": 337
+    },
+    "occhi-mezzi": {
+      "file": "occhi-mezzi.png",
+      "x": 509,
+      "y": 222
+    },
+    "occhi-chiusi": {
+      "file": "occhi-chiusi.png",
+      "x": 509,
+      "y": 222
+    },
+    "scritta-specchio": {
+      "file": "scritta-specchio.png",
+      "x": 710,
+      "y": 650
+    }
+  },
+  "ossa": {
+    "testa": {
+      "perno": [
+        604,
+        468
+      ],
+      "zona": {
+        "tipo": "poligono",
+        "punti": [
+          [
+            428,
+            150
+          ],
+          [
+            438,
+            62
+          ],
+          [
+            498,
+            14
+          ],
+          [
+            600,
+            0
+          ],
+          [
+            702,
+            10
+          ],
+          [
+            768,
+            58
+          ],
+          [
+            788,
+            150
+          ],
+          [
+            792,
+            250
+          ],
+          [
+            772,
+            330
+          ],
+          [
+            746,
+            394
+          ],
+          [
+            692,
+            438
+          ],
+          [
+            612,
+            454
+          ],
+          [
+            540,
+            440
+          ],
+          [
+            490,
+            396
+          ],
+          [
+            450,
+            322
+          ],
+          [
+            424,
+            250
+          ]
+        ]
+      },
+      "sfuma": 44
+    },
+    "viso": {
+      "perno": [
+        600,
+        262
+      ],
+      "zona": {
+        "tipo": "poligono",
+        "punti": [
+          [
+            482,
+            182
+          ],
+          [
+            540,
+            162
+          ],
+          [
+            660,
+            156
+          ],
+          [
+            728,
+            176
+          ],
+          [
+            744,
+            230
+          ],
+          [
+            734,
+            300
+          ],
+          [
+            700,
+            360
+          ],
+          [
+            650,
+            394
+          ],
+          [
+            600,
+            404
+          ],
+          [
+            550,
+            392
+          ],
+          [
+            506,
+            350
+          ],
+          [
+            480,
+            290
+          ]
+        ]
+      },
+      "sfuma": 48,
+      "genitore": "testa"
+    },
+    "mascella": {
+      "perno": [
+        602,
+        346
+      ],
+      "zona": {
+        "tipo": "poligono",
+        "punti": [
+          [
+            538,
+            374
+          ],
+          [
+            580,
+            382
+          ],
+          [
+            640,
+            378
+          ],
+          [
+            690,
+            364
+          ],
+          [
+            722,
+            374
+          ],
+          [
+            712,
+            408
+          ],
+          [
+            680,
+            436
+          ],
+          [
+            620,
+            452
+          ],
+          [
+            570,
+            446
+          ],
+          [
+            534,
+            412
+          ]
+        ]
+      },
+      "sfuma": 22,
+      "genitore": "testa"
+    },
+    "bocca": {
+      "perno": [
+        602,
+        345
+      ],
+      "zona": {
+        "tipo": "ellisse",
+        "centro": [
+          602,
+          345
+        ],
+        "raggi": [
+          64,
+          25
+        ]
+      },
+      "sfuma": 18,
+      "genitore": "testa"
+    }
+  },
+  "bocche": [
+    "bocca-chiusa",
+    "bocca-3",
+    "bocca-2",
+    "bocca-1"
+  ],
+  "bocca": {
+    "x1": 544,
+    "y1": 349,
+    "x2": 661,
+    "y2": 339,
+    "apertura": 24
+  },
+  "occhi": [
+    "occhi-mezzi",
+    "occhi-chiusi"
+  ],
+  "occhiDove": [
+    {
+      "x1": 511,
+      "y1": 246,
+      "x2": 561,
+      "y2": 248,
+      "su": 14,
+      "giu": 6
+    },
+    {
+      "x1": 624,
+      "y1": 242,
+      "x2": 674,
+      "y2": 237,
+      "su": 14,
+      "giu": 5
+    }
+  ],
+  "specchio": "scritta-specchio",
+  "scritta": {
+    "riquadro": [
+      716,
+      656,
+      884,
+      786
+    ],
+    "sposta": [
+      0,
+      0
+    ]
+  },
+  "figuraDi": "dottore",
+  "ampiezza": 1,
+  "labiale": {
+    "mascella": 5,
+    "stringe": 0.1
+  }
+}

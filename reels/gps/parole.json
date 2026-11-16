@@ -1,0 +1,884 @@
+{
+  "versione": 1,
+  "lingua": "it",
+  "motore": "stima",
+  "precisione": "stimata",
+  "voce": null,
+  "durataVoce": 53.994,
+  "coda": 1.4,
+  "durata": 55.4,
+  "fps": 30,
+  "impronta": "db988d7d30c8",
+  "scene": [
+    {
+      "nome": "aggancio",
+      "inizio": 0,
+      "fine": 6.889
+    },
+    {
+      "nome": "orbita",
+      "inizio": 6.889,
+      "fine": 15.891
+    },
+    {
+      "nome": "distanza",
+      "inizio": 15.891,
+      "fine": 25.501
+    },
+    {
+      "nome": "cerchi",
+      "inizio": 25.501,
+      "fine": 33.864
+    },
+    {
+      "nome": "tempo",
+      "inizio": 33.864,
+      "fine": 51.357
+    },
+    {
+      "nome": "chiusura",
+      "inizio": 51.357,
+      "fine": 55.4
+    }
+  ],
+  "segni": {
+    "nonsa": 1.747,
+    "niente": 4.694,
+    "ascolta": 5.636,
+    "sopra": 7.069,
+    "km": 8.169,
+    "sat": 10.508,
+    "due": 12.884,
+    "dove": 13.678,
+    "ora": 14.786,
+    "parte": 16.274,
+    "ms": 20.117,
+    "ritardo": 22.751,
+    "dist": 24.802,
+    "uno": 25.681,
+    "tre": 28.222,
+    "punto": 30.032,
+    "quarto": 31.317,
+    "orologio": 32.167,
+    "veloce": 35.282,
+    "micro": 37.583,
+    "poco": 40.864,
+    "luce": 41.909,
+    "dieci": 43.96,
+    "percio": 46.594,
+    "einstein": 49.199,
+    "commenta": 51.537,
+    "fonti": 53.44
+  },
+  "parole": [
+    {
+      "testo": "I",
+      "inizio": 0.25,
+      "fine": 0.453,
+      "frase": 0
+    },
+    {
+      "testo": "satelliti",
+      "inizio": 0.453,
+      "fine": 1.1,
+      "frase": 0
+    },
+    {
+      "testo": "GPS",
+      "inizio": 1.1,
+      "fine": 1.747,
+      "frase": 0,
+      "enfasi": true
+    },
+    {
+      "testo": "non",
+      "inizio": 1.747,
+      "fine": 1.95,
+      "frase": 0
+    },
+    {
+      "testo": "sanno",
+      "inizio": 1.95,
+      "fine": 2.301,
+      "frase": 0
+    },
+    {
+      "testo": "dove",
+      "inizio": 2.301,
+      "fine": 2.652,
+      "frase": 0
+    },
+    {
+      "testo": "sei.",
+      "inizio": 2.652,
+      "fine": 2.855,
+      "frase": 0
+    },
+    {
+      "testo": "Il",
+      "inizio": 3.235,
+      "fine": 3.438,
+      "frase": 1
+    },
+    {
+      "testo": "tuo",
+      "inizio": 3.438,
+      "fine": 3.641,
+      "frase": 1
+    },
+    {
+      "testo": "telefono",
+      "inizio": 3.641,
+      "fine": 4.288,
+      "frase": 1
+    },
+    {
+      "testo": "non",
+      "inizio": 4.288,
+      "fine": 4.491,
+      "frase": 1
+    },
+    {
+      "testo": "gli",
+      "inizio": 4.491,
+      "fine": 4.694,
+      "frase": 1
+    },
+    {
+      "testo": "manda",
+      "inizio": 4.694,
+      "fine": 5.045,
+      "frase": 1
+    },
+    {
+      "testo": "niente:",
+      "inizio": 5.045,
+      "fine": 5.396,
+      "frase": 1
+    },
+    {
+      "testo": "ascolta",
+      "inizio": 5.636,
+      "fine": 6.135,
+      "frase": 1,
+      "enfasi": true
+    },
+    {
+      "testo": "e",
+      "inizio": 6.135,
+      "fine": 6.338,
+      "frase": 1
+    },
+    {
+      "testo": "basta.",
+      "inizio": 6.338,
+      "fine": 6.689,
+      "frase": 1
+    },
+    {
+      "testo": "Sopra",
+      "inizio": 7.069,
+      "fine": 7.42,
+      "frase": 2
+    },
+    {
+      "testo": "di",
+      "inizio": 7.42,
+      "fine": 7.623,
+      "frase": 2
+    },
+    {
+      "testo": "te,",
+      "inizio": 7.623,
+      "fine": 7.826,
+      "frase": 2
+    },
+    {
+      "testo": "a",
+      "inizio": 7.966,
+      "fine": 8.169,
+      "frase": 2
+    },
+    {
+      "testo": "ventimila",
+      "inizio": 8.169,
+      "fine": 8.816,
+      "frase": 2,
+      "enfasi": true
+    },
+    {
+      "testo": "chilometri,",
+      "inizio": 8.816,
+      "fine": 9.463,
+      "frase": 2
+    },
+    {
+      "testo": "volano",
+      "inizio": 9.603,
+      "fine": 10.102,
+      "frase": 2
+    },
+    {
+      "testo": "più",
+      "inizio": 10.102,
+      "fine": 10.305,
+      "frase": 2
+    },
+    {
+      "testo": "di",
+      "inizio": 10.305,
+      "fine": 10.508,
+      "frase": 2
+    },
+    {
+      "testo": "trenta",
+      "inizio": 10.508,
+      "fine": 10.859,
+      "frase": 2,
+      "enfasi": true
+    },
+    {
+      "testo": "satelliti.",
+      "inizio": 10.859,
+      "fine": 11.506,
+      "frase": 2
+    },
+    {
+      "testo": "Ognuno",
+      "inizio": 11.886,
+      "fine": 12.385,
+      "frase": 3
+    },
+    {
+      "testo": "ripete",
+      "inizio": 12.385,
+      "fine": 12.884,
+      "frase": 3
+    },
+    {
+      "testo": "due",
+      "inizio": 12.884,
+      "fine": 13.087,
+      "frase": 3,
+      "enfasi": true
+    },
+    {
+      "testo": "cose:",
+      "inizio": 13.087,
+      "fine": 13.438,
+      "frase": 3
+    },
+    {
+      "testo": "dove",
+      "inizio": 13.678,
+      "fine": 14.029,
+      "frase": 3
+    },
+    {
+      "testo": "si",
+      "inizio": 14.029,
+      "fine": 14.232,
+      "frase": 3
+    },
+    {
+      "testo": "trova",
+      "inizio": 14.232,
+      "fine": 14.583,
+      "frase": 3
+    },
+    {
+      "testo": "e",
+      "inizio": 14.583,
+      "fine": 14.786,
+      "frase": 3
+    },
+    {
+      "testo": "che",
+      "inizio": 14.786,
+      "fine": 14.989,
+      "frase": 3
+    },
+    {
+      "testo": "ore",
+      "inizio": 14.989,
+      "fine": 15.34,
+      "frase": 3
+    },
+    {
+      "testo": "sono.",
+      "inizio": 15.34,
+      "fine": 15.691,
+      "frase": 3
+    },
+    {
+      "testo": "Il",
+      "inizio": 16.071,
+      "fine": 16.274,
+      "frase": 4
+    },
+    {
+      "testo": "segnale",
+      "inizio": 16.274,
+      "fine": 16.773,
+      "frase": 4
+    },
+    {
+      "testo": "viaggia",
+      "inizio": 16.773,
+      "fine": 17.124,
+      "frase": 4
+    },
+    {
+      "testo": "alla",
+      "inizio": 17.124,
+      "fine": 17.475,
+      "frase": 4
+    },
+    {
+      "testo": "velocità",
+      "inizio": 17.475,
+      "fine": 18.122,
+      "frase": 4
+    },
+    {
+      "testo": "della",
+      "inizio": 18.122,
+      "fine": 18.473,
+      "frase": 4
+    },
+    {
+      "testo": "luce:",
+      "inizio": 18.473,
+      "fine": 18.824,
+      "frase": 4,
+      "enfasi": true
+    },
+    {
+      "testo": "arriva",
+      "inizio": 19.064,
+      "fine": 19.563,
+      "frase": 4
+    },
+    {
+      "testo": "in",
+      "inizio": 19.563,
+      "fine": 19.766,
+      "frase": 4
+    },
+    {
+      "testo": "circa",
+      "inizio": 19.766,
+      "fine": 20.117,
+      "frase": 4
+    },
+    {
+      "testo": "settanta",
+      "inizio": 20.117,
+      "fine": 20.616,
+      "frase": 4,
+      "enfasi": true
+    },
+    {
+      "testo": "millesimi",
+      "inizio": 20.616,
+      "fine": 21.263,
+      "frase": 4
+    },
+    {
+      "testo": "di",
+      "inizio": 21.263,
+      "fine": 21.466,
+      "frase": 4
+    },
+    {
+      "testo": "secondo.",
+      "inizio": 21.466,
+      "fine": 21.965,
+      "frase": 4
+    },
+    {
+      "testo": "Da",
+      "inizio": 22.345,
+      "fine": 22.548,
+      "frase": 5
+    },
+    {
+      "testo": "quel",
+      "inizio": 22.548,
+      "fine": 22.751,
+      "frase": 5
+    },
+    {
+      "testo": "ritardo",
+      "inizio": 22.751,
+      "fine": 23.25,
+      "frase": 5
+    },
+    {
+      "testo": "il",
+      "inizio": 23.25,
+      "fine": 23.453,
+      "frase": 5
+    },
+    {
+      "testo": "telefono",
+      "inizio": 23.453,
+      "fine": 24.1,
+      "frase": 5
+    },
+    {
+      "testo": "calcola",
+      "inizio": 24.1,
+      "fine": 24.599,
+      "frase": 5
+    },
+    {
+      "testo": "la",
+      "inizio": 24.599,
+      "fine": 24.802,
+      "frase": 5
+    },
+    {
+      "testo": "distanza.",
+      "inizio": 24.802,
+      "fine": 25.301,
+      "frase": 5,
+      "enfasi": true
+    },
+    {
+      "testo": "Un",
+      "inizio": 25.681,
+      "fine": 25.884,
+      "frase": 6
+    },
+    {
+      "testo": "satellite",
+      "inizio": 25.884,
+      "fine": 26.531,
+      "frase": 6
+    },
+    {
+      "testo": "ti",
+      "inizio": 26.531,
+      "fine": 26.734,
+      "frase": 6
+    },
+    {
+      "testo": "mette",
+      "inizio": 26.734,
+      "fine": 27.085,
+      "frase": 6
+    },
+    {
+      "testo": "su",
+      "inizio": 27.085,
+      "fine": 27.288,
+      "frase": 6
+    },
+    {
+      "testo": "un",
+      "inizio": 27.288,
+      "fine": 27.491,
+      "frase": 6
+    },
+    {
+      "testo": "cerchio.",
+      "inizio": 27.491,
+      "fine": 27.842,
+      "frase": 6,
+      "enfasi": true
+    },
+    {
+      "testo": "Tre",
+      "inizio": 28.222,
+      "fine": 28.425,
+      "frase": 7
+    },
+    {
+      "testo": "cerchi",
+      "inizio": 28.425,
+      "fine": 28.776,
+      "frase": 7
+    },
+    {
+      "testo": "si",
+      "inizio": 28.776,
+      "fine": 28.979,
+      "frase": 7
+    },
+    {
+      "testo": "incrociano",
+      "inizio": 28.979,
+      "fine": 29.626,
+      "frase": 7
+    },
+    {
+      "testo": "in",
+      "inizio": 29.626,
+      "fine": 29.829,
+      "frase": 7
+    },
+    {
+      "testo": "un",
+      "inizio": 29.829,
+      "fine": 30.032,
+      "frase": 7
+    },
+    {
+      "testo": "punto",
+      "inizio": 30.032,
+      "fine": 30.383,
+      "frase": 7,
+      "enfasi": true
+    },
+    {
+      "testo": "solo.",
+      "inizio": 30.383,
+      "fine": 30.734,
+      "frase": 7
+    },
+    {
+      "testo": "Il",
+      "inizio": 31.114,
+      "fine": 31.317,
+      "frase": 8
+    },
+    {
+      "testo": "quarto",
+      "inizio": 31.317,
+      "fine": 31.668,
+      "frase": 8,
+      "enfasi": true
+    },
+    {
+      "testo": "corregge",
+      "inizio": 31.668,
+      "fine": 32.167,
+      "frase": 8
+    },
+    {
+      "testo": "l'orologio",
+      "inizio": 32.167,
+      "fine": 32.814,
+      "frase": 8
+    },
+    {
+      "testo": "del",
+      "inizio": 32.814,
+      "fine": 33.017,
+      "frase": 8
+    },
+    {
+      "testo": "telefono.",
+      "inizio": 33.017,
+      "fine": 33.664,
+      "frase": 8
+    },
+    {
+      "testo": "Dettaglio",
+      "inizio": 34.044,
+      "fine": 34.543,
+      "frase": 9
+    },
+    {
+      "testo": "assurdo:",
+      "inizio": 34.543,
+      "fine": 35.042,
+      "frase": 9,
+      "enfasi": true
+    },
+    {
+      "testo": "lassù",
+      "inizio": 35.282,
+      "fine": 35.633,
+      "frase": 9
+    },
+    {
+      "testo": "il",
+      "inizio": 35.633,
+      "fine": 35.836,
+      "frase": 9
+    },
+    {
+      "testo": "tempo",
+      "inizio": 35.836,
+      "fine": 36.187,
+      "frase": 9
+    },
+    {
+      "testo": "scorre",
+      "inizio": 36.187,
+      "fine": 36.538,
+      "frase": 9
+    },
+    {
+      "testo": "più",
+      "inizio": 36.538,
+      "fine": 36.741,
+      "frase": 9
+    },
+    {
+      "testo": "veloce,",
+      "inizio": 36.741,
+      "fine": 37.24,
+      "frase": 9,
+      "enfasi": true
+    },
+    {
+      "testo": "di",
+      "inizio": 37.38,
+      "fine": 37.583,
+      "frase": 9
+    },
+    {
+      "testo": "trentotto",
+      "inizio": 37.583,
+      "fine": 38.082,
+      "frase": 9,
+      "enfasi": true
+    },
+    {
+      "testo": "milionesimi",
+      "inizio": 38.082,
+      "fine": 38.877,
+      "frase": 9
+    },
+    {
+      "testo": "di",
+      "inizio": 38.877,
+      "fine": 39.08,
+      "frase": 9
+    },
+    {
+      "testo": "secondo",
+      "inizio": 39.08,
+      "fine": 39.579,
+      "frase": 9
+    },
+    {
+      "testo": "al",
+      "inizio": 39.579,
+      "fine": 39.782,
+      "frase": 9
+    },
+    {
+      "testo": "giorno.",
+      "inizio": 39.782,
+      "fine": 40.133,
+      "frase": 9
+    },
+    {
+      "testo": "Sembra",
+      "inizio": 40.513,
+      "fine": 40.864,
+      "frase": 10
+    },
+    {
+      "testo": "niente,",
+      "inizio": 40.864,
+      "fine": 41.215,
+      "frase": 10
+    },
+    {
+      "testo": "ma",
+      "inizio": 41.355,
+      "fine": 41.558,
+      "frase": 10
+    },
+    {
+      "testo": "alla",
+      "inizio": 41.558,
+      "fine": 41.909,
+      "frase": 10
+    },
+    {
+      "testo": "velocità",
+      "inizio": 41.909,
+      "fine": 42.556,
+      "frase": 10
+    },
+    {
+      "testo": "della",
+      "inizio": 42.556,
+      "fine": 42.907,
+      "frase": 10
+    },
+    {
+      "testo": "luce",
+      "inizio": 42.907,
+      "fine": 43.258,
+      "frase": 10
+    },
+    {
+      "testo": "fanno",
+      "inizio": 43.258,
+      "fine": 43.609,
+      "frase": 10
+    },
+    {
+      "testo": "circa",
+      "inizio": 43.609,
+      "fine": 43.96,
+      "frase": 10
+    },
+    {
+      "testo": "dieci",
+      "inizio": 43.96,
+      "fine": 44.311,
+      "frase": 10,
+      "enfasi": true
+    },
+    {
+      "testo": "chilometri",
+      "inizio": 44.311,
+      "fine": 44.958,
+      "frase": 10
+    },
+    {
+      "testo": "di",
+      "inizio": 44.958,
+      "fine": 45.161,
+      "frase": 10
+    },
+    {
+      "testo": "errore",
+      "inizio": 45.161,
+      "fine": 45.66,
+      "frase": 10
+    },
+    {
+      "testo": "al",
+      "inizio": 45.66,
+      "fine": 45.863,
+      "frase": 10
+    },
+    {
+      "testo": "giorno.",
+      "inizio": 45.863,
+      "fine": 46.214,
+      "frase": 10
+    },
+    {
+      "testo": "Per",
+      "inizio": 46.594,
+      "fine": 46.797,
+      "frase": 11
+    },
+    {
+      "testo": "questo",
+      "inizio": 46.797,
+      "fine": 47.148,
+      "frase": 11
+    },
+    {
+      "testo": "gli",
+      "inizio": 47.148,
+      "fine": 47.351,
+      "frase": 11
+    },
+    {
+      "testo": "orologi",
+      "inizio": 47.351,
+      "fine": 47.998,
+      "frase": 11
+    },
+    {
+      "testo": "dei",
+      "inizio": 47.998,
+      "fine": 48.201,
+      "frase": 11
+    },
+    {
+      "testo": "satelliti",
+      "inizio": 48.201,
+      "fine": 48.848,
+      "frase": 11
+    },
+    {
+      "testo": "sono",
+      "inizio": 48.848,
+      "fine": 49.199,
+      "frase": 11
+    },
+    {
+      "testo": "corretti",
+      "inizio": 49.199,
+      "fine": 49.698,
+      "frase": 11
+    },
+    {
+      "testo": "con",
+      "inizio": 49.698,
+      "fine": 49.901,
+      "frase": 11
+    },
+    {
+      "testo": "le",
+      "inizio": 49.901,
+      "fine": 50.104,
+      "frase": 11
+    },
+    {
+      "testo": "formule",
+      "inizio": 50.104,
+      "fine": 50.603,
+      "frase": 11
+    },
+    {
+      "testo": "di",
+      "inizio": 50.603,
+      "fine": 50.806,
+      "frase": 11
+    },
+    {
+      "testo": "Einstein.",
+      "inizio": 50.806,
+      "fine": 51.157,
+      "frase": 11,
+      "enfasi": true
+    },
+    {
+      "testo": "Commenta",
+      "inizio": 51.537,
+      "fine": 52.036,
+      "frase": 12
+    },
+    {
+      "testo": "GPS",
+      "inizio": 52.036,
+      "fine": 52.683,
+      "frase": 12,
+      "enfasi": true
+    },
+    {
+      "testo": "e",
+      "inizio": 52.683,
+      "fine": 52.886,
+      "frase": 12
+    },
+    {
+      "testo": "ti",
+      "inizio": 52.886,
+      "fine": 53.089,
+      "frase": 12
+    },
+    {
+      "testo": "mando",
+      "inizio": 53.089,
+      "fine": 53.44,
+      "frase": 12
+    },
+    {
+      "testo": "le",
+      "inizio": 53.44,
+      "fine": 53.643,
+      "frase": 12
+    },
+    {
+      "testo": "fonti.",
+      "inizio": 53.643,
+      "fine": 53.994,
+      "frase": 12
+    }
+  ]
+}

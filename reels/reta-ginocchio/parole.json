@@ -1,0 +1,1899 @@
+{
+  "versione": 1,
+  "lingua": "it",
+  "motore": "stima",
+  "precisione": "stimata",
+  "voce": null,
+  "durataVoce": 113.3,
+  "coda": 1.4,
+  "durata": 114.7,
+  "fps": 30,
+  "impronta": "897b9945faae",
+  "scene": [
+    {
+      "nome": "aggancio",
+      "inizio": 0,
+      "fine": 13.868
+    },
+    {
+      "nome": "studi",
+      "inizio": 13.868,
+      "fine": 26.241
+    },
+    {
+      "nome": "scala",
+      "inizio": 26.241,
+      "fine": 33.227
+    },
+    {
+      "nome": "risultati",
+      "inizio": 33.227,
+      "fine": 43.939
+    },
+    {
+      "nome": "applauso",
+      "inizio": 43.939,
+      "fine": 54.552
+    },
+    {
+      "nome": "differenza",
+      "inizio": 54.552,
+      "fine": 71.049
+    },
+    {
+      "nome": "rischi",
+      "inizio": 71.049,
+      "fine": 84.191
+    },
+    {
+      "nome": "conclusione",
+      "inizio": 84.191,
+      "fine": 100.011
+    },
+    {
+      "nome": "amico",
+      "inizio": 100.011,
+      "fine": 105.711
+    },
+    {
+      "nome": "chiusura",
+      "inizio": 105.711,
+      "fine": 114.7
+    }
+  ],
+  "segni": {
+    "reta": 1.506,
+    "ginocchio": 2.965,
+    "placebo": 5.211,
+    "meno": 6.412,
+    "quanto": 8.133,
+    "merito": 10.535,
+    "vediamo": 12.116,
+    "due": 16.099,
+    "rivista": 18.057,
+    "coinvolto": 21.19,
+    "mille": 22.04,
+    "anno": 25.136,
+    "scala": 28.823,
+    "dieci": 30.773,
+    "conreta": 33.813,
+    "calareta": 35.209,
+    "quattro": 36.761,
+    "conplacebo": 38.803,
+    "calaplacebo": 41.984,
+    "duepunti": 43.185,
+    "pubblico": 45.633,
+    "prima": 47.481,
+    "palco": 49.494,
+    "aspettarsi": 50.99,
+    "confronta": 57.968,
+    "differenza": 59.169,
+    "entrambi": 60.399,
+    "unodue": 63.347,
+    "miracolo": 67.051,
+    "caso": 70.498,
+    "altro": 71.986,
+    "autori": 74.417,
+    "effetti": 76.32,
+    "gravi": 77.614,
+    "comuni": 80.569,
+    "gastro": 83.048,
+    "duestudi": 85.361,
+    "riduce": 88.169,
+    "piu": 90.072,
+    "chi": 91.56,
+    "azienda": 94.313,
+    "dettagli": 96.762,
+    "manda": 100.191,
+    "scricchiola": 102.5,
+    "scale": 105.16,
+    "commenta": 105.891,
+    "database": 108.496,
+    "essenziali": 110.695,
+    "composti": 112.801
+  },
+  "parole": [
+    {
+      "testo": "Nei",
+      "inizio": 0.25,
+      "fine": 0.453,
+      "frase": 0
+    },
+    {
+      "testo": "nuovi",
+      "inizio": 0.453,
+      "fine": 0.804,
+      "frase": 0
+    },
+    {
+      "testo": "studi",
+      "inizio": 0.804,
+      "fine": 1.155,
+      "frase": 0
+    },
+    {
+      "testo": "sulla",
+      "inizio": 1.155,
+      "fine": 1.506,
+      "frase": 0
+    },
+    {
+      "testo": "Reta",
+      "inizio": 1.506,
+      "fine": 1.857,
+      "frase": 0,
+      "enfasi": true
+    },
+    {
+      "testo": "per",
+      "inizio": 1.857,
+      "fine": 2.06,
+      "frase": 0
+    },
+    {
+      "testo": "il",
+      "inizio": 2.06,
+      "fine": 2.263,
+      "frase": 0
+    },
+    {
+      "testo": "dolore",
+      "inizio": 2.263,
+      "fine": 2.762,
+      "frase": 0
+    },
+    {
+      "testo": "al",
+      "inizio": 2.762,
+      "fine": 2.965,
+      "frase": 0
+    },
+    {
+      "testo": "ginocchio,",
+      "inizio": 2.965,
+      "fine": 3.464,
+      "frase": 0
+    },
+    {
+      "testo": "anche",
+      "inizio": 3.604,
+      "fine": 3.955,
+      "frase": 0
+    },
+    {
+      "testo": "chi",
+      "inizio": 3.955,
+      "fine": 4.158,
+      "frase": 0
+    },
+    {
+      "testo": "ha",
+      "inizio": 4.158,
+      "fine": 4.361,
+      "frase": 0
+    },
+    {
+      "testo": "ricevuto",
+      "inizio": 4.361,
+      "fine": 5.008,
+      "frase": 0
+    },
+    {
+      "testo": "il",
+      "inizio": 5.008,
+      "fine": 5.211,
+      "frase": 0
+    },
+    {
+      "testo": "placebo",
+      "inizio": 5.211,
+      "fine": 5.71,
+      "frase": 0,
+      "enfasi": true
+    },
+    {
+      "testo": "ha",
+      "inizio": 5.71,
+      "fine": 5.913,
+      "frase": 0
+    },
+    {
+      "testo": "avuto",
+      "inizio": 5.913,
+      "fine": 6.412,
+      "frase": 0
+    },
+    {
+      "testo": "meno",
+      "inizio": 6.412,
+      "fine": 6.763,
+      "frase": 0
+    },
+    {
+      "testo": "dolore.",
+      "inizio": 6.763,
+      "fine": 7.262,
+      "frase": 0
+    },
+    {
+      "testo": "Quindi,",
+      "inizio": 7.642,
+      "fine": 7.993,
+      "frase": 1
+    },
+    {
+      "testo": "quanto",
+      "inizio": 8.133,
+      "fine": 8.484,
+      "frase": 1
+    },
+    {
+      "testo": "di",
+      "inizio": 8.484,
+      "fine": 8.687,
+      "frase": 1
+    },
+    {
+      "testo": "questo",
+      "inizio": 8.687,
+      "fine": 9.038,
+      "frase": 1
+    },
+    {
+      "testo": "miglioramento",
+      "inizio": 9.038,
+      "fine": 9.833,
+      "frase": 1
+    },
+    {
+      "testo": "è",
+      "inizio": 9.833,
+      "fine": 10.036,
+      "frase": 1
+    },
+    {
+      "testo": "davvero",
+      "inizio": 10.036,
+      "fine": 10.535,
+      "frase": 1
+    },
+    {
+      "testo": "merito",
+      "inizio": 10.535,
+      "fine": 11.034,
+      "frase": 1,
+      "enfasi": true
+    },
+    {
+      "testo": "della",
+      "inizio": 11.034,
+      "fine": 11.385,
+      "frase": 1
+    },
+    {
+      "testo": "Reta?",
+      "inizio": 11.385,
+      "fine": 11.736,
+      "frase": 1
+    },
+    {
+      "testo": "Vediamo",
+      "inizio": 12.116,
+      "fine": 12.615,
+      "frase": 2
+    },
+    {
+      "testo": "cosa",
+      "inizio": 12.615,
+      "fine": 12.966,
+      "frase": 2
+    },
+    {
+      "testo": "è",
+      "inizio": 12.966,
+      "fine": 13.169,
+      "frase": 2
+    },
+    {
+      "testo": "successo.",
+      "inizio": 13.169,
+      "fine": 13.668,
+      "frase": 2
+    },
+    {
+      "testo": "Questo",
+      "inizio": 14.048,
+      "fine": 14.399,
+      "frase": 3
+    },
+    {
+      "testo": "mese",
+      "inizio": 14.399,
+      "fine": 14.75,
+      "frase": 3
+    },
+    {
+      "testo": "sono",
+      "inizio": 14.75,
+      "fine": 15.101,
+      "frase": 3
+    },
+    {
+      "testo": "stati",
+      "inizio": 15.101,
+      "fine": 15.452,
+      "frase": 3
+    },
+    {
+      "testo": "pubblicati",
+      "inizio": 15.452,
+      "fine": 16.099,
+      "frase": 3
+    },
+    {
+      "testo": "due",
+      "inizio": 16.099,
+      "fine": 16.302,
+      "frase": 3,
+      "enfasi": true
+    },
+    {
+      "testo": "studi",
+      "inizio": 16.302,
+      "fine": 16.653,
+      "frase": 3
+    },
+    {
+      "testo": "sull'uomo",
+      "inizio": 16.653,
+      "fine": 17.152,
+      "frase": 3
+    },
+    {
+      "testo": "in",
+      "inizio": 17.152,
+      "fine": 17.355,
+      "frase": 3
+    },
+    {
+      "testo": "una",
+      "inizio": 17.355,
+      "fine": 17.706,
+      "frase": 3
+    },
+    {
+      "testo": "delle",
+      "inizio": 17.706,
+      "fine": 18.057,
+      "frase": 3
+    },
+    {
+      "testo": "riviste",
+      "inizio": 18.057,
+      "fine": 18.556,
+      "frase": 3
+    },
+    {
+      "testo": "mediche",
+      "inizio": 18.556,
+      "fine": 19.055,
+      "frase": 3
+    },
+    {
+      "testo": "più",
+      "inizio": 19.055,
+      "fine": 19.258,
+      "frase": 3
+    },
+    {
+      "testo": "importanti",
+      "inizio": 19.258,
+      "fine": 19.905,
+      "frase": 3
+    },
+    {
+      "testo": "al",
+      "inizio": 19.905,
+      "fine": 20.108,
+      "frase": 3
+    },
+    {
+      "testo": "mondo.",
+      "inizio": 20.108,
+      "fine": 20.459,
+      "frase": 3
+    },
+    {
+      "testo": "Hanno",
+      "inizio": 20.839,
+      "fine": 21.19,
+      "frase": 4
+    },
+    {
+      "testo": "coinvolto",
+      "inizio": 21.19,
+      "fine": 21.689,
+      "frase": 4
+    },
+    {
+      "testo": "circa",
+      "inizio": 21.689,
+      "fine": 22.04,
+      "frase": 4
+    },
+    {
+      "testo": "mille",
+      "inizio": 22.04,
+      "fine": 22.391,
+      "frase": 4,
+      "enfasi": true
+    },
+    {
+      "testo": "adulti",
+      "inizio": 22.391,
+      "fine": 22.89,
+      "frase": 4
+    },
+    {
+      "testo": "con",
+      "inizio": 22.89,
+      "fine": 23.093,
+      "frase": 4
+    },
+    {
+      "testo": "artrosi",
+      "inizio": 23.093,
+      "fine": 23.592,
+      "frase": 4
+    },
+    {
+      "testo": "al",
+      "inizio": 23.592,
+      "fine": 23.795,
+      "frase": 4
+    },
+    {
+      "testo": "ginocchio,",
+      "inizio": 23.795,
+      "fine": 24.294,
+      "frase": 4
+    },
+    {
+      "testo": "seguiti",
+      "inizio": 24.434,
+      "fine": 24.933,
+      "frase": 4
+    },
+    {
+      "testo": "per",
+      "inizio": 24.933,
+      "fine": 25.136,
+      "frase": 4
+    },
+    {
+      "testo": "oltre",
+      "inizio": 25.136,
+      "fine": 25.487,
+      "frase": 4
+    },
+    {
+      "testo": "un",
+      "inizio": 25.487,
+      "fine": 25.69,
+      "frase": 4
+    },
+    {
+      "testo": "anno.",
+      "inizio": 25.69,
+      "fine": 26.041,
+      "frase": 4
+    },
+    {
+      "testo": "Il",
+      "inizio": 26.421,
+      "fine": 26.624,
+      "frase": 5
+    },
+    {
+      "testo": "dolore",
+      "inizio": 26.624,
+      "fine": 27.123,
+      "frase": 5
+    },
+    {
+      "testo": "veniva",
+      "inizio": 27.123,
+      "fine": 27.622,
+      "frase": 5
+    },
+    {
+      "testo": "valutato",
+      "inizio": 27.622,
+      "fine": 28.269,
+      "frase": 5
+    },
+    {
+      "testo": "su",
+      "inizio": 28.269,
+      "fine": 28.472,
+      "frase": 5
+    },
+    {
+      "testo": "una",
+      "inizio": 28.472,
+      "fine": 28.823,
+      "frase": 5
+    },
+    {
+      "testo": "scala",
+      "inizio": 28.823,
+      "fine": 29.174,
+      "frase": 5,
+      "enfasi": true
+    },
+    {
+      "testo": "da",
+      "inizio": 29.174,
+      "fine": 29.377,
+      "frase": 5
+    },
+    {
+      "testo": "zero",
+      "inizio": 29.377,
+      "fine": 29.728,
+      "frase": 5
+    },
+    {
+      "testo": "a",
+      "inizio": 29.728,
+      "fine": 29.931,
+      "frase": 5
+    },
+    {
+      "testo": "dieci,",
+      "inizio": 29.931,
+      "fine": 30.282,
+      "frase": 5
+    },
+    {
+      "testo": "dove",
+      "inizio": 30.422,
+      "fine": 30.773,
+      "frase": 5
+    },
+    {
+      "testo": "dieci",
+      "inizio": 30.773,
+      "fine": 31.124,
+      "frase": 5
+    },
+    {
+      "testo": "indicava",
+      "inizio": 31.124,
+      "fine": 31.771,
+      "frase": 5
+    },
+    {
+      "testo": "il",
+      "inizio": 31.771,
+      "fine": 31.974,
+      "frase": 5
+    },
+    {
+      "testo": "dolore",
+      "inizio": 31.974,
+      "fine": 32.473,
+      "frase": 5
+    },
+    {
+      "testo": "più",
+      "inizio": 32.473,
+      "fine": 32.676,
+      "frase": 5
+    },
+    {
+      "testo": "forte.",
+      "inizio": 32.676,
+      "fine": 33.027,
+      "frase": 5
+    },
+    {
+      "testo": "Con",
+      "inizio": 33.407,
+      "fine": 33.61,
+      "frase": 6
+    },
+    {
+      "testo": "la",
+      "inizio": 33.61,
+      "fine": 33.813,
+      "frase": 6
+    },
+    {
+      "testo": "Reta,",
+      "inizio": 33.813,
+      "fine": 34.164,
+      "frase": 6
+    },
+    {
+      "testo": "il",
+      "inizio": 34.304,
+      "fine": 34.507,
+      "frase": 6
+    },
+    {
+      "testo": "dolore",
+      "inizio": 34.507,
+      "fine": 35.006,
+      "frase": 6
+    },
+    {
+      "testo": "è",
+      "inizio": 35.006,
+      "fine": 35.209,
+      "frase": 6
+    },
+    {
+      "testo": "diminuito",
+      "inizio": 35.209,
+      "fine": 35.856,
+      "frase": 6
+    },
+    {
+      "testo": "fino",
+      "inizio": 35.856,
+      "fine": 36.207,
+      "frase": 6
+    },
+    {
+      "testo": "a",
+      "inizio": 36.207,
+      "fine": 36.41,
+      "frase": 6
+    },
+    {
+      "testo": "quasi",
+      "inizio": 36.41,
+      "fine": 36.761,
+      "frase": 6
+    },
+    {
+      "testo": "quattro",
+      "inizio": 36.761,
+      "fine": 37.112,
+      "frase": 6,
+      "enfasi": true
+    },
+    {
+      "testo": "punti.",
+      "inizio": 37.112,
+      "fine": 37.463,
+      "frase": 6
+    },
+    {
+      "testo": "Ma",
+      "inizio": 37.843,
+      "fine": 38.046,
+      "frase": 7
+    },
+    {
+      "testo": "anche",
+      "inizio": 38.046,
+      "fine": 38.397,
+      "frase": 7
+    },
+    {
+      "testo": "con",
+      "inizio": 38.397,
+      "fine": 38.6,
+      "frase": 7
+    },
+    {
+      "testo": "il",
+      "inizio": 38.6,
+      "fine": 38.803,
+      "frase": 7
+    },
+    {
+      "testo": "placebo,",
+      "inizio": 38.803,
+      "fine": 39.302,
+      "frase": 7
+    },
+    {
+      "testo": "una",
+      "inizio": 39.442,
+      "fine": 39.793,
+      "frase": 7
+    },
+    {
+      "testo": "sostanza",
+      "inizio": 39.793,
+      "fine": 40.292,
+      "frase": 7
+    },
+    {
+      "testo": "senza",
+      "inizio": 40.292,
+      "fine": 40.643,
+      "frase": 7
+    },
+    {
+      "testo": "principio",
+      "inizio": 40.643,
+      "fine": 41.142,
+      "frase": 7
+    },
+    {
+      "testo": "attivo,",
+      "inizio": 41.142,
+      "fine": 41.641,
+      "frase": 7
+    },
+    {
+      "testo": "è",
+      "inizio": 41.781,
+      "fine": 41.984,
+      "frase": 7
+    },
+    {
+      "testo": "diminuito",
+      "inizio": 41.984,
+      "fine": 42.631,
+      "frase": 7
+    },
+    {
+      "testo": "di",
+      "inizio": 42.631,
+      "fine": 42.834,
+      "frase": 7
+    },
+    {
+      "testo": "circa",
+      "inizio": 42.834,
+      "fine": 43.185,
+      "frase": 7
+    },
+    {
+      "testo": "due",
+      "inizio": 43.185,
+      "fine": 43.388,
+      "frase": 7,
+      "enfasi": true
+    },
+    {
+      "testo": "punti.",
+      "inizio": 43.388,
+      "fine": 43.739,
+      "frase": 7
+    },
+    {
+      "testo": "È",
+      "inizio": 44.119,
+      "fine": 44.322,
+      "frase": 8
+    },
+    {
+      "testo": "un",
+      "inizio": 44.322,
+      "fine": 44.525,
+      "frase": 8
+    },
+    {
+      "testo": "po'",
+      "inizio": 44.525,
+      "fine": 44.728,
+      "frase": 8
+    },
+    {
+      "testo": "come",
+      "inizio": 44.728,
+      "fine": 45.079,
+      "frase": 8
+    },
+    {
+      "testo": "quando",
+      "inizio": 45.079,
+      "fine": 45.43,
+      "frase": 8
+    },
+    {
+      "testo": "il",
+      "inizio": 45.43,
+      "fine": 45.633,
+      "frase": 8
+    },
+    {
+      "testo": "pubblico",
+      "inizio": 45.633,
+      "fine": 46.132,
+      "frase": 8
+    },
+    {
+      "testo": "inizia",
+      "inizio": 46.132,
+      "fine": 46.631,
+      "frase": 8
+    },
+    {
+      "testo": "ad",
+      "inizio": 46.631,
+      "fine": 46.834,
+      "frase": 8
+    },
+    {
+      "testo": "applaudire",
+      "inizio": 46.834,
+      "fine": 47.481,
+      "frase": 8,
+      "enfasi": true
+    },
+    {
+      "testo": "prima",
+      "inizio": 47.481,
+      "fine": 47.832,
+      "frase": 8
+    },
+    {
+      "testo": "ancora",
+      "inizio": 47.832,
+      "fine": 48.331,
+      "frase": 8
+    },
+    {
+      "testo": "che",
+      "inizio": 48.331,
+      "fine": 48.534,
+      "frase": 8
+    },
+    {
+      "testo": "la",
+      "inizio": 48.534,
+      "fine": 48.737,
+      "frase": 8
+    },
+    {
+      "testo": "band",
+      "inizio": 48.737,
+      "fine": 48.94,
+      "frase": 8
+    },
+    {
+      "testo": "salga",
+      "inizio": 48.94,
+      "fine": 49.291,
+      "frase": 8
+    },
+    {
+      "testo": "sul",
+      "inizio": 49.291,
+      "fine": 49.494,
+      "frase": 8
+    },
+    {
+      "testo": "palco:",
+      "inizio": 49.494,
+      "fine": 49.845,
+      "frase": 8
+    },
+    {
+      "testo": "a",
+      "inizio": 50.085,
+      "fine": 50.288,
+      "frase": 8
+    },
+    {
+      "testo": "volte",
+      "inizio": 50.288,
+      "fine": 50.639,
+      "frase": 8
+    },
+    {
+      "testo": "basta",
+      "inizio": 50.639,
+      "fine": 50.99,
+      "frase": 8
+    },
+    {
+      "testo": "aspettarsi",
+      "inizio": 50.99,
+      "fine": 51.637,
+      "frase": 8,
+      "enfasi": true
+    },
+    {
+      "testo": "di",
+      "inizio": 51.637,
+      "fine": 51.84,
+      "frase": 8
+    },
+    {
+      "testo": "stare",
+      "inizio": 51.84,
+      "fine": 52.191,
+      "frase": 8
+    },
+    {
+      "testo": "meglio",
+      "inizio": 52.191,
+      "fine": 52.542,
+      "frase": 8
+    },
+    {
+      "testo": "per",
+      "inizio": 52.542,
+      "fine": 52.745,
+      "frase": 8
+    },
+    {
+      "testo": "provare",
+      "inizio": 52.745,
+      "fine": 53.244,
+      "frase": 8
+    },
+    {
+      "testo": "un",
+      "inizio": 53.244,
+      "fine": 53.447,
+      "frase": 8
+    },
+    {
+      "testo": "po'",
+      "inizio": 53.447,
+      "fine": 53.65,
+      "frase": 8
+    },
+    {
+      "testo": "di",
+      "inizio": 53.65,
+      "fine": 53.853,
+      "frase": 8
+    },
+    {
+      "testo": "sollievo.",
+      "inizio": 53.853,
+      "fine": 54.352,
+      "frase": 8
+    },
+    {
+      "testo": "Quindi,",
+      "inizio": 54.732,
+      "fine": 55.083,
+      "frase": 9
+    },
+    {
+      "testo": "per",
+      "inizio": 55.223,
+      "fine": 55.426,
+      "frase": 9
+    },
+    {
+      "testo": "capire",
+      "inizio": 55.426,
+      "fine": 55.925,
+      "frase": 9
+    },
+    {
+      "testo": "quanto",
+      "inizio": 55.925,
+      "fine": 56.276,
+      "frase": 9
+    },
+    {
+      "testo": "funziona",
+      "inizio": 56.276,
+      "fine": 56.775,
+      "frase": 9
+    },
+    {
+      "testo": "davvero",
+      "inizio": 56.775,
+      "fine": 57.274,
+      "frase": 9
+    },
+    {
+      "testo": "la",
+      "inizio": 57.274,
+      "fine": 57.477,
+      "frase": 9
+    },
+    {
+      "testo": "Reta,",
+      "inizio": 57.477,
+      "fine": 57.828,
+      "frase": 9
+    },
+    {
+      "testo": "bisogna",
+      "inizio": 57.968,
+      "fine": 58.467,
+      "frase": 9
+    },
+    {
+      "testo": "guardare",
+      "inizio": 58.467,
+      "fine": 58.966,
+      "frase": 9
+    },
+    {
+      "testo": "la",
+      "inizio": 58.966,
+      "fine": 59.169,
+      "frase": 9
+    },
+    {
+      "testo": "differenza.",
+      "inizio": 59.169,
+      "fine": 59.816,
+      "frase": 9,
+      "enfasi": true
+    },
+    {
+      "testo": "In",
+      "inizio": 60.196,
+      "fine": 60.399,
+      "frase": 10
+    },
+    {
+      "testo": "entrambi",
+      "inizio": 60.399,
+      "fine": 60.898,
+      "frase": 10
+    },
+    {
+      "testo": "gli",
+      "inizio": 60.898,
+      "fine": 61.101,
+      "frase": 10
+    },
+    {
+      "testo": "studi,",
+      "inizio": 61.101,
+      "fine": 61.452,
+      "frase": 10
+    },
+    {
+      "testo": "il",
+      "inizio": 61.592,
+      "fine": 61.795,
+      "frase": 10
+    },
+    {
+      "testo": "dolore",
+      "inizio": 61.795,
+      "fine": 62.294,
+      "frase": 10
+    },
+    {
+      "testo": "è",
+      "inizio": 62.294,
+      "fine": 62.497,
+      "frase": 10
+    },
+    {
+      "testo": "diminuito",
+      "inizio": 62.497,
+      "fine": 63.144,
+      "frase": 10
+    },
+    {
+      "testo": "da",
+      "inizio": 63.144,
+      "fine": 63.347,
+      "frase": 10
+    },
+    {
+      "testo": "uno",
+      "inizio": 63.347,
+      "fine": 63.698,
+      "frase": 10
+    },
+    {
+      "testo": "a",
+      "inizio": 63.698,
+      "fine": 63.901,
+      "frase": 10
+    },
+    {
+      "testo": "due",
+      "inizio": 63.901,
+      "fine": 64.104,
+      "frase": 10
+    },
+    {
+      "testo": "punti",
+      "inizio": 64.104,
+      "fine": 64.455,
+      "frase": 10
+    },
+    {
+      "testo": "in",
+      "inizio": 64.455,
+      "fine": 64.658,
+      "frase": 10
+    },
+    {
+      "testo": "più",
+      "inizio": 64.658,
+      "fine": 64.861,
+      "frase": 10
+    },
+    {
+      "testo": "rispetto",
+      "inizio": 64.861,
+      "fine": 65.36,
+      "frase": 10
+    },
+    {
+      "testo": "al",
+      "inizio": 65.36,
+      "fine": 65.563,
+      "frase": 10
+    },
+    {
+      "testo": "placebo.",
+      "inizio": 65.563,
+      "fine": 66.062,
+      "frase": 10
+    },
+    {
+      "testo": "Non",
+      "inizio": 66.442,
+      "fine": 66.645,
+      "frase": 11
+    },
+    {
+      "testo": "è",
+      "inizio": 66.645,
+      "fine": 66.848,
+      "frase": 11
+    },
+    {
+      "testo": "un",
+      "inizio": 66.848,
+      "fine": 67.051,
+      "frase": 11
+    },
+    {
+      "testo": "miracolo,",
+      "inizio": 67.051,
+      "fine": 67.698,
+      "frase": 11,
+      "enfasi": true
+    },
+    {
+      "testo": "ma",
+      "inizio": 67.838,
+      "fine": 68.041,
+      "frase": 11
+    },
+    {
+      "testo": "non",
+      "inizio": 68.041,
+      "fine": 68.244,
+      "frase": 11
+    },
+    {
+      "testo": "è",
+      "inizio": 68.244,
+      "fine": 68.447,
+      "frase": 11
+    },
+    {
+      "testo": "nemmeno",
+      "inizio": 68.447,
+      "fine": 68.946,
+      "frase": 11
+    },
+    {
+      "testo": "un",
+      "inizio": 68.946,
+      "fine": 69.149,
+      "frase": 11
+    },
+    {
+      "testo": "risultato",
+      "inizio": 69.149,
+      "fine": 69.796,
+      "frase": 11
+    },
+    {
+      "testo": "dovuto",
+      "inizio": 69.796,
+      "fine": 70.295,
+      "frase": 11
+    },
+    {
+      "testo": "al",
+      "inizio": 70.295,
+      "fine": 70.498,
+      "frase": 11
+    },
+    {
+      "testo": "caso.",
+      "inizio": 70.498,
+      "fine": 70.849,
+      "frase": 11
+    },
+    {
+      "testo": "C'è",
+      "inizio": 71.229,
+      "fine": 71.432,
+      "frase": 12
+    },
+    {
+      "testo": "però",
+      "inizio": 71.432,
+      "fine": 71.783,
+      "frase": 12
+    },
+    {
+      "testo": "un",
+      "inizio": 71.783,
+      "fine": 71.986,
+      "frase": 12
+    },
+    {
+      "testo": "altro",
+      "inizio": 71.986,
+      "fine": 72.337,
+      "frase": 12
+    },
+    {
+      "testo": "aspetto",
+      "inizio": 72.337,
+      "fine": 72.836,
+      "frase": 12
+    },
+    {
+      "testo": "da",
+      "inizio": 72.836,
+      "fine": 73.039,
+      "frase": 12
+    },
+    {
+      "testo": "considerare.",
+      "inizio": 73.039,
+      "fine": 73.834,
+      "frase": 12
+    },
+    {
+      "testo": "Gli",
+      "inizio": 74.214,
+      "fine": 74.417,
+      "frase": 13
+    },
+    {
+      "testo": "autori",
+      "inizio": 74.417,
+      "fine": 74.916,
+      "frase": 13
+    },
+    {
+      "testo": "hanno",
+      "inizio": 74.916,
+      "fine": 75.267,
+      "frase": 13
+    },
+    {
+      "testo": "riportato",
+      "inizio": 75.267,
+      "fine": 75.914,
+      "frase": 13
+    },
+    {
+      "testo": "che",
+      "inizio": 75.914,
+      "fine": 76.117,
+      "frase": 13
+    },
+    {
+      "testo": "gli",
+      "inizio": 76.117,
+      "fine": 76.32,
+      "frase": 13
+    },
+    {
+      "testo": "effetti",
+      "inizio": 76.32,
+      "fine": 76.819,
+      "frase": 13
+    },
+    {
+      "testo": "collaterali",
+      "inizio": 76.819,
+      "fine": 77.614,
+      "frase": 13
+    },
+    {
+      "testo": "gravi",
+      "inizio": 77.614,
+      "fine": 77.965,
+      "frase": 13,
+      "enfasi": true
+    },
+    {
+      "testo": "erano",
+      "inizio": 77.965,
+      "fine": 78.464,
+      "frase": 13
+    },
+    {
+      "testo": "più",
+      "inizio": 78.464,
+      "fine": 78.667,
+      "frase": 13
+    },
+    {
+      "testo": "frequenti",
+      "inizio": 78.667,
+      "fine": 79.166,
+      "frase": 13
+    },
+    {
+      "testo": "con",
+      "inizio": 79.166,
+      "fine": 79.369,
+      "frase": 13
+    },
+    {
+      "testo": "la",
+      "inizio": 79.369,
+      "fine": 79.572,
+      "frase": 13
+    },
+    {
+      "testo": "Reta;",
+      "inizio": 79.572,
+      "fine": 79.923,
+      "frase": 13
+    },
+    {
+      "testo": "i",
+      "inizio": 80.163,
+      "fine": 80.366,
+      "frase": 13
+    },
+    {
+      "testo": "più",
+      "inizio": 80.366,
+      "fine": 80.569,
+      "frase": 13
+    },
+    {
+      "testo": "comuni,",
+      "inizio": 80.569,
+      "fine": 81.068,
+      "frase": 13
+    },
+    {
+      "testo": "in",
+      "inizio": 81.208,
+      "fine": 81.411,
+      "frase": 13
+    },
+    {
+      "testo": "generale,",
+      "inizio": 81.411,
+      "fine": 82.058,
+      "frase": 13
+    },
+    {
+      "testo": "erano",
+      "inizio": 82.198,
+      "fine": 82.697,
+      "frase": 13
+    },
+    {
+      "testo": "quelli",
+      "inizio": 82.697,
+      "fine": 83.048,
+      "frase": 13
+    },
+    {
+      "testo": "gastrointestinali.",
+      "inizio": 83.048,
+      "fine": 83.991,
+      "frase": 13
+    },
+    {
+      "testo": "In",
+      "inizio": 84.371,
+      "fine": 84.574,
+      "frase": 14
+    },
+    {
+      "testo": "conclusione,",
+      "inizio": 84.574,
+      "fine": 85.221,
+      "frase": 14
+    },
+    {
+      "testo": "due",
+      "inizio": 85.361,
+      "fine": 85.564,
+      "frase": 14
+    },
+    {
+      "testo": "studi",
+      "inizio": 85.564,
+      "fine": 85.915,
+      "frase": 14
+    },
+    {
+      "testo": "sull'uomo",
+      "inizio": 85.915,
+      "fine": 86.414,
+      "frase": 14
+    },
+    {
+      "testo": "hanno",
+      "inizio": 86.414,
+      "fine": 86.765,
+      "frase": 14
+    },
+    {
+      "testo": "dimostrato",
+      "inizio": 86.765,
+      "fine": 87.412,
+      "frase": 14
+    },
+    {
+      "testo": "che",
+      "inizio": 87.412,
+      "fine": 87.615,
+      "frase": 14
+    },
+    {
+      "testo": "la",
+      "inizio": 87.615,
+      "fine": 87.818,
+      "frase": 14
+    },
+    {
+      "testo": "Reta",
+      "inizio": 87.818,
+      "fine": 88.169,
+      "frase": 14
+    },
+    {
+      "testo": "riduce",
+      "inizio": 88.169,
+      "fine": 88.668,
+      "frase": 14
+    },
+    {
+      "testo": "il",
+      "inizio": 88.668,
+      "fine": 88.871,
+      "frase": 14
+    },
+    {
+      "testo": "dolore",
+      "inizio": 88.871,
+      "fine": 89.37,
+      "frase": 14
+    },
+    {
+      "testo": "al",
+      "inizio": 89.37,
+      "fine": 89.573,
+      "frase": 14
+    },
+    {
+      "testo": "ginocchio",
+      "inizio": 89.573,
+      "fine": 90.072,
+      "frase": 14
+    },
+    {
+      "testo": "più",
+      "inizio": 90.072,
+      "fine": 90.275,
+      "frase": 14,
+      "enfasi": true
+    },
+    {
+      "testo": "del",
+      "inizio": 90.275,
+      "fine": 90.478,
+      "frase": 14
+    },
+    {
+      "testo": "placebo.",
+      "inizio": 90.478,
+      "fine": 90.977,
+      "frase": 14
+    },
+    {
+      "testo": "Gli",
+      "inizio": 91.357,
+      "fine": 91.56,
+      "frase": 15
+    },
+    {
+      "testo": "studi",
+      "inizio": 91.56,
+      "fine": 91.911,
+      "frase": 15
+    },
+    {
+      "testo": "sono",
+      "inizio": 91.911,
+      "fine": 92.262,
+      "frase": 15
+    },
+    {
+      "testo": "stati",
+      "inizio": 92.262,
+      "fine": 92.613,
+      "frase": 15
+    },
+    {
+      "testo": "condotti",
+      "inizio": 92.613,
+      "fine": 93.112,
+      "frase": 15
+    },
+    {
+      "testo": "con",
+      "inizio": 93.112,
+      "fine": 93.315,
+      "frase": 15
+    },
+    {
+      "testo": "il",
+      "inizio": 93.315,
+      "fine": 93.518,
+      "frase": 15
+    },
+    {
+      "testo": "coinvolgimento",
+      "inizio": 93.518,
+      "fine": 94.313,
+      "frase": 15
+    },
+    {
+      "testo": "dell'azienda",
+      "inizio": 94.313,
+      "fine": 94.96,
+      "frase": 15
+    },
+    {
+      "testo": "che",
+      "inizio": 94.96,
+      "fine": 95.163,
+      "frase": 15
+    },
+    {
+      "testo": "produce",
+      "inizio": 95.163,
+      "fine": 95.662,
+      "frase": 15
+    },
+    {
+      "testo": "la",
+      "inizio": 95.662,
+      "fine": 95.865,
+      "frase": 15
+    },
+    {
+      "testo": "Reta,",
+      "inizio": 95.865,
+      "fine": 96.216,
+      "frase": 15
+    },
+    {
+      "testo": "e",
+      "inizio": 96.356,
+      "fine": 96.559,
+      "frase": 15
+    },
+    {
+      "testo": "i",
+      "inizio": 96.559,
+      "fine": 96.762,
+      "frase": 15
+    },
+    {
+      "testo": "dettagli",
+      "inizio": 96.762,
+      "fine": 97.261,
+      "frase": 15,
+      "enfasi": true
+    },
+    {
+      "testo": "sono",
+      "inizio": 97.261,
+      "fine": 97.612,
+      "frase": 15
+    },
+    {
+      "testo": "importanti",
+      "inizio": 97.612,
+      "fine": 98.259,
+      "frase": 15
+    },
+    {
+      "testo": "tanto",
+      "inizio": 98.259,
+      "fine": 98.61,
+      "frase": 15
+    },
+    {
+      "testo": "quanto",
+      "inizio": 98.61,
+      "fine": 98.961,
+      "frase": 15
+    },
+    {
+      "testo": "i",
+      "inizio": 98.961,
+      "fine": 99.164,
+      "frase": 15
+    },
+    {
+      "testo": "risultati.",
+      "inizio": 99.164,
+      "fine": 99.811,
+      "frase": 15
+    },
+    {
+      "testo": "Manda",
+      "inizio": 100.191,
+      "fine": 100.542,
+      "frase": 16
+    },
+    {
+      "testo": "questo",
+      "inizio": 100.542,
+      "fine": 100.893,
+      "frase": 16
+    },
+    {
+      "testo": "video",
+      "inizio": 100.893,
+      "fine": 101.244,
+      "frase": 16
+    },
+    {
+      "testo": "a",
+      "inizio": 101.244,
+      "fine": 101.447,
+      "frase": 16
+    },
+    {
+      "testo": "quell'amico",
+      "inizio": 101.447,
+      "fine": 102.094,
+      "frase": 16
+    },
+    {
+      "testo": "a",
+      "inizio": 102.094,
+      "fine": 102.297,
+      "frase": 16
+    },
+    {
+      "testo": "cui",
+      "inizio": 102.297,
+      "fine": 102.5,
+      "frase": 16
+    },
+    {
+      "testo": "scricchiolano",
+      "inizio": 102.5,
+      "fine": 103.147,
+      "frase": 16
+    },
+    {
+      "testo": "le",
+      "inizio": 103.147,
+      "fine": 103.35,
+      "frase": 16
+    },
+    {
+      "testo": "ginocchia",
+      "inizio": 103.35,
+      "fine": 103.849,
+      "frase": 16
+    },
+    {
+      "testo": "ogni",
+      "inizio": 103.849,
+      "fine": 104.2,
+      "frase": 16
+    },
+    {
+      "testo": "volta",
+      "inizio": 104.2,
+      "fine": 104.551,
+      "frase": 16
+    },
+    {
+      "testo": "che",
+      "inizio": 104.551,
+      "fine": 104.754,
+      "frase": 16
+    },
+    {
+      "testo": "fa",
+      "inizio": 104.754,
+      "fine": 104.957,
+      "frase": 16
+    },
+    {
+      "testo": "le",
+      "inizio": 104.957,
+      "fine": 105.16,
+      "frase": 16
+    },
+    {
+      "testo": "scale.",
+      "inizio": 105.16,
+      "fine": 105.511,
+      "frase": 16
+    },
+    {
+      "testo": "Commenta",
+      "inizio": 105.891,
+      "fine": 106.39,
+      "frase": 17
+    },
+    {
+      "testo": "MAPPA",
+      "inizio": 106.39,
+      "fine": 106.741,
+      "frase": 17,
+      "enfasi": true
+    },
+    {
+      "testo": "per",
+      "inizio": 106.741,
+      "fine": 106.944,
+      "frase": 17
+    },
+    {
+      "testo": "ricevere",
+      "inizio": 106.944,
+      "fine": 107.591,
+      "frase": 17
+    },
+    {
+      "testo": "gratis",
+      "inizio": 107.591,
+      "fine": 107.942,
+      "frase": 17
+    },
+    {
+      "testo": "il",
+      "inizio": 107.942,
+      "fine": 108.145,
+      "frase": 17
+    },
+    {
+      "testo": "nostro",
+      "inizio": 108.145,
+      "fine": 108.496,
+      "frase": 17
+    },
+    {
+      "testo": "database",
+      "inizio": 108.496,
+      "fine": 109.143,
+      "frase": 17
+    },
+    {
+      "testo": "con",
+      "inizio": 109.143,
+      "fine": 109.346,
+      "frase": 17
+    },
+    {
+      "testo": "tutte",
+      "inizio": 109.346,
+      "fine": 109.697,
+      "frase": 17
+    },
+    {
+      "testo": "le",
+      "inizio": 109.697,
+      "fine": 109.9,
+      "frase": 17
+    },
+    {
+      "testo": "informazioni",
+      "inizio": 109.9,
+      "fine": 110.695,
+      "frase": 17
+    },
+    {
+      "testo": "essenziali",
+      "inizio": 110.695,
+      "fine": 111.342,
+      "frase": 17
+    },
+    {
+      "testo": "su",
+      "inizio": 111.342,
+      "fine": 111.545,
+      "frase": 17
+    },
+    {
+      "testo": "questo",
+      "inizio": 111.545,
+      "fine": 111.896,
+      "frase": 17
+    },
+    {
+      "testo": "e",
+      "inizio": 111.896,
+      "fine": 112.099,
+      "frase": 17
+    },
+    {
+      "testo": "tanti",
+      "inizio": 112.099,
+      "fine": 112.45,
+      "frase": 17
+    },
+    {
+      "testo": "altri",
+      "inizio": 112.45,
+      "fine": 112.801,
+      "frase": 17
+    },
+    {
+      "testo": "composti.",
+      "inizio": 112.801,
+      "fine": 113.3,
+      "frase": 17
+    }
+  ],
+  "suoni": [
+    {
+      "nome": "pop",
+      "t": 22.04
+    },
+    {
+      "nome": "ding",
+      "t": 36.761
+    },
+    {
+      "nome": "ding",
+      "t": 43.185
+    },
+    {
+      "nome": "errore",
+      "t": 77.614
+    },
+    {
+      "nome": "successo",
+      "t": 90.072
+    },
+    {
+      "nome": "whoosh",
+      "t": 105.891
+    }
+  ]
+}

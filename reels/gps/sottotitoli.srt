@@ -1,0 +1,83 @@
+1
+00:00:00,250 --> 00:00:03,105
+I satelliti GPS non sanno dove sei.
+
+2
+00:00:03,235 --> 00:00:05,636
+Il tuo telefono non gli manda niente:
+
+3
+00:00:05,636 --> 00:00:06,939
+ascolta e basta.
+
+4
+00:00:07,069 --> 00:00:09,603
+Sopra di te, a ventimila chilometri,
+
+5
+00:00:09,603 --> 00:00:11,756
+volano più di trenta satelliti.
+
+6
+00:00:11,886 --> 00:00:13,678
+Ognuno ripete due cose:
+
+7
+00:00:13,678 --> 00:00:15,941
+dove si trova e che ore sono.
+
+8
+00:00:16,071 --> 00:00:19,064
+Il segnale viaggia alla velocità della luce:
+
+9
+00:00:19,064 --> 00:00:22,215
+arriva in circa settanta millesimi di secondo.
+
+10
+00:00:22,345 --> 00:00:25,551
+Da quel ritardo il telefono calcola la distanza.
+
+11
+00:00:25,681 --> 00:00:28,092
+Un satellite ti mette su un cerchio.
+
+12
+00:00:28,222 --> 00:00:30,984
+Tre cerchi si incrociano in un punto solo.
+
+13
+00:00:31,114 --> 00:00:33,914
+Il quarto corregge l'orologio del telefono.
+
+14
+00:00:34,044 --> 00:00:35,282
+Dettaglio assurdo:
+
+15
+00:00:35,282 --> 00:00:37,380
+lassù il tempo scorre più veloce,
+
+16
+00:00:37,380 --> 00:00:40,383
+di trentotto milionesimi di secondo al giorno.
+
+17
+00:00:40,513 --> 00:00:43,960
+Sembra niente, ma alla velocità della luce fanno circa
+
+18
+00:00:43,960 --> 00:00:46,464
+dieci chilometri di errore al giorno.
+
+19
+00:00:46,594 --> 00:00:49,901
+Per questo gli orologi dei satelliti sono corretti con
+
+20
+00:00:49,901 --> 00:00:51,407
+le formule di Einstein.
+
+21
+00:00:51,537 --> 00:00:54,244
+Commenta GPS e ti mando le fonti.

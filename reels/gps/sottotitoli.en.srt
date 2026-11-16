@@ -1,0 +1,79 @@
+1
+00:00:00,250 --> 00:00:03,604
+GPS satellites have no idea where you are.
+
+2
+00:00:03,734 --> 00:00:05,285
+Your phone sends them nothing:
+
+3
+00:00:05,285 --> 00:00:06,292
+it just listens.
+
+4
+00:00:06,422 --> 00:00:08,956
+Above you, twenty thousand kilometers up,
+
+5
+00:00:08,956 --> 00:00:10,961
+fly more than thirty satellites.
+
+6
+00:00:11,091 --> 00:00:12,642
+Each one repeats two things:
+
+7
+00:00:12,642 --> 00:00:14,812
+where it is and what time it is.
+
+8
+00:00:14,942 --> 00:00:17,102
+The signal travels at the speed of light:
+
+9
+00:00:17,102 --> 00:00:19,754
+it arrives in about seventy milliseconds.
+
+10
+00:00:19,884 --> 00:00:22,693
+From that delay, your phone works out the distance.
+
+11
+00:00:22,823 --> 00:00:25,234
+One satellite puts you on a circle.
+
+12
+00:00:25,364 --> 00:00:27,331
+Three circles cross at a single point.
+
+13
+00:00:27,461 --> 00:00:29,225
+The fourth corrects your phone's clock.
+
+14
+00:00:29,355 --> 00:00:30,648
+One absurd detail:
+
+15
+00:00:30,648 --> 00:00:32,387
+up there, time runs faster,
+
+16
+00:00:32,387 --> 00:00:34,853
+by thirty-eight millionths of a second a day.
+
+17
+00:00:34,983 --> 00:00:37,246
+It sounds like nothing, but at the speed of
+
+18
+00:00:37,246 --> 00:00:40,063
+light that's about ten kilometers of error per day.
+
+19
+00:00:40,193 --> 00:00:43,602
+That's why satellite clocks are corrected with Einstein's equations.
+
+20
+00:00:43,732 --> 00:00:46,346
+Comment GPS and I'll send you the sources.

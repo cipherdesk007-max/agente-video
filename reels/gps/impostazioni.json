@@ -1,0 +1,10 @@
+{
+  "narratore": {
+    "chi": "dottore",
+    "grandezza": 100,
+    "lato": "destra",
+    "alza": 0,
+    "specchia": false
+  },
+  "stile": "3d"
+}
