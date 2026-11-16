@@ -89,6 +89,26 @@ function righe(testo: string, massimo: number): string[] {
   return esito;
 }
 
+/**
+ * Quello che una scena pronta non riesce a mostrare non si butta via in silenzio: un grafico con una colonna in meno
+ * o una frase senza la coda sono un video sbagliato. La scena si ferma e dice cosa non entra e cosa fare.
+ */
+function entro<T>(blocco: string, cosa: string, elenco: T[], massimo: number): T[] {
+  if (elenco.length > massimo) {
+    throw new Error(`${blocco}: ${elenco.length} ${cosa}, ne entrano ${massimo}. Dividi il contenuto in due scene (${Math.ceil(elenco.length / 2)} e ${Math.floor(elenco.length / 2)}), oppure disegna la scena a mano.`);
+  }
+  return elenco;
+}
+
+/** Come `righe`, ma se il testo non sta nelle righe a disposizione lo dice invece di tagliarne la coda. */
+function righeEntro(blocco: string, testo: string, perRiga: number, massimo: number): string[] {
+  const elenco = righe(testo, perRiga);
+  if (elenco.length > massimo) {
+    throw new Error(`${blocco}: "${testo.slice(0, 40)}…" è di ${testo.length} caratteri, ne entrano circa ${perRiga * massimo} (${massimo} righe da ${perRiga}). Accorcia la scritta: a schermo vanno poche parole, il resto lo dice la voce.`);
+  }
+  return elenco;
+}
+
 /** Scritta centrata su più righe, che entra dal basso. */
 function Righe({testo, x = CX, y, dimensione, colore = C.testo, peso = 800, da, interlinea = 1.12, larghezza = 900, massimo}: {testo: string; x?: number; y: number; dimensione: number; colore?: string; peso?: number; da: number; interlinea?: number; larghezza?: number; massimo?: number}) {
   if (da <= 0 || !testo) return null;
@@ -188,7 +208,7 @@ export function bloccoNumero({valore, decimali = 0, prefisso = '', suffisso = ''
 export function bloccoLista({titolo, voci, colore = C.luce}: {titolo?: Testo; voci: {testo: Testo; segno?: Quando}[]; colore?: string}): ComponentType {
   return function Lista() {
     const {s, dice, dopo} = useBlocco();
-    const elenco = voci.slice(0, 5);
+    const elenco = entro('bloccoLista', 'voci', voci, 5);
     const passo = elenco.length > 4 ? 142 : 158;
     const y0 = CY + (titolo ? 40 : 0) - ((elenco.length - 1) * passo) / 2;
     const tempi = elenco.map((v, i) => dopo(v.segno, i, elenco.length));
@@ -203,7 +223,7 @@ export function bloccoLista({titolo, voci, colore = C.luce}: {titolo?: Testo; vo
           const p = molla(da, {rigidita: 210, smorzamento: 19});
           const accesa = i === attiva;
           const testo = dice(v.testo);
-          const linee = righe(testo, 24).slice(0, 2);
+          const linee = righeEntro('bloccoLista', testo, 24, 2);
           const corpo = adatta('x'.repeat(Math.max(...linee.map((r) => r.length))), 700, 54, 34);
           return (
             <div
@@ -293,7 +313,7 @@ export function bloccoConfronto({sinistra, destra, titolo, fonte}: {sinistra: La
 export function bloccoBarre({titolo, dati, unita, decimali = 0, colori, fonte}: {titolo?: Testo; dati: {etichetta: Testo; valore: number; segno?: Quando}[]; unita?: Testo; decimali?: number; colori?: string[]; fonte?: Testo}): ComponentType {
   return function Barre() {
     const {s, dice, dopo, cifre, tre} = useBlocco();
-    const voci = dati.slice(0, 6);
+    const voci = entro('bloccoBarre', 'colonne', dati, 6);
     const n = voci.length;
     const tinte = colori ?? [C.luce, C.luce2, C.accento, C.positivo, '#C58BFF', C.negativo];
     const passo = Math.min(210, 820 / n);
@@ -380,7 +400,7 @@ export function bloccoAnello({valore, etichetta, segno, colore = C.luce, fonte}:
 export function bloccoPassi({titolo, passi, colore = C.luce}: {titolo?: Testo; passi: {testo: Testo; segno?: Quando}[]; colore?: string}): ComponentType {
   return function Passi() {
     const {s, dice, dopo} = useBlocco();
-    const elenco = passi.slice(0, 5);
+    const elenco = entro('bloccoPassi', 'passi', passi, 5);
     const n = elenco.length;
     const passo = n > 4 ? 150 : 172;
     const y0 = CY + (titolo ? 40 : 0) - ((n - 1) * passo) / 2;
@@ -400,7 +420,7 @@ export function bloccoPassi({titolo, passi, colore = C.luce}: {titolo?: Testo; p
           const acceso = da > 0;
           const corrente = i === attivo;
           const testo = dice(v.testo);
-          const linee = righe(testo, 24).slice(0, 2);
+          const linee = righeEntro('bloccoPassi', testo, 24, 2);
           const corpo = adatta('x'.repeat(Math.max(...linee.map((r) => r.length))), 690, 52, 32);
           const r = corrente ? 30 : 22;
           return (
@@ -427,7 +447,7 @@ export function bloccoPassi({titolo, passi, colore = C.luce}: {titolo?: Testo; p
 
 function Scheda({cappello, testo, colore, y, da, spenta = 0, barrata = 0}: {cappello: string; testo: string; colore: string; y: number; da: number; spenta?: number; barrata?: number}) {
   if (da <= 0) return null;
-  const linee = righe(testo, 22).slice(0, 3);
+  const linee = righeEntro('bloccoMito', testo, 22, 3);
   const corpo = adatta('x'.repeat(Math.max(...linee.map((r) => r.length))), 720, 58, 34);
   const p = molla(da, {rigidita: 200, smorzamento: 18});
   return (
@@ -542,7 +562,7 @@ export function bloccoLinea({titolo, punti, unita, decimali = 0, prefisso = '', 
 export function bloccoTorta({titolo, fette, segno, evidenzia, segnoEvidenzia, fonte}: {titolo?: Testo; fette: {etichetta: Testo; valore: number; colore?: string}[]; segno?: Quando; evidenzia?: number; segnoEvidenzia?: Quando; fonte?: Testo}): ComponentType {
   return function Torta() {
     const {s, dice, dopo, cifre} = useBlocco();
-    const voci = fette.slice(0, 6);
+    const voci = entro('bloccoTorta', 'fette', fette, 6);
     const da = dopo(segno, 0, 3);
     const stacco = evidenzia === undefined ? 0 : rampa(segnoEvidenzia === undefined ? da - 1.6 : dopo(segnoEvidenzia), 0.5);
     const totale = voci.reduce((somma, f) => somma + Math.max(0, f.valore), 0) || 1;
@@ -579,7 +599,7 @@ export function bloccoClassifica({titolo, voci, unita, decimali = 0, prefisso = 
       <ConFonte fonte={fonte} da={da}>
         <Bagliore x={CX} y={CY} raggio={560} colore={colore} forza={0.12} />
         <Cappello testo={[dice(titolo), dice(unita)].filter(Boolean).join(' · ')} y={CY - 376} da={s.t - 0.1} />
-        <GraficoClassifica x={CX} y={CY + 10} larghezza={820} voci={voci.slice(0, 6).map((v) => ({etichetta: dice(v.etichetta), valore: v.valore, colore: v.colore}))} p={rampa(da, 1.6)} colore={colore} decimali={decimali} prefisso={prefisso} suffisso={suffisso} evidenzia={acceso ? evidenzia : undefined} />
+        <GraficoClassifica x={CX} y={CY + 10} larghezza={820} voci={entro('bloccoClassifica', 'voci', voci, 6).map((v) => ({etichetta: dice(v.etichetta), valore: v.valore, colore: v.colore}))} p={rampa(da, 1.6)} colore={colore} decimali={decimali} prefisso={prefisso} suffisso={suffisso} evidenzia={acceso ? evidenzia : undefined} />
       </ConFonte>
     );
   };
@@ -591,7 +611,7 @@ export function bloccoClassifica({titolo, voci, unita, decimali = 0, prefisso = 
 export function bloccoIcone({titolo, voci, colore = C.luce}: {titolo?: Testo; voci: {icona: DisegnoIcona; testo: Testo; segno?: Quando; colore?: string}[]; colore?: string}): ComponentType {
   return function Icone() {
     const {s, dice, dopo} = useBlocco();
-    const lista = voci.slice(0, 6);
+    const lista = entro('bloccoIcone', 'voci', voci, 6);
     const n = lista.length;
     const perRiga = n <= 3 ? n : n === 4 ? 2 : 3;
     const righeTotali = Math.ceil(n / perRiga);
@@ -628,7 +648,7 @@ export function bloccoIcone({titolo, voci, colore = C.luce}: {titolo?: Testo; vo
 export function bloccoScala({titolo, minimo = 0, massimo = 10, cursori, estremi, verso = 'male', decimali = 0, fonte}: {titolo?: Testo; minimo?: number; massimo?: number; cursori: {etichetta: Testo; valore: number; da?: number; segno?: Quando; colore?: string}[]; estremi?: [Testo, Testo]; verso?: 'male' | 'bene'; decimali?: number; fonte?: Testo}): ComponentType {
   return function Scala() {
     const {s, dice, dopo, cifre} = useBlocco();
-    const lista = cursori.slice(0, 3);
+    const lista = entro('bloccoScala', 'cursori', cursori, 3);
     const X0 = 150;
     const X1 = 930;
     const Y = CY - 20;
@@ -681,7 +701,7 @@ export function bloccoScala({titolo, minimo = 0, massimo = 10, cursori, estremi,
 export function bloccoSchede({titolo, schede, totale, fonte}: {titolo?: Testo; schede: {sopra?: Testo; valore: string | number; unita?: Testo; sotto?: Testo; colore?: string; segno?: Quando}[]; totale?: {valore: number; etichetta?: Testo; segno?: Quando; decimali?: number}; fonte?: Testo}): ComponentType {
   return function Schede() {
     const {s, dice, dopo, cifre} = useBlocco();
-    const lista = schede.slice(0, 3);
+    const lista = entro('bloccoSchede', 'schede', schede, 3);
     const n = lista.length;
     const larga = n === 3 ? 280 : 400;
     const passo = larga + (n === 3 ? 26 : 60);
@@ -720,7 +740,7 @@ export function bloccoAvviso({titolo, sotto, punti = [], segno, colore = C.negat
   return function Avviso() {
     const {s, dice, dopo} = useBlocco();
     const da = segno === undefined ? s.t - 0.9 : dopo(segno);
-    const lista = punti.slice(0, 3);
+    const lista = entro('bloccoAvviso', 'punti', punti, 3);
     const lato = 250;
     const h = lato * 0.87;
     const yTriangolo = lista.length ? 640 : 700;
@@ -817,7 +837,7 @@ export function bloccoPersone({titolo, quante = 10, accese, etichetta, segno, co
 export function bloccoTempo({titolo, tappe, colore = C.luce, fonte}: {titolo?: Testo; tappe: {quando: Testo; testo?: Testo; segno?: Quando; colore?: string}[]; colore?: string; fonte?: Testo}): ComponentType {
   return function Tempo() {
     const {s, dice, dopo} = useBlocco();
-    const lista = tappe.slice(0, 4);
+    const lista = entro('bloccoTempo', 'tappe', tappe, 4);
     const n = lista.length;
     const y = CY - 40;
     const x0 = 150;
@@ -871,7 +891,7 @@ export function bloccoSchermo({titolo, file, clip, segno, note = [], colore = C.
   return function Schermo() {
     const {s, dice, dopo} = useBlocco();
     const da = segno === undefined ? s.t - 0.25 : dopo(segno);
-    const lista = note.slice(0, 3);
+    const lista = entro('bloccoSchermo', 'note', note, 3);
     const entra = molla(s.t - 0.1, {rigidita: 170, smorzamento: 17});
     const x = lista.length ? 330 : CX;
     return (
@@ -962,7 +982,7 @@ export function bloccoStudio({rivista, titolo, dati = [], pagato, segno, segnoPa
   return function Studio() {
     const {s, dice, dopo} = useBlocco();
     const da = segno === undefined ? s.t - 0.2 : dopo(segno);
-    const lista = dati.slice(0, 3);
+    const lista = entro('bloccoStudio', 'dati', dati, 3);
     const p = molla(da, {rigidita: 180, smorzamento: 17});
     const testo = dice(titolo);
     const daPagato = pagato ? dopo(segnoPagato, lista.length + 1, lista.length + 2) : -1;
