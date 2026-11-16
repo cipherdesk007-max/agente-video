@@ -10,10 +10,11 @@ import {spawnSync} from 'node:child_process';
 import {CACHE, ErroreFmlab, RADICE, leggiEnv, leggiJson, rel, scriviJson, sec} from './percorsi.mjs';
 import {leggiImpostazioni} from './impostazioni.mjs';
 import {apriReel, estraiVariante} from './reel.mjs';
-import {componiDati, leggiCopione, pausaDopo, pesoParola, stimaTempi, tempiDaCaratteri} from './copione.mjs';
+import {componiDati, confrontaTesto, leggiCopione, pausaDopo, pesoParola, stimaTempi, tempiDaCaratteri} from './copione.mjs';
 import {leggiWav, scriviWav, silenzio, taglia, trattiDiVoce} from './wav.mjs';
 import {creaSrt} from './comune/pagine.mjs';
 import {trovaFfmpeg} from './ffmpeg.mjs';
+import {VELOCITA_MASSIMA, adattaDurata, durataMinima, paroleMassime} from './durata.mjs';
 
 const MOTORI = ['elevenlabs', 'mac', 'comando', 'stima'];
 
@@ -423,10 +424,25 @@ export async function comandoVoce(slug, argomenti = []) {
   const nuova = tutti.includes('nuova');
   const resto = tutti.filter((a) => a !== 'nuova');
   let scelte = {motore: 'auto', elevenlabs: {}, mac: {}, comando: {}};
+  let chiesta = null;
   try {
-    scelte = leggiImpostazioni(slug).voce ?? scelte;
+    const impostazioni = leggiImpostazioni(slug);
+    scelte = impostazioni.voce ?? scelte;
+    chiesta = impostazioni.durata ?? null;
   } catch {
     // impostazioni non leggibili: si va con quelle di serie (l'errore lo segnalano foto, render e verifica)
+  }
+  // se la persona ha dato il testo del reel (testo.txt), il copione deve pronunciare quello, parola per parola
+  const fileTesto = path.join(reel.dir, `testo${reel.suffisso}.txt`);
+  if (fs.existsSync(fileTesto)) {
+    const diverso = confrontaTesto(fs.readFileSync(fileTesto, 'utf8'), copione.testoParlato);
+    if (diverso) {
+      throw new ErroreFmlab(
+        `Il copione non dice più il testo dato (${rel(fileTesto)}): alla parola ${diverso.parola} c'è "${diverso.trovato}" al posto di "${diverso.atteso}".\n` +
+          'Il testo si pronuncia parola per parola: nel copione si aggiungono solo scene, segni, enfasi e suoni.\n' +
+          `Se il testo nuovo è voluto da chi lo ha scritto, aggiorna ${rel(fileTesto)} e riprova.`
+      );
+    }
   }
 
   let motore = resto[0];
@@ -443,6 +459,17 @@ export async function comandoVoce(slug, argomenti = []) {
     console.log(`Motore voce scelto in automatico: ${motore}`);
   }
 
+  // prima di spendere: se il testo non può stare nella durata chiesta nemmeno alla velocità massima, lo si dice adesso
+  const coda = numeroEnv('FMLAB_CODA') ?? 1.4;
+  if (chiesta && motore !== 'stima' && copione.parole.length > paroleMassime(chiesta, coda)) {
+    const troppe = copione.parole.length - paroleMassime(chiesta, coda);
+    throw new ErroreFmlab(
+      `Il testo ha ${copione.parole.length} parole: in ${chiesta} secondi (più 5 di scarto) ne entrano al massimo ${paroleMassime(chiesta, coda)}, anche con la voce a velocità ${String(VELOCITA_MASSIMA).replace('.', ',')}.\n` +
+        `Non ho generato la voce (nessun credito speso). Si può: togliere almeno ${troppe} parole dal testo, oppure chiedere una durata di almeno ${durataMinima(copione.parole.length, coda)} secondi:\n` +
+        `  npm run imposta ${slug} durata=${durataMinima(copione.parole.length, coda)}`
+    );
+  }
+
   let esito;
   if (motore === 'elevenlabs') esito = await voceElevenLabs(copione, reel, scelte, {nuova});
   else if (motore === 'mac') esito = await voceMac(copione, reel, scelte);
@@ -457,19 +484,37 @@ export async function comandoVoce(slug, argomenti = []) {
     }
   }
 
-  const dati = componiDati(copione, esito.tempi, {
+  // la durata chiesta: se la voce è troppo lunga la si velocizza. L'audio resta com'è sul disco (così si riusa senza
+  // spendere): la velocità sta scritta in parole.json, e render e anteprima la applicano alla voce mentre suona.
+  const fineNaturale = Math.max(...esito.tempi.map((t) => t.fine));
+  const misura = adattaDurata({fineVoce: fineNaturale, coda, parole: copione.parole.length, chiesta});
+  const v = misura.velocita;
+  const dati = componiDati(copione, v === 1 ? esito.tempi : esito.tempi.map((t) => ({inizio: t.inizio / v, fine: t.fine / v})), {
     motore,
     precisione: esito.precisione,
     voce: esito.voce,
-    durataAudio: esito.durataAudio ?? null,
-    coda: numeroEnv('FMLAB_CODA') ?? 1.4,
+    durataAudio: esito.durataAudio ? esito.durataAudio / v : null,
+    coda,
     lingua: reel.lingua,
+    velocita: v,
   });
   scriviJson(reel.parole, dati);
   fs.writeFileSync(reel.srt, creaSrt(dati.parole));
 
   console.log(`\nVoce pronta per "${reel.nome}"  ·  lingua: ${reel.lingua}  ·  motore: ${motore}${esito.nomeVoce ? ` (${esito.nomeVoce})` : ''}  ·  precisione: ${esito.precisione}`);
   console.log(`  parole: ${dati.parole.length}   durata video: ${sec(dati.durata)}   audio: ${esito.voce ? rel(path.join(reel.dir, esito.voce)) : '(nessuno, tempi stimati)'}`);
+  if (chiesta) {
+    const virgola = (x) => String(Math.round(x * 100) / 100).replace('.', ',');
+    if (misura.entra && v > 1) console.log(`  durata chiesta: ${chiesta} s — a ritmo naturale erano ${sec(fineNaturale + coda, 1)}: voce a velocità ${virgola(v)}, il testo non è stato toccato.`);
+    else if (misura.entra) console.log(`  durata chiesta: ${chiesta} s — ci sta a velocità normale.`);
+    else if (misura.paroleDaTogliere) {
+      console.log(`  ✖ durata chiesta: ${chiesta} s — anche a velocità ${virgola(VELOCITA_MASSIMA)} il reel dura ${sec(dati.durata, 1)}: è fuori dai 5 secondi di scarto.`);
+      console.log(`    Togli circa ${misura.paroleDaTogliere} parole dal testo, oppure chiedi una durata più lunga:  npm run imposta ${slug} durata=${Math.ceil((dati.durata - 5) / 5) * 5}`);
+    } else {
+      console.log(`  ✖ durata chiesta: ${chiesta} s — il reel dura ${sec(dati.durata, 1)}: è più corto di oltre 5 secondi, e la voce non si rallenta.`);
+      console.log(`    Servono circa ${misura.paroleMancanti} parole in più, oppure chiedi una durata più corta:  npm run imposta ${slug} durata=${Math.max(15, Math.round(dati.durata / 5) * 5)}`);
+    }
+  }
   // quanto è costata: così si vede subito se si stanno spendendo crediti
   if (esito.riusata) console.log(`  crediti: 0 — testo, voce e impostazioni non sono cambiati, ho riusato la voce già generata.  (Per rifarla comunque: npm run voce ${slug}${reel.variante ? ' ' + reel.variante : ''} nuova)`);
   else if (motore === 'elevenlabs') console.log(`  crediti: ${esito.caratteri} caratteri inviati a ElevenLabs. Finché non cambi il testo, rilanciare questo comando non ne consuma altri.`);

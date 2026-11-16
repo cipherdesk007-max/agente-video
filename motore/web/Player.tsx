@@ -22,6 +22,7 @@ export function Player({reel, dati, slug, totale, impostazioni, personaggi}: Pro
   const [guide, setGuide] = useState(false);
   const [scala, setScala] = useState(0.4);
   const audio = useRef<HTMLAudioElement | null>(null);
+  const velocita = dati.velocita ?? 1;
   const orologio = useRef({partenza: 0, base: 0});
   const frameRef = useRef(frame);
   frameRef.current = frame;
@@ -44,20 +45,22 @@ export function Player({reel, dati, slug, totale, impostazioni, personaggi}: Pro
     orologio.current = {partenza: performance.now(), base: da / fps};
     const a = audio.current;
     if (a) {
-      a.currentTime = da / fps;
+      // la voce velocizzata per stare nella durata chiesta: l'audio sul disco è quello naturale
+      a.playbackRate = velocita;
+      a.currentTime = (da / fps) * velocita;
       a.play().catch(() => undefined);
     }
     setSuona(true);
-  }, [fps, totale]);
+  }, [fps, totale, velocita]);
 
   const vaiA = useCallback(
     (f: number) => {
       const n = Math.min(totale - 1, Math.max(0, Math.round(f)));
       setFrame(n);
       orologio.current = {partenza: performance.now(), base: n / fps};
-      if (audio.current) audio.current.currentTime = n / fps;
+      if (audio.current) audio.current.currentTime = (n / fps) * velocita;
     },
-    [fps, totale]
+    [fps, totale, velocita]
   );
 
   useEffect(() => {
@@ -66,7 +69,7 @@ export function Player({reel, dati, slug, totale, impostazioni, personaggi}: Pro
     const passo = () => {
       const a = audio.current;
       // finché l'audio suona è lui l'orologio: così bocca e parole restano agganciate alla voce
-      const ora = a && !a.paused && !a.ended ? a.currentTime : orologio.current.base + (performance.now() - orologio.current.partenza) / 1000;
+      const ora = a && !a.paused && !a.ended ? a.currentTime / velocita : orologio.current.base + (performance.now() - orologio.current.partenza) / 1000;
       const n = Math.min(totale - 1, Math.floor(ora * fps));
       setFrame(n);
       if (n >= totale - 1) {
@@ -78,7 +81,7 @@ export function Player({reel, dati, slug, totale, impostazioni, personaggi}: Pro
     };
     id = requestAnimationFrame(passo);
     return () => cancelAnimationFrame(id);
-  }, [suona, fps, totale]);
+  }, [suona, fps, totale, velocita]);
 
   useEffect(() => {
     const tasto = (e: KeyboardEvent) => {

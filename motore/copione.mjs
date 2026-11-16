@@ -154,7 +154,7 @@ const arrotonda = (x) => Math.round(x * 1000) / 1000;
  * @param {ReturnType<typeof leggiCopione>} copione
  * @param {{inizio:number, fine:number}[]} tempi  un elemento per parola
  */
-export function componiDati(copione, tempi, {motore, precisione, voce = null, durataAudio = null, coda = 1.4, fps = 30, lingua = 'it'} = {}) {
+export function componiDati(copione, tempi, {motore, precisione, voce = null, durataAudio = null, coda = 1.4, fps = 30, lingua = 'it', velocita = 1} = {}) {
   if (tempi.length !== copione.parole.length) {
     throw new ErroreFmlab(`Tempi e parole non coincidono (${tempi.length} tempi per ${copione.parole.length} parole).`);
   }
@@ -197,6 +197,8 @@ export function componiDati(copione, tempi, {motore, precisione, voce = null, du
     precisione,
     voce,
     durataVoce: arrotonda(durataVoce),
+    // la voce è stata velocizzata per stare nella durata chiesta: i tempi sono già quelli veloci, l'audio no
+    ...(velocita && velocita !== 1 ? {velocita} : {}),
     coda,
     durata: arrotonda(durata),
     fps,
@@ -220,7 +222,7 @@ export function riallinea(copione, dati) {
   const nuovi = componiDati(
     copione,
     dati.parole.map((p) => ({inizio: p.inizio, fine: p.fine})),
-    {motore: dati.motore, precisione: dati.precisione, voce: dati.voce ?? null, durataAudio: dati.durataVoce ?? null, coda: dati.coda ?? 1.4, fps: dati.fps ?? 30, lingua: dati.lingua ?? 'it'}
+    {motore: dati.motore, precisione: dati.precisione, voce: dati.voce ?? null, durataAudio: dati.durataVoce ?? null, coda: dati.coda ?? 1.4, fps: dati.fps ?? 30, lingua: dati.lingua ?? 'it', velocita: dati.velocita ?? 1}
   );
   const parole = dati.parole.map((p, i) => {
     const {enfasi: _prima, ...resto} = p;

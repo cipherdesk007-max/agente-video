@@ -5,10 +5,13 @@ import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {ErroreFmlab, leggiJson, rel, sec} from './percorsi.mjs';
 import {estraiVariante} from './reel.mjs';
-import {leggiCopione} from './copione.mjs';
+import {confrontaTesto, leggiCopione} from './copione.mjs';
+import {giudicaDurata} from './durata.mjs';
+import {avvisiNarratore, leggiImpostazioni} from './impostazioni.mjs';
 import {impagina} from './comune/pagine.mjs';
 import {apriReelNelBrowser} from './foto.mjs';
 import {infoMedia, misuraTraccia, trovaFfmpeg} from './ffmpeg.mjs';
+import {trovaMusica} from './render.mjs';
 
 const OK = '✓';
 const AVVISO = '⚠';
@@ -49,6 +52,13 @@ function differenza(a, b) {
   return somma / a.length;
 }
 
+/** Cosa c'è nella traccia audio, detto per quello che è (B16). */
+export function fraseAudio({voce = false, effetti = 0, musica = false} = {}) {
+  const pezzi = [voce ? 'la voce' : null, musica ? 'la musica' : null, effetti ? `${effetti} ${effetti === 1 ? 'effetto sonoro' : 'effetti sonori'}` : null].filter(Boolean);
+  if (!pezzi.length) return 'silenzio: voce non ancora generata';
+  return `con ${pezzi.join(', ')}${voce ? '' : ' (senza voce: non ancora generata)'}`;
+}
+
 /** npm run verifica <reel> [lingua] */
 export async function comandoVerifica(slug, argomenti = []) {
   const {variante, resto} = estraiVariante(slug, argomenti);
@@ -71,9 +81,24 @@ export async function comandoVerifica(slug, argomenti = []) {
     if (dati.motore === 'stima') R.avviso('Tempi stimati, nessuna voce', 'Va bene per lavorare alle scene. Per il video finale genera la voce vera.');
     else R.ok(`Voce: ${dati.motore}, precisione "${dati.precisione}"`);
 
+    // il testo dato dalla persona (testo.txt): il copione deve pronunciare quello, parola per parola
+    const fileTesto = path.join(reel.dir, `testo${reel.suffisso}.txt`);
+    if (fs.existsSync(fileTesto)) {
+      const diverso = confrontaTesto(fs.readFileSync(fileTesto, 'utf8'), copione.testoParlato);
+      if (diverso) R.errore(`Il copione non dice il testo dato: alla parola ${diverso.parola} c'è "${diverso.trovato}" al posto di "${diverso.atteso}"`, `Il testo di ${rel(fileTesto)} va pronunciato parola per parola: nel copione si aggiungono solo scene, segni, enfasi e suoni.`);
+      else R.ok(`Il testo del reel è quello dato, parola per parola (${copione.parole.length} parole, ${rel(fileTesto)})`);
+    }
+
     const parole = dati.parole.length;
     const ritmo = parole / Math.max(0.1, dati.durataVoce);
-    if (dati.durata > 90) R.avviso(`Durata ${sec(dati.durata, 1)}: oltre 90 secondi`, 'I reel più visti stanno tra 30 e 60 secondi.');
+    const chiesta = leggiImpostazioni(slug).durata;
+    const svelta = dati.velocita && dati.velocita !== 1 ? `, voce a velocità ${String(Math.round(dati.velocita * 100) / 100).replace('.', ',')}` : '';
+    if (chiesta) {
+      // la regola: la durata è quella chiesta, con al massimo 5 secondi di scarto
+      const giudizio = giudicaDurata(dati.durata, chiesta);
+      if (giudizio.ok) R.ok(`Durata ${sec(dati.durata, 1)}, chiesti ${chiesta} (scarto ${String(giudizio.scarto).replace('.', ',')} s)${svelta}, ${parole} parole`);
+      else R.errore(`Durata ${sec(dati.durata, 1)}, chiesti ${chiesta}: ${giudizio.scarto > 0 ? 'più lungo' : 'più corto'} di oltre 5 secondi${svelta}`, giudizio.scarto > 0 ? `La voce è già alla velocità massima. Togli parole dal testo oppure chiedi una durata più lunga: npm run imposta ${slug} durata=…  (npm run voce ${slug} stima  dice quante parole).` : `La voce non si rallenta. Servono più parole, oppure una durata più corta: npm run imposta ${slug} durata=${Math.max(15, Math.round(dati.durata / 5) * 5)}`);
+    } else if (dati.durata > 90) R.avviso(`Durata ${sec(dati.durata, 1)}: oltre 90 secondi`, 'I reel più visti stanno tra 30 e 60 secondi.');
     else if (dati.durata < 12) R.avviso(`Durata ${sec(dati.durata, 1)}: molto corto`);
     else R.ok(`Durata ${sec(dati.durata, 1)}, ${parole} parole (${ritmo.toFixed(1).replace('.', ',')} al secondo)`);
 
@@ -189,6 +214,7 @@ export async function comandoVerifica(slug, argomenti = []) {
     }
     // specchiato con una scritta addosso che non è stata preparata: si legge al contrario
     const scelto = info.impostazioni?.narratore;
+    for (const avviso of avvisiNarratore(scelto)) R.avviso(avviso.split(':')[0], `${avviso.split(': ').slice(1).join(': ')}:  npm run imposta ${slug} specchia=si`);
     if (corpo && scelto?.specchia) {
       const {leggiPersonaggi} = await import('./personaggio.mjs');
       const chi = leggiPersonaggi()[scelto.chi];
@@ -232,7 +258,7 @@ export async function comandoVerifica(slug, argomenti = []) {
       if (media.audio) {
         const a = misuraTraccia(ff, reel.video, 'a');
         if (dati.voce && a?.durata !== null && a.durata < dati.durataVoce - 0.15) R.errore(`L'audio dura ${sec(a.durata)}, la voce ${sec(dati.durataVoce)}`);
-        else R.ok(`Audio ${media.audio.codec} ${media.audio.hz} Hz${dati.voce ? ', con la voce' : ' (silenzio: voce non ancora generata)'}`);
+        else R.ok(`Audio ${media.audio.codec} ${media.audio.hz} Hz, ${fraseAudio({voce: Boolean(dati.voce), effetti: (dati.suoni ?? []).length, musica: Boolean(trovaMusica(reel.dir)) && leggiImpostazioni(slug).musica > 0})}`);
       } else {
         R.avviso('Il video non ha traccia audio');
       }

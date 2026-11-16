@@ -14,6 +14,7 @@ FMLAB Reel Kit — comandi
                                            lato=destra|sinistra  specchia=si|no  alza=0…600  stile=auto|2d|3d
                                            mano=auto|aperta|alza|giu (la seconda mano)  musica=0…100
                                            voce=auto|elevenlabs|mac|comando|stima
+                                           durata=15…180|libera (secondi chiesti: scarto massimo 5, la voce si velocizza)
   npm run voce <reel> [lingua] [motore]    voce + tempi parola per parola (motore: elevenlabs | mac | comando | stima)
                                            se il testo non è cambiato riusa la voce già fatta: zero crediti ("nuova" per rifarla)
   npm run foto <reel> [lingua] <dove>…     fotogrammi a piena risoluzione (dove: secondi, segno, scena, "fine")

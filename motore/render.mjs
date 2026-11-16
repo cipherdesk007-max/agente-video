@@ -138,7 +138,7 @@ export async function rendi(slug, variante = null, opzioni = {}) {
     const eventi = intero ? suoniDelReel(dati, reel.dir) : [];
     const volumeEffetti = Number(process.env.FMLAB_VOLUME_SUONI ?? 60);
     if (eventi.length && volumeEffetti > 0) effetti = await tracciaSuoni(ff, eventi, totale / fps, uscita.replace(/\.mp4$/, '.suoni.tmp.wav'));
-    const audio = argomentiAudio({voce: conVoce ? fileVoce : null, musica: fileMusica, volume, durata: totale / fps, effetti, volumeEffetti});
+    const audio = argomentiAudio({voce: conVoce ? fileVoce : null, musica: fileMusica, volume, durata: totale / fps, effetti, volumeEffetti, velocita: dati.velocita ?? 1});
     await esegui(ff, ['-i', muto, ...audio, '-movflags', '+faststart', '-y', provvisorio]);
     if (effetti) fs.rmSync(effetti, {force: true});
     fs.renameSync(provvisorio, uscita);

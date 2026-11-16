@@ -28,6 +28,8 @@ export type DatiReel = {
   /** File audio nella cartella del reel, o null se non c'è ancora la voce. */
   voce: string | null;
   durataVoce: number;
+  /** Maggiore di 1 se la voce è stata velocizzata per stare nella durata chiesta (i tempi sono già quelli veloci). */
+  velocita?: number;
   coda: number;
   durata: number;
   fps: number;

@@ -45,10 +45,10 @@ export async function comandoStato(slug) {
   const imp = leggiImpostazioni(slug);
   const n = imp.narratore;
   console.log(`\n${slug}  ·  ${rel(reel.dir)}  ·  lingua ${reel.linguaBase}${altreLingue(slug).length ? ` (+ ${altreLingue(slug).join(', ')})` : ''}`);
-  console.log(`narratore ${n.chi}${n.chi === 'nessuno' ? '' : ` ${n.grandezza}% a ${n.lato}`}  ·  stile ${imp.stile}  ·  voce ${imp.voce.motore}`);
+  console.log(`narratore ${n.chi}${n.chi === 'nessuno' ? '' : ` ${n.grandezza}% a ${n.lato}`}  ·  stile ${imp.stile}  ·  voce ${imp.voce.motore}  ·  durata ${imp.durata ? `chiesta ${imp.durata} s` : 'libera'}`);
   console.log(`copione: ${copione.parole.length} parole, ${copione.scene.length} scene, ${Object.keys(copione.segni).length} segni`);
   if (dati) {
-    console.log(`tempi: ${dati.motore} (${dati.precisione}), durata ${sec(dati.durata, 1)}${dati.impronta === copione.impronta ? '' : '  ⚠ il copione è cambiato dopo la voce'}`);
+    console.log(`tempi: ${dati.motore} (${dati.precisione}), durata ${sec(dati.durata, 1)}${dati.velocita && dati.velocita !== 1 ? ` (voce a velocità ${String(dati.velocita).replace('.', ',')})` : ''}${imp.durata && Math.abs(dati.durata - imp.durata) > 5 ? `  ✖ chiesti ${imp.durata} s: fuori dai 5 secondi di scarto` : ''}${dati.impronta === copione.impronta ? '' : '  ⚠ il copione è cambiato dopo la voce'}`);
     for (const s of dati.scene) {
       const segni = Object.entries(dati.segni).filter(([, t]) => t >= s.inizio && t < s.fine).map(([nome, t]) => `${nome} ${t.toFixed(1)}`);
       console.log(`  ${s.nome.padEnd(12)} ${s.inizio.toFixed(1).padStart(5)} → ${s.fine.toFixed(1).padStart(5)}   ${segni.join(' · ')}`);

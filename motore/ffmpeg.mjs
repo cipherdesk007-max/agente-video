@@ -193,7 +193,7 @@ export function lufsMusica(volume) {
  *            (si rialza nelle pause); entra ed esce sfumando.
  * Senza voce e senza musica mette una traccia di silenzio: alcuni social rifiutano i video senza audio.
  */
-export function argomentiAudio({voce = null, musica = null, volume = 30, durata, effetti = null, volumeEffetti = 60}) {
+export function argomentiAudio({voce = null, musica = null, volume = 30, durata, effetti = null, volumeEffetti = 60, velocita = 1}) {
   const D = Math.max(0.5, durata).toFixed(3);
   const conMusica = Boolean(musica) && volume > 0;
   const conEffetti = Boolean(effetti) && volumeEffetti > 0;
@@ -208,7 +208,9 @@ export function argomentiAudio({voce = null, musica = null, volume = 30, durata,
   let n = 1; // l'ingresso 0 è il video muto
   if (voce) {
     ingressi.push('-i', voce);
-    grafo.push(`[${n}:a]loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000,apad,atrim=0:${D}${conMusica ? ',asplit=2[v][chiave]' : '[v]'}`);
+    // voce velocizzata per stare nella durata chiesta: stessa misura dei tempi, senza cambiare l'altezza della voce
+    const svelta = velocita && Math.abs(velocita - 1) > 0.001 ? `atempo=${Number(velocita).toFixed(4).replace(/0+$/, '').replace(/\.$/, '')},` : '';
+    grafo.push(`[${n}:a]${svelta}loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000,apad,atrim=0:${D}${conMusica ? ',asplit=2[v][chiave]' : '[v]'}`);
     pezzi.push('[v]');
     n++;
   }
