@@ -127,11 +127,14 @@ Tre scelte tengono insieme tutto il piano:
 - **Pezzo:** il regalo sul tablet (`ebook`, la mappa).
 - **Segni:** `Commenta` (entra il tablet, con il `whoosh`), `gratis`, `database` (le due scritte), `essenziali` (il
   tablet gira).
-- **Perché:** un invito solo, alla fine, con la parola da scrivere e il regalo in mano. Quattro segni tengono viva
-  anche l'ultima frase.
+- **Perché:** l'invito a commentare sta alla fine, per esteso, con la parola da scrivere e il regalo in mano.
+  Quattro segni tengono viva anche l'ultima frase.
 
 ## Cosa non è a posto
 
+Lo dice `npm run giudica reta-testo`: 5 righe a posto, 2 da sistemare, 1 senza giudizio (non c'è una durata chiesta).
+
 - La prima frase ha 20 parole: la pagella ne chiede meno di 12. Il testo è della persona e non si tocca; il piano
   risponde con quattro segni dentro quella frase.
+- Gli inviti sono due ("Manda questo video…" e "Commenta…"): la pagella ne chiede uno. Anche questo è nel testo.
 - I tempi sono stimati. Con la voce vera i segni restano sulle loro parole, ma la durata cambia.

@@ -8,12 +8,12 @@ controlli (`motore/piano.mjs`, `motore/verifica.mjs`, `motore/durata.mjs`, `rife
 |---|---|---|
 | 1 | **Aggancio**: la prima frase ha meno di 12 parole. | Si conta in `copione.md`. `npm run verifica` avvisa quando la prima frase supera le 14. |
 | 2 | **Un segno ogni 2-3 secondi**, mai più di 4 secondi senza un cambio sul palco. | `npm run piano <reel>`: avvisa a ogni tratto oltre 3,5 secondi senza novità e dice da quali parole comincia. |
-| 3 | **Il numero arriva quando la voce lo pronuncia**: nella frase "è diminuito di circa due punti" un segno su "diminuito" (parte il movimento) e uno su "due" (il numero è arrivato). | Manuale, capitolo 5. Si guarda nei provini: sul fotogramma della parola "due" il numero c'è già. |
-| 4 | **Nessuna posa del narratore tenuta più di 4 secondi circa.** | `npm run confronta <reel>` sul video: riga "Narratore: posa tenuta più a lungo", soglia 3,335 secondi (dai riferimenti). |
+| 3 | **Il numero arriva quando la voce lo pronuncia**: nella frase "è diminuito di circa due punti" un segno su "diminuito" (parte il movimento) e uno su "due" (il numero è arrivato). | Manuale, capitolo 5. `npm run giudica` conta le scene con un numero a schermo che hanno un segno su una cifra detta dalla voce. Poi si guarda nei provini: sul fotogramma della parola "due" il numero c'è già. |
+| 4 | **Nessuna posa del narratore tenuta più di 4 secondi circa.** | `npm run giudica` la legge dalla scaletta delle pose, senza video. Sul video la misura `npm run confronta <reel>`: riga "Narratore: posa tenuta più a lungo", soglia 3,335 secondi (dai riferimenti). |
 | 5 | **Rischio cartelli basso.** | `npm run piano <reel>`: "Rischio cartelli: N su 100 (basso)". Basso è sotto 35, alto da 60 in su: con il rischio alto il render non parte. Sotto elenca le voci che lo alzano. |
 | 6 | **Durata entro 5 secondi da quella chiesta.** | `npm run verifica <reel>`: fuori dai 5 secondi è un errore. La durata chiesta è in `impostazioni.json`. |
 | 7 | **Numeri in lettere nel testo; ogni numero a schermo con la sua riga in `fonti.md`.** | `npm run piano <reel>` avvisa per ogni numero a schermo senza riga; `npm run verifica` lo dà come errore. |
-| 8 | **Un invito solo, per esteso, alla fine.** | Si legge l'ultima frase di `copione.md`: un "Commenta…" e nessun altro invito prima. |
+| 8 | **Un invito solo, per esteso, alla fine.** | Si legge l'ultima frase di `copione.md`: un "Commenta…" e nessun altro invito prima. `npm run giudica` conta le frasi che cominciano con un invito (Commenta, Segui, Salva, Manda…). |
 
 ## Tre domande prima di consegnare
 

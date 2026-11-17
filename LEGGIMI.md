@@ -138,6 +138,7 @@ video: le scene si riallineano da sole alle parole.
 | `npm run collaudo` | controlla che il kit funzioni su questo computer |
 | `npm run fai ginocchio testo=testo.txt "Titolo"` | dal testo al video in otto tappe; poi `npm run fai ginocchio` riparte da dove serve (`bozza` per fare prima) |
 | `npm run piano ginocchio` | controlla il piano di regia (`piano.json`) e dà il rischio cartelli da 0 a 100 |
+| `npm run giudica ginocchio` | la pagella del piano in una schermata: otto righe, ✓ o ✖ con il numero accanto (`docs/OCCHIO.md`) |
 | `npm run regalo` | cosa si può regalare in chiusura (ebook, mappa, PDF) e come aggiungerne uno |
 | `npm run frasi audio.mp3 testo.txt` | taglia una registrazione della voce nelle sue frasi e le mette in banca: nei reel non costano (senza niente: elenco) |
 | `npm run affianca ginocchio` | dodici fotogrammi del reel accanto a dodici del video di riferimento: si guarda prima di misurare |

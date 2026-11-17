@@ -1,5 +1,17 @@
 # Novità
 
+## 2.5 · l'occhio del regista
+
+- **`npm run giudica <reel>`**: la pagella di un piano in una schermata. Otto righe (aggancio, ritmo delle novità,
+  numero sulla voce, posa del narratore, rischio cartelli, durata, numeri e fonti, invito), ognuna con ✓ o ✖ e il
+  numero accanto; in fondo tre domande da farsi prima di consegnare. Non fa render e non genera voce.
+- **`docs/OCCHIO.md`**: le otto voci della pagella, ognuna con "come si controlla".
+- **`docs/RICETTE.md`**: otto modi di dire una cosa (il numero che arriva, il confronto, i passi, il mito, il
+  prima/dopo, la scalata, la metafora, la domanda), con la scena di `piano.json` pronta da copiare.
+- **`docs/ESEMPIO-PIANO.md`**: il piano di `reta-testo` scena per scena, con il perché di ogni pezzo e di ogni segno.
+- **`docs/TARGETS.md`**: le 28 misure del metro, riferimenti contro `reta-testo` e `mots-c`, e cosa resta da chiudere.
+- **Tre voci alternative pronte** in `voci/COME-FARE.md`: righe complete per il `.env`, con cosa parte in rete.
+
 ## 2.4 · la banca musicale del kit
 
 - **Quattro trame ambientali generate dal kit** (`quiete`, `marea`, `brina`, `orbita`): una formula di ffmpeg, nessun

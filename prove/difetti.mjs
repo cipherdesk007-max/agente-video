@@ -1324,6 +1324,56 @@ await prova('B35 · docs/TARGETS.md: una riga per ogni misura del metro; riferim
   assert.doesNotMatch(guida, /\bvoto\b|\/10\b|ottimo|eccellente/i, 'niente voti: fatti');
 });
 
+// ───────────────────────── B36 · npm run giudica: la pagella in una schermata ─────────────────────────
+
+await prova('B36 · giudica: su reta-testo l\'esito è noto riga per riga; una schermata sola, senza render, senza voce e senza scrivere niente nel reel', async () => {
+  const {pagella, schermata, numeroInLettere, PAGELLA, treDomande} = await carica('motore/giudica.mjs');
+  const dir = path.join(K, 'reels/reta-testo');
+  const prima = fs.readdirSync(dir).map((f) => `${f}:${fs.statSync(path.join(dir, f)).mtimeMs}`).join('|');
+  const p = await pagella('reta-testo');
+  assert.equal(fs.readdirSync(dir).map((f) => `${f}:${fs.statSync(path.join(dir, f)).mtimeMs}`).join('|'), prima, 'la pagella non tocca il reel');
+  assert.equal(p.righe.length, 8);
+  const esiti = Object.fromEntries(p.righe.map((r) => [r.n, r.esito]));
+  assert.deepEqual(esiti, {1: 'no', 2: 'ok', 3: 'ok', 4: 'ok', 5: 'ok', 6: 'nd', 7: 'ok', 8: 'no'});
+  const valore = (n) => p.righe[n - 1].valore;
+  assert.equal(valore(1), '20 parole', 'la prima frase di reta-testo ha 20 parole: più delle 12 della pagella');
+  assert.match(valore(2), /^una ogni \d,\d s · attesa più lunga \d,\d s/);
+  assert.equal(valore(3), '4 scene su 4 con un segno sulla cifra');
+  assert.match(valore(4), /^la più lunga \d,\d s, dal secondo/);
+  assert.ok(Number(/([\d,]+) s/.exec(valore(4))[1].replace(',', '.')) <= PAGELLA.posa);
+  assert.equal(valore(5), '0 su 100 (basso)');
+  assert.match(valore(6), /^nessuna durata chiesta \(107,9 s stimati\)$/);
+  assert.equal(valore(7), '0 cifre nel testo · 0 numeri senza riga in fonti.md');
+  assert.equal(valore(8), '2 inviti: "Manda…", "Commenta…"');
+  // la schermata: una sola, con il segno e il numero accanto a ogni riga e le tre domande in fondo
+  const testo = schermata(p);
+  const righe = testo.trim().split('\n');
+  assert.ok(righe.length <= 24, `la pagella è di ${righe.length} righe: non sta in una schermata`);
+  assert.equal(righe.filter((r) => /^  [✓✖·]  \d /.test(r)).length, 8);
+  assert.ok(testo.includes('✖  1 Aggancio') && testo.includes('✓  5 Rischio cartelli basso'));
+  assert.match(testo, /5 a posto, 2 da sistemare, 1 che qui non si può dire\./);
+  assert.equal(treDomande().length, 3);
+  for (const d of treDomande()) assert.ok(testo.includes(d), 'le tre domande sono quelle di docs/OCCHIO.md');
+  // i numeri della pagella sono quelli scritti in docs/OCCHIO.md
+  const occhio = fs.readFileSync(path.join(K, 'docs/OCCHIO.md'), 'utf8');
+  assert.ok(occhio.includes(`meno di ${PAGELLA.aggancio} parole`) && occhio.includes(`mai più di ${PAGELLA.novitaMassima} secondi`) && occhio.includes(`più di ${PAGELLA.posa} secondi circa`));
+  // i numeri in lettere: quelli veri sì, le parole che ci somigliano no
+  for (const si of ['due', 'quattro', 'dieci', 'venti', 'mille', 'ventidue', 'trentuno', 'duecento', 'duemila', 'Quattro,']) assert.ok(numeroInLettere(si), si);
+  for (const no of ['dolore', 'placebo', 'studi', 'punti', 'tra', 'settimana', 'novità', 'vento']) assert.ok(!numeroInLettere(no), no);
+  // dalla riga di comando: stesso testo, esito 0; un reel senza piano dà un messaggio che si capisce
+  const env = {...process.env, FMLAB_REGISTRO: fs.mkdtempSync(path.join(os.tmpdir(), 'fmlab-b36-')), FMLAB_DASHBOARD: 'no'};
+  try {
+    const r = spawnSync(process.execPath, [path.join(K, 'motore/cli.mjs'), 'giudica', 'reta-testo'], {cwd: K, encoding: 'utf8', env});
+    assert.equal(r.status, 0, r.stderr);
+    assert.ok(r.stdout.includes('Pagella di "reta-testo"') && r.stdout.includes('2 inviti'));
+    const senza = spawnSync(process.execPath, [path.join(K, 'motore/cli.mjs'), 'giudica'], {cwd: K, encoding: 'utf8', env});
+    assert.notEqual(senza.status, 0);
+    assert.match(senza.stdout + senza.stderr, /npm run giudica <reel>/);
+  } finally {
+    fs.rmSync(env.FMLAB_REGISTRO, {recursive: true, force: true});
+  }
+});
+
 if (pannello) await pannello.server.chiudi();
 cancella();
 const falliti = esiti.filter((e) => !e.ok);
