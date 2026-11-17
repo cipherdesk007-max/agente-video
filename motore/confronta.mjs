@@ -600,6 +600,7 @@ async function misuraNarratore(ff, file) {
     cambiAlMinuto: arr(((tratti.length - 1) / (firme.length / NFPS)) * 60, 1),
     stessaPosaMediana: arr(mediana(durate)),
     stessaPosaMassimo: arr(Math.max(...durate)),
+    stessaPosaDove: arr(tratti[durate.indexOf(Math.max(...durate))].da / NFPS, 1), // a che secondo comincia: è lì che si va a guardare
   };
 }
 
@@ -834,6 +835,7 @@ export function tabella(nome, m, soglie) {
   if (m.sottotitoli.presenti) altro.push(`sottotitoli: ${m.sottotitoli.pagine} pagine, ${m.sottotitoli.paroleContate} parole, contrasto ${scrivi(m.sottotitoli.contrasto)}:1`);
   else altro.push('sottotitoli: non trovati nella fascia in alto');
   if (!m.narratore.presente) altro.push('narratore: non c\'è');
+  if (m.narratore?.presente && m.narratore.stessaPosaDove !== undefined) altro.push(`narratore: la posa tenuta più a lungo comincia al secondo ${scrivi(m.narratore.stessaPosaDove)} (per guardarla: npm run foto <reel> ${Math.round(m.narratore.stessaPosaDove + 1)})`);
   if (!m.audio.presente) altro.push('audio: nessuna traccia');
   else if (m.audio.muto) altro.push('audio: silenzio (niente voce: volume, ritardo ed effetti non si possono misurare)');
   else if (m.audio.senzaVoce) altro.push(`audio: solo effetti sonori, nessuna voce (${scrivi(m.audio.soloEffetti.lufs)} LUFS): volume, ritardo e musica si misurano solo con la voce vera`);

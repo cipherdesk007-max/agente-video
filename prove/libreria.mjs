@@ -48,13 +48,17 @@ await prova('gesti: scaletta sempre uguale, in ordine, con una pausa tra un gest
   assert.equal(a.filter((e) => e.gesto === 'saluta').length, 1);
   assert.ok(a.every((e) => gesti.GESTI.includes(e.gesto)));
 });
-await prova('pose: una nuova a ogni frase, inciso e segno; mai due uguali di fila; tenute almeno un secondo e un quarto', () => {
+await prova('pose: una nuova a ogni frase, inciso e segno; mai due uguali o quasi uguali di fila; tenute da uno a tre secondi e mezzo', () => {
   const pose = gesti.scalettaAssetti(dati, () => undefined);
   assert.ok(pose.length >= 8, `solo ${pose.length} pose`);
   for (let i = 1; i < pose.length; i++) {
     assert.notEqual(pose[i].posa, pose[i - 1].posa);
+    // due pose quasi uguali di fila (presenta e lato, lato e aperto, aperto e dito) a guardarle sono una posa sola
+    assert.ok(!gesti.poseVicine(pose[i].posa, pose[i - 1].posa), `${pose[i - 1].posa} e poi ${pose[i].posa} a ${pose[i].t}: sembra fermo`);
     assert.ok(pose[i].t - pose[i - 1].t >= gesti.TENUTA - 0.26, `pose troppo vicine a ${pose[i].t}`);
   }
+  // nessuna posa tenuta più di tre secondi e mezzo, nemmeno sull'ultima frase
+  pose.forEach((c, i) => assert.ok((pose[i + 1]?.t ?? dati.durata) - c.t <= 3.5, `${c.posa} tenuta ${((pose[i + 1]?.t ?? dati.durata) - c.t).toFixed(1)} s da ${c.t.toFixed(1)}`));
   assert.ok(new Set(pose.map((p) => p.posa)).size >= 3);
   assert.equal(pose[pose.length - 1].posa, 'alto'); // sull'invito finale il dito va in alto
   const fissa = gesti.scalettaAssetti(dati, () => ({posa: 'lato'}));

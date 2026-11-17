@@ -87,6 +87,14 @@ const SINONIMI: Record<string, string[]> = {
 /** L'ordine in cui il kit alterna le pose quando nessuna regola ne sceglie una. */
 const GIRO_POSE = ['dito', 'aperto', 'lato', 'pensa', 'alto', 'presenta', 'conserte'];
 
+/**
+ * Pose che a guardarle sono quasi la stessa: il braccio si sposta di una decina di gradi e basta (presenta e lato,
+ * lato e aperto, aperto e dito). Una dopo l'altra non sono un cambio di posa: il narratore sembra fermo, e il metro
+ * lo conta fermo. Dopo una posa non si sceglie mai una sua vicina.
+ */
+const VICINE: Record<string, string[]> = {presenta: ['lato'], lato: ['presenta', 'aperto'], aperto: ['lato', 'dito'], dito: ['aperto']};
+export const poseVicine = (a: string, b: string): boolean => a === b || (VICINE[a] ?? []).includes(b);
+
 /** `seconda` = lo stato dell'altra mano scelto insieme a questa posa (solo per i personaggi che ce l'hanno). */
 export type CambioPosa = {t: number; posa: string; seconda?: string};
 
@@ -242,8 +250,11 @@ export function scalettaAssetti(dati: DatiReel, regiaDi: (nomeScena: string) => 
   let conta = 0;
   const scegli = (adatte: string[], precedente: string): string => {
     const candidate = [...new Set(adatte.map((p) => nota(p)).filter((p): p is string => !!p))];
-    const libere = candidate.filter((p) => p !== precedente);
-    const tra = libere.length ? libere : alterna.filter((p) => p !== precedente);
+    // all'inizio del reel non c'è una posa di prima da cui allontanarsi: basta non restare com'è
+    const vicina = (p: string) => (cambi.length ? poseVicine(p, precedente) : p === precedente);
+    const libere = candidate.filter((p) => !vicina(p));
+    const lontane = libere.length ? libere : alterna.filter((p) => !vicina(p));
+    const tra = lontane.length ? lontane : [...candidate, ...alterna].filter((p) => p !== precedente);
     const lista = tra.length ? tra : candidate.length ? candidate : alterna;
     return lista.reduce((migliore, p) => ((ultimoUso[p] ?? -1) < (ultimoUso[migliore] ?? -1) ? p : migliore), lista[0]);
   };
@@ -333,13 +344,13 @@ export function scalettaAssetti(dati: DatiReel, regiaDi: (nomeScena: string) => 
         return;
       }
       if (f.inizio - ultimoCambio < TENUTA) return; // una posa va tenuta almeno un po': niente cambi a raffica
-      if (f.fine >= scena.fine - 0.4 && f.dentro) return; // non si cambia posa a un soffio dal cambio di scena
+      if (f.inizio >= scena.fine - TENUTA && f.dentro) return; // non si cambia posa a un soffio dal cambio di scena: lì ne arriva un'altra
       const haEnfasi = f.parole.some((p) => p.enfasi);
       // una frase che comincia negando o frenando ("Non è un miracolo…", "Ma…") si dice bene a braccia conserte
       const frena = f.parole.slice(0, 2).some((p) => negazione.test(pulita(p.testo))) || FRENI.test(pulita(f.parole[0]?.testo ?? ''));
       const precedente = cambi.length ? cambi[cambi.length - 1].posa : 'dito';
       let posa: string;
-      if (casa) posa = precedente === casa ? scegli(alterna, precedente) : casa; // di casa, un'altra, di casa…
+      if (casa) posa = poseVicine(precedente, casa) ? scegli(alterna, precedente) : casa; // di casa, un'altra lontana, di casa…
       else if (f.domanda) posa = scegli(['pensa', 'aperto'], precedente); // ci sta pensando: dito al mento, o mano aperta
       else if (n === 0 && k > 0 && !f.dentro) posa = scegli(['lato', 'presenta', 'aperto'], precedente); // scena nuova: presenta quello che è comparso
       else if (frena && !ultima) posa = scegli(['conserte', 'pensa'], precedente); // sta mettendo un freno: braccia conserte, o dito al mento
