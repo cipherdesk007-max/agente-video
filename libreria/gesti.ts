@@ -299,9 +299,22 @@ export function scalettaAssetti(dati: DatiReel, regiaDi: (nomeScena: string) => 
     spunti.forEach((f) => {
       if (!f.dentro) n++;
       if (f.inizio - ultimoCambio < TENUTA) return; // una posa va tenuta almeno un po': niente cambi a raffica
-      if (f.fine >= scena.fine - 0.4 && f.dentro) return; // non si cambia posa a un soffio dal cambio di scena
+      if (f.fine >= scena.fine - 0.4 && f.dentro && !(ultima && f.invito)) return; // non si cambia posa a un soffio dal cambio di scena
       const haInvito = ultima && f.invito;
-      if (haInvito && f.dentro) return; // sull'invito finale il dito resta in alto fino alla fine della frase
+      const precedenteQui = cambi.length ? cambi[cambi.length - 1].posa : 'dito';
+      // sull'invito finale il dito in alto è la posa di casa: ci si torna, e la frase finisce così; ma in mezzo il
+      // narratore si muove (tenerlo fermo per tutto l'invito erano sette secondi con lo stesso gesto)
+      if (haInvito && f.dentro) {
+        const alto = nota('alto') ?? alterna[0];
+        const ultimoSpunto = f === spunti[spunti.length - 1] || spunti[spunti.indexOf(f) + 1]?.inizio >= scena.fine - 1.6;
+        const posa = precedenteQui === alto ? (ultimoSpunto ? alto : scegli(alterna, alto)) : alto;
+        if (posa !== precedenteQui) {
+          cambi.push({t: Math.max(0, f.inizio - 0.25), posa, seconda: secondaPer(posa, regia?.seconda)});
+          ultimoUso[posa] = conta++;
+          ultimoCambio = f.inizio;
+        }
+        return;
+      }
       const haEnfasi = f.parole.some((p) => p.enfasi);
       // una frase che comincia negando o frenando ("Non è un miracolo…", "Ma…") si dice bene a braccia conserte
       const frena = f.parole.slice(0, 2).some((p) => negazione.test(pulita(p.testo))) || FRENI.test(pulita(f.parole[0]?.testo ?? ''));
