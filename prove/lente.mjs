@@ -37,6 +37,11 @@ async function prova(nome, f) {
 }
 
 /** Lancia un comando del kit e restituisce codice di uscita e testo stampato. */
+// le prove non devono sporcare il registro, la coda e il diario veri (la dashboard li mostra a chi usa il kit)
+const PROVA_REGISTRO = fs.mkdtempSync(path.join(os.tmpdir(), 'fmlab-prove-'));
+process.env.FMLAB_REGISTRO ??= PROVA_REGISTRO;
+process.env.FMLAB_DIARIO ??= path.join(PROVA_REGISTRO, 'diario.md');
+process.on('exit', () => fs.rmSync(PROVA_REGISTRO, {recursive: true, force: true}));
 function kit(argomenti, {env = {}, attesa = 900000} = {}) {
   const r = spawnSync(process.execPath, [CLI, ...argomenti], {cwd: K, encoding: 'utf8', timeout: attesa, env: {...process.env, FMLAB_NON_APRIRE: '1', ...env}});
   return {codice: r.status, testo: `${r.stdout ?? ''}${r.stderr ?? ''}`};
