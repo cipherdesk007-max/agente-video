@@ -54,8 +54,10 @@ un segno ogni 2-3 secondi. Segni ed enfasi si spostano senza rifare la voce: il 
 
 ## Scene pronte (`libreria/Blocchi.tsx`)
 
-Quello che non entra in una scena pronta (una voce in più del massimo, una scritta troppo lunga) ferma la scena
-con un errore che dice cosa fare: niente viene tagliato in silenzio.
+Le scene pronte si adattano: un elenco più lungo del posto **scorre** (restano a schermo gli ultimi comparsi, lungo
+la scena passano tutti), torta e classifica **raggruppano** le voci più piccole in "Altri (n)", le barre arrivano a
+12 colonne, una scritta un po' lunga si rimpicciolisce. Solo oltre questi limiti la scena si ferma con un errore che
+dice cosa fare: niente viene tagliato in silenzio.
 Ogni testo: `'scritta'` oppure `{it: '…', en: '…'}`. Ogni `segno`: nome di un `[segno]`, oppure secondi dall'inizio
 della scena, oppure niente (si distribuiscono da soli).
 
@@ -123,6 +125,41 @@ Esempio completo: `reels/gps/scene.tsx`. Tutto è funzione del tempo: `const s =
   `<Filmato clip={demo} … />`; con `schermo` riempiono lo schermo di un `<Telefono>`. Mai `<video>`.
 
 Vietati: animazioni CSS, `Date`, `Math.random()`, `setTimeout`.
+
+## Il mondo dietro le scene: luogo, camera, protagonista
+
+Dietro ogni scena c'è un posto a livelli (trama, luogo disegnato, luce) e una camera che non si ferma: viaggia
+sempre, scatta a ogni cambio di scena e dà una spinta con un lampo a ogni `[segno]`. Tre cose si dichiarano in
+`definisciReel`, scena per scena:
+
+```tsx
+export default definisciReel({
+  protagonista: {tipo: 'peptide', colore: '#5CF2C8'},          // 'peptide' | 'goccia' | 'cellula'
+  scene: {
+    aggancio: {componente: Aggancio, atmosfera: {tinta: '#E8455A', luogo: 'corpo'}},
+    studi:    {componente: Studi, atmosfera: {luogo: 'studio'}, entra: 'destra', protagonista: {onda: 0.3}},
+    rischi:   {componente: Rischi, atmosfera: {luogo: 'vaso'}, protagonista: [{colore: '#FF4D5E', onda: 1.6}, {segno: 'stop', acceso: 0.1}]},
+  },
+});
+```
+
+- **`luogo`**: `corpo` · `vaso` · `membrana` · `laboratorio` · `stadio` · `palco` · `bilancia` · `studio` · `vuoto`.
+- **`entra`**: da che parte la camera arriva nella scena. `avanti` (di serie: attraversa la scena prima, che si
+  ingrandisce e si sfoca) · `sinistra` · `destra` · `alto` · `basso` (carrellata). Mai un taglio, mai una dissolvenza semplice.
+- **`protagonista`**: un oggetto solo per tutto il reel, che resta mentre le scene cambiano. Ogni scena ne dice lo
+  stato: `x`, `y`, `grandezza`, `acceso` (0-1), `carica` (0-1, da vuoto a pieno), `colore`, `onda` (0-2, da calmo ad
+  agitato), `presenza`. Più stati nella stessa scena: il primo all'ingresso, gli altri ognuno al suo `segno`.
+  `false` = esce di scena. Quello che non scrivi resta com'era: **è lo stesso oggetto che cambia stato, non uno nuovo.**
+- `mondo: false` nel reel torna al fondo semplice di prima.
+
+## Immagini generate (materiale, non video)
+
+`npm run immagine <reel> "un ginocchio in sezione, cartilagine azzurra"` dà un PNG su fondo trasparente in
+`libreria/immagini/`, da mettere in scena con `<Foto file="libreria/immagini/….png" … />`: ad animarlo è il kit.
+Se un'immagine con lo stesso soggetto e lo stesso stile c'è già, esce dalla biblioteca e **costa zero**. Lo stile
+è quello del foglio `reels/<reel>/immagini.json` (`{"stile": "…", "formato": "1:1"}`), oppure quello del kit.
+Chi genera si sceglie in `.env` con `FMLAB_IMMAGINI`: `nessuno` (di serie: non spende mai), `higgsfield`,
+`stability`, `comando`. **Prima di generare con un fornitore a pagamento: chiedi.** `npm run immagini` elenca la biblioteca.
 
 ## Dove stanno le cose (1080x1920)
 

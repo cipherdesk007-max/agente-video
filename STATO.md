@@ -1,12 +1,12 @@
 # Stato dei lavori
 
-Incarico: `BRIEF_AGENTE.md`. Difetti: `BUG.md`. Aggiornato il 16/11/2026.
+Incarico: `BRIEF_AGENTE.md`. Difetti: `BUG.md`. Aggiornato il 17/11/2026.
 
 | Fase | Stato | Controllo |
 |---|---|---|
 | 0 · Diagnosi | **chiusa** (un punto da confermare sul Mac, vedi sotto) | prove veloci, collaudo e prove lente verdi; nessun difetto grave aperto |
 | 1 · Il metro | **chiusa** | `npm run confronta` dà gli stessi numeri due volte; le soglie stanno in `riferimenti/misure.json` |
-| 2 · Motore delle scene | da fare | — |
+| 2 · Motore delle scene | **chiusa** (controllo superato; tre punti aperti, vedi sotto) | `reta-ginocchio` rifatto: tagli, novità e palco dentro le soglie; render misurato |
 | 3 · Il regista | da fare | — |
 | 4 · Rifinitura | da fare | — |
 
@@ -143,6 +143,80 @@ contrasto), luminosità, tinte, palco occupato.
 - Correzione a una misura della fase 0: il riferimento 1 è a **−14,6 LUFS**, non −17,7 come scriveva `ANALISI.md`.
   Il volume della voce del kit (−14,0) è già dentro la soglia: non c'è niente da cambiare in fase 4.
 
+## Fase 2 · cosa è chiuso (17/11/2026)
+
+- **Il mondo a livelli** (`libreria/Mondo.tsx`): fondo, nebbia, trama lontana e vicina, luogo disegnato, luce, ognuno
+  a una distanza diversa. La camera viaggia sempre, scatta a ogni cambio di scena, dà una spinta con un lampo a ogni
+  `[segno]`. Vale per tutti i reel, anche quelli già fatti (`mondo: false` lo spegne).
+- **Otto luoghi pronti**, disegnati dal kit a costo zero: corpo con organi, vaso sanguigno, membrana con recettori,
+  laboratorio, stadio, palco, bilancia, documento/studio.
+- **Passaggi senza taglio**: `entra: 'avanti'` attraversa la scena prima (si ingrandisce e si sfoca), `sinistra`,
+  `destra`, `alto`, `basso` sono carrellate; la tinta del mondo cambia insieme. Guardati a un fotogramma ogni 0,2 s.
+- **Il protagonista** (`libreria/Protagonista.tsx`): un oggetto solo che resta mentre le scene cambiano, e cambia
+  stato (acceso/spento, pieno/vuoto, colore, calmo/agitato) al cambio di scena o a un segno. Tre tipi: peptide,
+  goccia, cellula.
+- **Immagini generate come materiale** (`motore/immagini.mjs`): un'interfaccia, quattro fornitori (`nessuno` di serie,
+  `higgsfield`, `stability`, `comando`), fondo trasparente fatto dal kit, biblioteca con impronta.
+- **Le scene pronte si adattano** invece di fermarsi: scorrono, raggruppano, stringono.
+- **`reta-ginocchio` rifatto** con il motore nuovo: un luogo per scena, tre carrellate, la catena della Reta come
+  protagonista (mezza carica alla scala del dolore, spenta sul placebo, rossa e agitata sui rischi).
+
+### `reta-ginocchio`, prima e dopo (stesso copione, stesse scene, `npm run confronta`)
+
+| | Soglia | Prima | Dopo |
+|---|---|---|---|
+| Tagli netti | 0 | 0 | 0 |
+| Secondi tra due novità (mediana) | al massimo 2,01 | 2,70 | **1,95** |
+| Secondi tra due novità (9 volte su 10) | al massimo 4,16 | 4,67 | **3,15** |
+| Attesa più lunga senza novità | al massimo 8,0 | 7,1 s | 3,73 s |
+| Palco occupato (media / momenti più vuoti) | almeno 0,36 / 0,12 | 0,46 / 0,23 | 0,54 / 0,34 |
+| Tempo con il palco fermo | al massimo 7,4% | 56,6% | **0,1%** |
+| Fermo più lungo | al massimo 1,76 s | 4,4 s | **0,13 s** |
+| Movimento sul palco | almeno 2,98% | 0,62% | 1,49% (ancora fuori) |
+| Sottotitoli: contrasto nei momenti peggiori | almeno 2,98 | 6,0 | 4,5 |
+| Sottotitoli: tempo con altro nella loro fascia | al massimo 51,8% | 0,4% | 43,8% (riferimenti: 23-45%) |
+| Misure dentro / fuori / non misurabili | | 15 / 8 / 5 | **19 / 4 / 5** |
+| Tempo di render (2 pezzi, 3.441 fotogrammi) | | 5,8 fotogrammi al secondo | 4,5: **12 min 40 s** |
+| Peso del video | | 44 MB | 102 MB |
+
+Le quattro misure ancora fuori: il movimento, e le tre del narratore (fase 4).
+
+Prove a fine fase: `npm test` 65 prove in 8,9 s (17 motore, 21 libreria, 27 difetti e fasi); `npm run prove:lente`
+9 su 9 in 11 min 43 s su questo computer (collaudo, modelli, render fermato, durata con voce finta, metro, mondo,
+soglie dei riferimenti, numeri e fonti, pannello dal telefono).
+
+### Punti aperti della fase 2
+
+1. **Movimento sul palco: 1,49% contro almeno 2,98%.** Il fondo ora si muove sempre, ma nei riferimenti si muove
+   quello che sta *davanti*: oggetti che girano, la camera che gli passa accanto. Ho provato a spingere solo il fondo
+   (camera il doppio più veloce, più fili): il numero sale di poco (1,31 → 1,47 → 1,60) e la fascia dei sottotitoli
+   si riempie (dal 2% al 40% del tempo). Non è la strada: serve che le scene siano oggetti in movimento, cioè il
+   lavoro del regista (fase 3) sulle scene, non altro fondo.
+2. **Immagini generate: mai provate con un fornitore vero.** Higgsfield e Stability sono provati contro servizi finti
+   in locale (richiesta, attesa, scarico, ritaglio). La forma della risposta "finita" di Higgsfield e l'indirizzo di
+   Stability li ho scritti dalla loro documentazione senza poterli chiamare: **alla prima immagine vera possono
+   servire ritocchi.** Servono le chiavi, e si spendono crediti: è una delle cose da chiedere.
+3. **I luoghi sono disegni al tratto fatti dal kit**, non illustrazioni: danno il posto e il movimento, non ancora la
+   ricchezza dei riferimenti. Il salto di aspetto passa dalle immagini generate (punto 2) e dalla prova cieca, che
+   non è ancora stata fatta.
+
+### Scelte della fase 2, e perché
+
+- **Una scena dichiara solo da dove si entra** (`entra`); da dove si esce è l'ingresso della scena dopo. Due
+  dichiarazioni per lo stesso passaggio potevano contraddirsi.
+- **La trasparenza delle immagini la fa il kit** (soggetto chiesto su verde pieno, `ffmpeg` toglie il verde): così
+  vale per qualunque fornitore, anche per quelli che non sanno fare il fondo trasparente.
+- **Secondo fornitore: Stability, più `comando`** (un programma qualsiasi, anche uno che gira sul Mac senza rete).
+  Di serie `nessuno`: il kit non spende mai da solo.
+- **Barre fino a 12 colonne, poi errore**: oltre non si leggono su un telefono, e raggruppare una serie nel tempo
+  la falsa. Torta e classifica invece raggruppano ("Altri (n)"), gli elenchi scorrono.
+- **Il protagonista sta in basso a sinistra** (x 260, y 1392) se la scena non dice altro: è il punto libero in
+  tutte e dieci le scene di `reta-ginocchio`, tra il palco e la didascalia dell'app.
+- **Effetto sul metro da tenere presente:** con il mondo dietro, il conteggio delle parole dai sottotitoli sbaglia
+  di più (316 contate, 290 vere: +9%; prima −3%), e le misure del narratore si spostano anche se il narratore non è
+  cambiato (cambi di posa al minuto 15,7 → 14,1), perché nel suo riquadro ora passa il fondo. Da sistemare nel metro
+  prima di giudicare il narratore in fase 4.
+
 ## Da decidere (Francesco)
 
 1. **Voce vera per misurare un reel del kit** (volume, musica, anticipo dei sottotitoli, parole al minuto): serve
@@ -151,9 +225,14 @@ contrasto), luminosità, tinte, palco occupato.
 2. **Riconoscitore della voce sul Mac**, per il controllo "parole pronunciate = testo dato": un programma gratuito
    da installare una volta, che il kit chiamerebbe da solo. Senza, quel controllo resta fatto sul copione e non
    sull'audio.
+3. **Chiavi per le immagini** (Higgsfield, che hai già): per provare `npm run immagine` con il servizio vero
+   servono `HF_API_KEY_ID` e `HF_API_KEY_SECRET` nel file `.env` del Mac, e il permesso di spendere i crediti di
+   qualche immagine di prova.
+4. **Chi scrive il piano di regia nella fase 3**: un modello che gira sul Mac (gratis, ma sul MacBook del 2017 è
+   lento e va installato) oppure un servizio a pagamento con la chiave in `.env` (pochi centesimi a reel).
 
 ## Prossimo passo
 
-Fase 2, il motore delle scene illustrate. Il primo numero da muovere è il palco fermo (57% → sotto il 7%), poi i
-secondi tra due novità (2,7 → sotto 2,0). Controllo di fase: `reta-ginocchio` rifatto con il motore nuovo dentro le
-soglie su tagli, novità e palco, con il tempo di render misurato.
+Fase 3, il regista: dal testo incollato al piano di regia (`piano.json`) e alle scene, senza un agente esterno.
+Prima scelta da fare lì: quale modello scrive il piano (uno locale sul Mac, o uno a pagamento con la chiave in
+`.env`). È una spesa o un'installazione: va chiesta.

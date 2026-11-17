@@ -1,5 +1,19 @@
 # Novità
 
+## Verso la 2.0 · fase 2: il motore delle scene illustrate (in corso)
+
+- **Il mondo a livelli** dietro ogni scena (`libreria/Mondo.tsx`): trama lontana e vicina, luogo disegnato, luce,
+  ognuno a una distanza diversa. La camera viaggia sempre, scatta a ogni cambio di scena e dà una spinta con un
+  lampo a ogni `[segno]`. Otto luoghi pronti: corpo, vaso, membrana, laboratorio, stadio, palco, bilancia, studio.
+- **Passaggi senza taglio**: ogni scena dichiara da che parte si entra (`entra`): attraversando la scena prima,
+  oppure in carrellata da un lato.
+- **Il protagonista** (`libreria/Protagonista.tsx`): un oggetto che resta da una scena all'altra e cambia stato
+  (acceso/spento, pieno/vuoto, colore, calmo/agitato) invece di essere sostituito.
+- **Immagini generate come materiale** (`motore/immagini.mjs`, `npm run immagine`): un'interfaccia, più fornitori
+  scelti in `.env`, fondo trasparente fatto dal kit, biblioteca con impronta (la seconda volta costa zero).
+- **Le scene pronte si adattano**: scorrono, raggruppano, stringono, invece di fermarsi al primo elemento in più.
+- `reta-ginocchio` rifatto con il motore nuovo. I numeri prima e dopo sono in `STATO.md`.
+
 ## Verso la 2.0 · fase 1: il metro
 
 - **`npm run confronta <video>`** misura un video qualsiasi e stampa una tabella: tagli netti, secondi tra una novità

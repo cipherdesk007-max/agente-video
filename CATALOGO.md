@@ -52,6 +52,26 @@ dolore:   bloccoScala({titolo: 'Dolore da 0 a 10', cursori: [{etichetta: 'Prima'
 cosa:     bloccoIcone({titolo: 'Cosa conta', voci: [{icona: FaHeartPulse, testo: 'Cuore', segno: 'cuore'}, {icona: FaBrain, testo: 'Testa', segno: 'testa'}]}),
 ```
 
+## Luoghi (il mondo dietro le scene)
+
+`atmosfera: {luogo: '…'}` nella scena. Disegnati dal kit, a costo zero, a più livelli e con la camera che li percorre.
+
+| Luogo | Cosa si vede |
+|---|---|
+| `corpo` | il busto con cuore che batte, polmoni, fegato, stomaco, intestino |
+| `vaso` | le due pareti di un vaso sanguigno e i globuli rossi che scorrono |
+| `membrana` | il doppio strato con le teste e le code, e tre recettori che lo attraversano |
+| `laboratorio` | il banco con la beuta che bolle, le provette, la mensola |
+| `stadio` | le gradinate con il pubblico che si accende e due torri faro |
+| `palco` | il sipario, tre riflettori che si muovono, la pedana |
+| `bilancia` | la bilancia a due piatti che oscilla |
+| `studio` | i fogli di uno studio con righe, grafico e timbro |
+| `vuoto` | solo trama e luce |
+
+## Protagonista
+
+`protagonista: {tipo: '…'}` nel reel: `peptide` (la catena di perle), `goccia`, `cellula`. Stati per scena in `SCHEDA.md`.
+
 ## Oggetti 3D
 
 Ognuno restituisce le sue facce: `<Scena3D x={540} y={880} camera={{giro: -20 + s.t * 4, alza: 14, zoom: 2}} oggetti={[...fiala3d(), ...ombra({raggio: 200})]} />`.
