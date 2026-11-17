@@ -1222,6 +1222,37 @@ await prova('B32 · docs/OCCHIO.md: otto voci, ognuna con il suo controllo; i nu
   assert.equal(occhio.slice(occhio.indexOf('## Tre domande')).split('\n').filter((r) => /^\d\. .+\?/.test(r)).length, 3);
 });
 
+// ───────────────────────── B33 · le ricette (docs/RICETTE.md) ─────────────────────────
+
+await prova('B33 · docs/RICETTE.md: da sei a otto ricette, ognuna con quando usarla, il testo e una scena che passa il controllo del piano; i numeri sono quelli di reta-testo', async () => {
+  const {controllaPiano, BLOCCHI} = await carica('motore/piano.mjs');
+  const ricette = fs.readFileSync(path.join(K, 'docs/RICETTE.md'), 'utf8').split(/^## \d · /m).slice(1);
+  const catalogo = fs.readFileSync(path.join(K, 'CATALOGO.md'), 'utf8');
+  const fonti = fs.readFileSync(path.join(K, 'reels/reta-testo/fonti.md'), 'utf8') + fs.readFileSync(path.join(K, 'reels/reta-testo/piano.json'), 'utf8');
+  assert.ok(ricette.length >= 6 && ricette.length <= 8, `le ricette sono ${ricette.length}`);
+  const blocchi = [];
+  for (const r of ricette) {
+    const titolo = r.split('\n')[0];
+    assert.match(r, /\*\*Quando:\*\* .{20,}/, `${titolo}: manca quando usarla`);
+    const testo = /\*\*Testo:\*\* (.+)/.exec(r)?.[1];
+    const riga = /```json\n(.+)\n```/.exec(r)?.[1];
+    assert.ok(testo && riga, `${titolo}: mancano il testo o la scena`);
+    const scena = JSON.parse(riga);
+    blocchi.push(scena.blocco);
+    assert.ok(catalogo.includes(BLOCCHI[scena.blocco].fn), `${titolo}: il blocco "${scena.blocco}" non è in CATALOGO.md`);
+    assert.ok(Object.keys(scena.segni ?? {}).length && scena.enfasi?.length && scena.camera, `${titolo}: la scena mostra segni, enfasi e camera`);
+    const esito = controllaPiano({versione: 1, titolo: 'Ricetta', scene: [scena]}, testo);
+    assert.deepEqual(esito.errori, [], titolo);
+    assert.deepEqual(esito.avvisi.filter((a) => !a.startsWith('Effetti sonori')), [], `${titolo}: la scena d'esempio ha un avviso`);
+    // nessun numero inventato: ogni numero con la virgola è scritto nelle fonti o nel piano di reta-testo
+    for (const [n] of riga.matchAll(/\b\d+\.\d+\b/g)) {
+      if (Number(n) <= 1) continue; // gli stati dei soggetti vanno da 0 a 1: non sono dati
+      assert.ok(fonti.includes(n.replace('.', ',')) || fonti.includes(n), `${titolo}: il numero ${n} non viene da reels/reta-testo`);
+    }
+  }
+  for (const serve of ['numero', 'confronto', 'passi', 'mito', 'scala', 'barre']) assert.ok(blocchi.includes(serve), `manca la ricetta con il blocco "${serve}"`);
+});
+
 if (pannello) await pannello.server.chiudi();
 cancella();
 const falliti = esiti.filter((e) => !e.ok);
