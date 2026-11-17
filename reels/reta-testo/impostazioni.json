@@ -1,0 +1,20 @@
+{
+  "regalo": "auto",
+  "narratore": {
+    "chi": "dottore",
+    "grandezza": 100,
+    "lato": "destra",
+    "alza": 0,
+    "specchia": false,
+    "mano2": "auto"
+  },
+  "stile": "2d",
+  "musica": 30,
+  "durata": null,
+  "voce": {
+    "motore": "auto",
+    "elevenlabs": {},
+    "mac": {},
+    "comando": {}
+  }
+}
