@@ -964,7 +964,7 @@ export function bloccoSigla({nome = stile.logo.nome, sotto, segno}: {nome?: Test
  * Il regalo della pagina sul tablet 3D che gira, con l'invito sotto ("Commenta MAPPA").
  * `regalo` sceglie quale: uno dei nomi di `stile/regali.json` (`npm run regalo` li elenca e ne aggiunge). Senza, il primo.
  */
-export function bloccoEbook({sopra, invito, sotto, segno, segnoSopra, segnoSotto, gira = 28, regalo}: {sopra?: Testo; invito?: Testo; sotto?: Testo; segno?: Quando; /** La riga sopra compare su un'altra parola. */ segnoSopra?: Quando; /** La riga sotto compare su un'altra parola (di serie poco dopo l'invito). */ segnoSotto?: Quando; gira?: number; regalo?: string} = {}): ComponentType {
+export function bloccoEbook({sopra, invito, sotto, segno, segnoSopra, segnoSotto, segnoGiro, gira = 28, regalo}: {sopra?: Testo; invito?: Testo; sotto?: Testo; segno?: Quando; /** La riga sopra compare su un'altra parola. */ segnoSopra?: Quando; /** La riga sotto compare su un'altra parola (di serie poco dopo l'invito). */ segnoSotto?: Quando; /** Su questa parola il tablet fa un giro intero. */ segnoGiro?: Quando; gira?: number; regalo?: string} = {}): ComponentType {
   const scelto = regaloDi(regalo);
   return function ScenaEbook() {
     const {s, dice, dopo} = useBlocco();
@@ -974,7 +974,7 @@ export function bloccoEbook({sopra, invito, sotto, segno, segnoSopra, segnoSotto
       <>
         <Bagliore x={CX} y={CY - 90} raggio={600} colore={C.positivo} forza={0.16 + 0.1 * rampa(da, 0.6)} />
         <Cappello testo={dice(sopra)} y={CY - 480} da={segnoSopra === undefined ? da - 0.2 : dopo(segnoSopra)} colore={C.positivo} />
-        <Ebook x={CX} y={CY - 90} larghezza={450} da={da} gira={gira} file={scelto.file} misure={scelto.misure} />
+        <Ebook x={CX} y={CY - 90} larghezza={450} da={da} gira={gira} file={scelto.file} misure={scelto.misure} giro={segnoGiro === undefined ? 0 : 360 * rampa(dopo(segnoGiro), 1, curve.morbida)} />
         {testo ? <Righe testo={testo} y={CY + 340} dimensione={adatta(testo, 820, 84, 46, 0.66)} peso={900} da={da - 0.5} larghezza={900} /> : null}
         <Cappello testo={dice(sotto)} y={CY + 425} da={segnoSotto === undefined ? da - 0.8 : dopo(segnoSotto)} />
       </>
@@ -1007,10 +1007,10 @@ export function bloccoParole({parole, titolo, colore = C.luce}: {parole: {testo:
           if (dietro >= 3.4) return null;
           const testo = dice(p.testo);
           const tinta = p.colore ?? (i % 2 ? C.testo : colore);
-          const corpo = adatta(testo, 880, 176, 64, 0.58);
+          const corpo = adatta(testo, 760, 168, 56, 0.6);
           const entra = molla(da, {rigidita: 170, smorzamento: 15});
           const piccolo = limita(dietro);
-          const scala = mix(mix(1.5, 1, entra), 0.44, piccolo) * (1 + 0.05 * limita(da / 4) * (1 - piccolo));
+          const scala = mix(mix(0.6, 1, entra), 0.44, piccolo) * (1 - 0.05 * (1 - limita(da / 4)) * (1 - piccolo));
           const y = CY + 30 - (dietro <= 1 ? dietro * 250 : 250 + (dietro - 1) * 104) + 7 * Math.sin(s.t * 1.3 + i);
           const x = CX + (dietro > 0 ? 14 * Math.sin(s.t * 0.7 + i * 2.1) : 0);
           const opaco = rampa(da, 0.14) * mix(1, 0.5, piccolo) * (1 - rampa(dietro - 2.5, 0.8));

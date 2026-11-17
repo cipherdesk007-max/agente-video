@@ -57,7 +57,7 @@ export function Logo({x, y, larghezza = 420, da, fino, bagliore = 1, spento = 0}
  *
  * Per la scena intera ("Commenta MAPPA e te lo mando") c'è bloccoEbook. Per cambiare copertina: sostituisci stile/ebook.jpg.
  */
-export function Ebook({x, y, larghezza = 460, da, fino, gira = 22, bagliore = 1, file, misure}: {x: number; y: number; larghezza?: number; da: number; fino?: number; /** Gradi di oscillazione a destra e a sinistra (0 = fermo, di fronte). */ gira?: number; bagliore?: number; /** Un'altra copertina, dalla cartella stile/. */ file?: string; /** Larghezza e altezza della copertina in pixel (di serie quelle di stile.ebook). */ misure?: [number, number]}) {
+export function Ebook({x, y, larghezza = 460, da, fino, gira = 22, bagliore = 1, file, misure, giro = 0}: {x: number; y: number; larghezza?: number; da: number; fino?: number; /** Gradi di oscillazione a destra e a sinistra (0 = fermo, di fronte). */ gira?: number; bagliore?: number; /** Un'altra copertina, dalla cartella stile/. */ file?: string; /** Larghezza e altezza della copertina in pixel (di serie quelle di stile.ebook). */ misure?: [number, number]; /** Gradi in più attorno all'asse verticale: 360 = un giro intero (per farlo girare su una parola). */ giro?: number}) {
   const tempo = useTempo();
   if (da <= 0) return null;
   const uscita = fino === undefined ? 0 : rampa(fino, 0.3, curve.entra);
@@ -69,7 +69,7 @@ export function Ebook({x, y, larghezza = 460, da, fino, gira = 22, bagliore = 1,
   const spessore = L * 0.04;
   const raggio = L * 0.075;
   const p = molla(da, {rigidita: 70, smorzamento: 13});
-  const ry = mix(-150, 0, p) + gira * Math.sin((tempo.ora * 2 * Math.PI) / 5.2) * rampa(da - 0.5, 0.8);
+  const ry = mix(-150, 0, p) + gira * Math.sin((tempo.ora * 2 * Math.PI) / 5.2) * rampa(da - 0.5, 0.8) + giro;
   const rx = 5 + 2.5 * onda(tempo.ora, 4.1);
   const su = 10 * onda(tempo.ora, 3.3);
   const strati = 9;

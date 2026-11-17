@@ -30,16 +30,17 @@ const RESPIRO = 0.012;
  * I movimenti di camera dentro una scena, dall'inizio alla fine della scena: scala, spostamento (pixel) e giro (gradi).
  * 'spinta' si avvicina, 'indietro' si allontana, 'destra'/'sinistra' carrellano (la scena scorre dall'altra parte),
  * 'sale'/'scende' come una gru, 'gira' ruota di poco attorno al centro, 'ferma' lascia solo il respiro.
+ * La scena non diventa mai più grande di come è disegnata (scala al più 1): così niente esce dalle zone sicure.
  */
 const MOVIMENTI: Record<string, {scala: [number, number]; x: [number, number]; y: [number, number]; giro: [number, number]}> = {
   ferma: {scala: [1, 1], x: [0, 0], y: [0, 0], giro: [0, 0]},
-  spinta: {scala: [0.95, 1.05], x: [0, 0], y: [0, 0], giro: [0, 0]},
-  indietro: {scala: [1.05, 0.95], x: [0, 0], y: [0, 0], giro: [0, 0]},
-  destra: {scala: [1, 1], x: [44, -44], y: [0, 0], giro: [0, 0]},
-  sinistra: {scala: [1, 1], x: [-44, 44], y: [0, 0], giro: [0, 0]},
-  sale: {scala: [1, 1], x: [0, 0], y: [-30, 30], giro: [0, 0]},
-  scende: {scala: [1, 1], x: [0, 0], y: [30, -30], giro: [0, 0]},
-  gira: {scala: [0.98, 1.02], x: [-18, 18], y: [0, 0], giro: [-1.5, 1.5]},
+  spinta: {scala: [0.92, 1], x: [0, 0], y: [0, 0], giro: [0, 0]},
+  indietro: {scala: [1, 0.92], x: [0, 0], y: [0, 0], giro: [0, 0]},
+  destra: {scala: [0.95, 0.95], x: [26, -26], y: [0, 0], giro: [0, 0]},
+  sinistra: {scala: [0.95, 0.95], x: [-26, 26], y: [0, 0], giro: [0, 0]},
+  sale: {scala: [0.95, 0.95], x: [0, 0], y: [-20, 20], giro: [0, 0]},
+  scende: {scala: [0.95, 0.95], x: [0, 0], y: [20, -20], giro: [0, 0]},
+  gira: {scala: [0.93, 0.96], x: [-12, 12], y: [0, 0], giro: [-1.6, 1.6]},
 };
 
 declare global {
@@ -166,7 +167,7 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
   const inquadra = (scena: Scena): {scala: number; x: number; y: number; giro: number} => {
     const def = reel.scene[scena.nome];
     const scelte = def && typeof def === 'object' && 'componente' in def ? def : null;
-    const base = scelte?.campo === 'largo' ? 0.92 : scelte?.campo === 'stretto' ? 1.06 : 1;
+    const base = scelte?.campo === 'largo' ? 0.9 : scelte?.campo === 'stretto' ? 1 : scelte?.campo === 'medio' ? 0.95 : 1;
     const a = scena.avanzamento;
     const m = MOVIMENTI[scelte?.camera ?? 'ferma'] ?? MOVIMENTI.ferma;
     return {scala: base * mix(m.scala[0], m.scala[1], a), x: mix(m.x[0], m.x[1], a), y: mix(m.y[0], m.y[1], a), giro: mix(m.giro[0], m.giro[1], a)};
@@ -208,7 +209,10 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
     () => ({inizi: elenco.map((s) => ({t: s.inizio, verso: versoDi(s.nome)})), segni: [...new Set(Object.values(dati.segni))].sort((a, b) => a - b)}),
     [dati, reel]
   );
-  const camera = cameraMondo(tempo.ora, inizi, segni, durata || PASSAGGIO);
+  // il mondo dietro segue il movimento di camera della scena, più forte di lei: è la parallasse che dà profondità
+  const viaggio = cameraMondo(tempo.ora, inizi, segni, durata || PASSAGGIO);
+  const q0 = inquadra(corrente);
+  const camera = {x: viaggio.x - q0.x * 5, y: viaggio.y - q0.y * 5, spinta: viaggio.spinta + (q0.scala - 0.95) * 4};
 
   // il protagonista: un solo oggetto per tutto il reel, sopra le scene. Resta mentre intorno cambia tutto.
   const statoProt = reel.protagonista
