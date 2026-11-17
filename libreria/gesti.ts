@@ -287,7 +287,10 @@ export function scalettaAssetti(dati: DatiReel, regiaDi: (nomeScena: string) => 
         const lungo = f.parole[fine - 1].fine - f.parole[inizi[k]].inizio;
         if (lungo > 2.0 && fine - inizi[k] >= 3) {
           const meta = f.parole.findIndex((p, i) => i > inizi[k] && p.inizio >= f.parole[inizi[k]].inizio + lungo / 2);
-          if (meta > inizi[k] && meta < fine) inizi.splice(k + 1, 0, meta);
+          if (meta > inizi[k] && meta < fine) {
+            inizi.splice(k + 1, 0, meta);
+            k--; // anche la prima metà si riguarda: una frase di sette secondi senza virgole fa quattro tratti, non due
+          }
         }
       }
       inizi.forEach((da, k) => {
@@ -296,18 +299,32 @@ export function scalettaAssetti(dati: DatiReel, regiaDi: (nomeScena: string) => 
       });
     });
     let n = -1;
+    let ruoli: Map<Spunto, 'alto' | 'altra'> | null = null;
+    let ultimoInvito: Spunto | null = null;
     spunti.forEach((f) => {
       if (!f.dentro) n++;
-      if (f.inizio - ultimoCambio < TENUTA) return; // una posa va tenuta almeno un po': niente cambi a raffica
-      if (f.fine >= scena.fine - 0.4 && f.dentro && !(ultima && f.invito)) return; // non si cambia posa a un soffio dal cambio di scena
-      const haInvito = ultima && f.invito;
-      const precedenteQui = cambi.length ? cambi[cambi.length - 1].posa : 'dito';
-      // sull'invito finale il dito in alto è la posa di casa: ci si torna, e la frase finisce così; ma in mezzo il
-      // narratore si muove (tenerlo fermo per tutto l'invito erano sette secondi con lo stesso gesto)
-      if (haInvito && f.dentro) {
+      // L'invito finale ("Commenta…") si prepara tutto insieme, partendo dalla fine: l'ultima posa è il dito in alto
+      // e la frase finisce così, prima un'altra, prima ancora il dito in alto… Deciso una posa alla volta, capitava
+      // che l'ultimo spunto trovasse il dito già alzato e il narratore restasse fermo cinque secondi.
+      if (ultima && f.invito) {
+        if (!ruoli) {
+          ruoli = new Map();
+          const scattano: Spunto[] = [];
+          let u = ultimoCambio;
+          for (const s of spunti.slice(spunti.indexOf(f))) {
+            if (!s.invito || s.inizio - u < TENUTA || s.inizio > scena.fine - 1.2) continue;
+            scattano.push(s);
+            u = s.inizio;
+          }
+          scattano.reverse().forEach((s, i) => ruoli!.set(s, i % 2 === 0 ? 'alto' : 'altra'));
+          ultimoInvito = scattano[0] ?? null;
+        }
+        const ruolo = ruoli.get(f);
+        if (!ruolo) return;
         const alto = nota('alto') ?? alterna[0];
-        const ultimoSpunto = f === spunti[spunti.length - 1] || spunti[spunti.indexOf(f) + 1]?.inizio >= scena.fine - 1.6;
-        const posa = precedenteQui === alto ? (ultimoSpunto ? alto : scegli(alterna, alto)) : alto;
+        const precedenteQui = cambi.length ? cambi[cambi.length - 1].posa : 'dito';
+        const altra = () => scegli(alterna.filter((a) => a !== alto), precedenteQui);
+        const posa = ruolo === 'altra' ? altra() : precedenteQui === alto && f !== ultimoInvito ? altra() : alto;
         if (posa !== precedenteQui) {
           cambi.push({t: Math.max(0, f.inizio - 0.25), posa, seconda: secondaPer(posa, regia?.seconda)});
           ultimoUso[posa] = conta++;
@@ -315,13 +332,14 @@ export function scalettaAssetti(dati: DatiReel, regiaDi: (nomeScena: string) => 
         }
         return;
       }
+      if (f.inizio - ultimoCambio < TENUTA) return; // una posa va tenuta almeno un po': niente cambi a raffica
+      if (f.fine >= scena.fine - 0.4 && f.dentro) return; // non si cambia posa a un soffio dal cambio di scena
       const haEnfasi = f.parole.some((p) => p.enfasi);
       // una frase che comincia negando o frenando ("Non è un miracolo…", "Ma…") si dice bene a braccia conserte
       const frena = f.parole.slice(0, 2).some((p) => negazione.test(pulita(p.testo))) || FRENI.test(pulita(f.parole[0]?.testo ?? ''));
       const precedente = cambi.length ? cambi[cambi.length - 1].posa : 'dito';
       let posa: string;
-      if (casa && !haInvito) posa = precedente === casa ? scegli(alterna, precedente) : casa; // di casa, un'altra, di casa…
-      else if (haInvito) posa = nota('alto') ?? alterna[0];
+      if (casa) posa = precedente === casa ? scegli(alterna, precedente) : casa; // di casa, un'altra, di casa…
       else if (f.domanda) posa = scegli(['pensa', 'aperto'], precedente); // ci sta pensando: dito al mento, o mano aperta
       else if (n === 0 && k > 0 && !f.dentro) posa = scegli(['lato', 'presenta', 'aperto'], precedente); // scena nuova: presenta quello che è comparso
       else if (frena && !ultima) posa = scegli(['conserte', 'pensa'], precedente); // sta mettendo un freno: braccia conserte, o dito al mento
