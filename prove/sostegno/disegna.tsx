@@ -5,6 +5,7 @@ import {ScenaCtx, TempoCtx, creaScena, creaTempo} from '../../libreria/tempo';
 import type {DatiReel} from '../../libreria/tempo';
 
 export * as blocchi from '../../libreria/Blocchi';
+export * as mondo from '../../libreria/Mondo';
 
 /** Disegna `Scena` al secondo `t` di una scena lunga `durata` secondi. I segni cadono tutti al secondo 0,5. */
 export function disegna(Scena: ComponentType, {t = 9, durata = 10, lingua = 'it'} = {}): string {

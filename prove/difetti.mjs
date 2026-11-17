@@ -234,17 +234,43 @@ await prova('B04 · copione cambiato dopo la voce: i tempi stimati si rifanno da
 // ───────────────────────── B05 · scene pronte: niente tagli in silenzio ─────────────────────────
 
 const {disegna, blocchi} = await ts('prove/sostegno/disegna.tsx');
-await prova('B05 · scene pronte: quello che non entra dà un errore che dice cosa, non sparisce', () => {
-  const voci = (n) => Array.from({length: n}, (_, i) => ({testo: `Voce ${i + 1}`}));
-  assert.equal((disegna(blocchi.bloccoLista({voci: voci(5)})).match(/Voce \d/g) ?? []).length, 5);
-  assert.throws(() => disegna(blocchi.bloccoLista({voci: voci(6)})), /bloccoLista.*6.*5/s);
-  assert.throws(() => disegna(blocchi.bloccoBarre({dati: Array.from({length: 7}, (_, i) => ({etichetta: `C${i}`, valore: i + 1}))})), /bloccoBarre.*7.*6/s);
-  assert.throws(() => disegna(blocchi.bloccoPassi({passi: voci(6)})), /bloccoPassi/);
-  assert.throws(() => disegna(blocchi.bloccoSchede({schede: Array.from({length: 4}, (_, i) => ({valore: `${i}`}))})), /bloccoSchede/);
-  assert.throws(() => disegna(blocchi.bloccoTempo({tappe: Array.from({length: 5}, (_, i) => ({quando: `${i}`}))})), /bloccoTempo/);
-  const lungo = 'Questa voce è lunga e arriva fino in fondo alla riga senza perdere la parola FINALE';
-  assert.throws(() => disegna(blocchi.bloccoLista({voci: [{testo: lungo}]})), /bloccoLista.*caratteri/s);
-  assert.throws(() => disegna(blocchi.bloccoMito({mito: `${lungo} ${lungo}`, verita: 'Corta'})), /bloccoMito.*caratteri/s);
+await prova('B05 · fase 2 · scene pronte: quando gli elementi sono tanti la scena si adatta (scorre, raggruppa, stringe)', () => {
+  const voci = (n) => Array.from({length: n}, (_, i) => ({testo: `Voce ${i + 1}.`}));
+  const viste = (html) => [...new Set(html.match(/Voce \d+\./g) ?? [])];
+  // fino al posto disponibile: tutte
+  assert.equal(viste(disegna(blocchi.bloccoLista({voci: voci(5)}))).length, 5);
+  // SCORRE: 8 voci in una scena di 10 secondi. A fine scena si vedono le ultime 5; a metà quelle comparse fin lì;
+  // lungo la scena passano tutte e 8, nessuna esclusa.
+  const lista = blocchi.bloccoLista({voci: voci(8)});
+  assert.deepEqual(viste(disegna(lista, {t: 9.9})), ['Voce 4.', 'Voce 5.', 'Voce 6.', 'Voce 7.', 'Voce 8.']);
+  const passate = new Set();
+  for (let t = 0.2; t < 10; t += 0.2) for (const v of viste(disegna(lista, {t}))) passate.add(v);
+  assert.equal(passate.size, 8, `lungo la scena si sono viste ${passate.size} voci su 8`);
+  assert.ok(viste(disegna(lista, {t: 3})).length <= 5);
+  for (const [nome, blocco] of [
+    ['bloccoPassi', blocchi.bloccoPassi({passi: voci(7)})],
+    ['bloccoAvviso', blocchi.bloccoAvviso({titolo: 'Attenzione', punti: voci(5)})],
+    ['bloccoStudio', blocchi.bloccoStudio({rivista: 'Rivista', titolo: 'Titolo', dati: voci(5)})],
+  ]) {
+    const tutte = new Set();
+    for (let t = 0.2; t < 10; t += 0.2) for (const v of viste(disegna(blocco, {t}))) tutte.add(v);
+    assert.ok(tutte.size >= (nome === 'bloccoPassi' ? 7 : 5), `${nome}: viste ${tutte.size} voci`);
+  }
+  assert.doesNotThrow(() => disegna(blocchi.bloccoSchede({schede: Array.from({length: 5}, (_, i) => ({valore: `${i}`}))})));
+  assert.doesNotThrow(() => disegna(blocchi.bloccoTempo({tappe: Array.from({length: 7}, (_, i) => ({quando: `${2000 + i}`}))})));
+  // RAGGRUPPA: una torta di 9 fette ne mostra 5 più "Altri (4)", e il totale resta 100
+  const torta = disegna(blocchi.bloccoTorta({fette: Array.from({length: 9}, (_, i) => ({etichetta: `Fetta${i + 1}`, valore: i === 0 ? 60 : 5}))}));
+  assert.match(torta, /Altri \(4\)/);
+  assert.equal((torta.match(/Fetta\d/g) ?? []).filter((v, i, a) => a.indexOf(v) === i).length, 5);
+  assert.match(disegna(blocchi.bloccoClassifica({voci: Array.from({length: 8}, (_, i) => ({etichetta: `Voce${i}`, valore: 10 - i}))})), /Altri \(3\)/);
+  // STRINGE: le barre arrivano a 12 colonne; oltre, lo dice (un grafico con 13 colonne non si legge su un telefono)
+  const barre = (n) => blocchi.bloccoBarre({dati: Array.from({length: n}, (_, i) => ({etichetta: `Col${i + 1}x`, valore: i + 1}))});
+  assert.equal(new Set(disegna(barre(12)).match(/Col\d+x/g)).size, 12);
+  assert.throws(() => disegna(barre(13)), /bloccoBarre.*13.*12/s);
+  // le scritte: fino al 40% più lunghe si rimpiccioliscono; oltre, l'errore dice quanto
+  const lungo = 'Questa voce è lunga e arriva in fondo senza perdere FINALE';
+  assert.match(disegna(blocchi.bloccoLista({voci: [{testo: lungo}]})), /FINALE/);
+  assert.throws(() => disegna(blocchi.bloccoLista({voci: [{testo: `${lungo} ${lungo}`}]})), /bloccoLista.*caratteri/s);
 });
 await prova('B05 · scene pronte: nel codice non resta nessun taglio muto', () => {
   const codice = fs.readFileSync(path.join(K, 'libreria/Blocchi.tsx'), 'utf8');
@@ -342,6 +368,41 @@ await rimandata('B18 · nessun nome di assistente fuori dai due file di istruzio
   const nomi = ['clau' + 'de', 'cod' + 'ex', 'chat' + 'gpt', 'open' + 'ai', 'gem' + 'ini', 'copi' + 'lot'].join('\\|');
   const r = spawnSync('git', ['grep', '-il', nomi, '--', '.', ':!BRIEF_AGENTE.md', ':!BUG.md', ':!STATO.md'], {cwd: K, encoding: 'utf8'});
   assert.equal(r.stdout.trim(), '');
+});
+
+// ───────────────────────── il mondo a livelli (fase 2) ─────────────────────────
+
+await prova('mondo: la camera non si ferma mai, scatta a ogni cambio di scena e dà una spinta a ogni segno', async () => {
+  const {mondo} = await ts('prove/sostegno/disegna.tsx');
+  const inizi = [{t: 0}, {t: 10}, {t: 20, verso: 'sinistra'}];
+  const segni = [3, 6.5, 14];
+  const cam = (t) => mondo.cameraMondo(t, inizi, segni);
+  // stesso istante, stessa camera (niente di casuale)
+  assert.deepEqual(cam(7.3), cam(7.3));
+  // mai ferma: in ogni decimo di secondo si sposta
+  for (let t = 0; t < 25; t += 0.1) assert.ok(Math.hypot(cam(t + 0.1).x - cam(t).x, cam(t + 0.1).y - cam(t).y) > 3, `camera ferma al secondo ${t.toFixed(1)}`);
+  // la spinta: zero prima del segno, piena un decimo dopo, spenta dopo un secondo
+  assert.equal(cam(2.99).spinta, 0);
+  assert.ok(cam(3.1).spinta > 0.95);
+  assert.equal(cam(4.2).spinta, 0);
+  // lo scatto al cambio di scena: in mezzo secondo la camera fa molta più strada del solito
+  const passo = (t) => Math.hypot(cam(t + 0.5).x - cam(t).x, cam(t + 0.5).y - cam(t).y);
+  assert.ok(passo(9.9) > passo(8) * 4, `scatto ${passo(9.9).toFixed(0)} contro viaggio ${passo(8).toFixed(0)}`);
+  // una scena in cui si entra da sinistra sposta la camera verso sinistra
+  assert.ok(cam(20.6).x - cam(19.8).x < 0);
+});
+await prova('mondo: tutti i luoghi pronti si disegnano, e ci sono quelli chiesti dall\'incarico', async () => {
+  const {mondo, disegna} = await ts('prove/sostegno/disegna.tsx');
+  for (const chiesto of ['corpo', 'vaso', 'membrana', 'laboratorio', 'stadio', 'palco', 'bilancia', 'studio']) assert.ok(mondo.LUOGHI.includes(chiesto), `manca il luogo ${chiesto}`);
+  const {createElement} = await import('react');
+  const vuoto = disegna(() => createElement(mondo.Mondo, {camera: {x: 0, y: 0, spinta: 0}, luogo: 'vuoto'})).length;
+  for (const luogo of mondo.LUOGHI) {
+    for (const t of [0.5, 9]) {
+      const html = disegna(() => createElement(mondo.Mondo, {camera: mondo.cameraMondo(t, [{t: 0}], [1]), luogo, luogoPrima: 'vaso', passaggio: t < 1 ? 0.4 : 1, avanzamento: t / 10, raggi: 0.5}), {t});
+      assert.doesNotMatch(html, /NaN|undefined/, `${luogo}: un valore non calcolato nel disegno`);
+      if (luogo !== 'vuoto' && t > 1) assert.ok(html.length > vuoto + 400, `${luogo}: il disegno è vuoto`);
+    }
+  }
 });
 
 // ───────────────────────── il metro (fase 1) ─────────────────────────

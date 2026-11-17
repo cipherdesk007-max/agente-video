@@ -65,7 +65,31 @@ function useBlocco() {
     return s.t - (0.3 + (Math.max(1.2, s.durata) - 1.1) * (i / Math.max(1, n)));
   };
   const cifre = (valore: number, decimali = 0) => numero(valore, decimali, tempo.lingua);
-  return {s, tempo, dice, parola, dopo, cifre, tre: tempo.impostazioni.stile === '3d'};
+  /**
+   * Più elementi del posto: non se ne butta via nessuno, la scena SCORRE. A schermo restano gli ultimi `massimo`
+   * comparsi: quando ne arriva uno nuovo il più vecchio esce. Ogni elemento compare nel momento che avrebbe avuto
+   * con tutto l'elenco a schermo (il suo segno, o il suo posto lungo la scena).
+   */
+  const scorre = <T extends {segno?: Quando}>(elenco: T[], massimo: number): T[] => {
+    const n = elenco.length;
+    if (n <= massimo) return elenco;
+    const fissati = elenco.map((v, i) => (v.segno === undefined ? {...v, segno: 0.3 + (Math.max(1.2, s.durata) - 1.1) * (i / n)} : v));
+    const comparsi = fissati.filter((v) => dopo(v.segno) > 0).length;
+    const primo = Math.min(Math.max(0, comparsi - massimo), n - massimo);
+    return fissati.slice(primo, primo + massimo);
+  };
+  /**
+   * Più voci del posto in un grafico che va visto tutto insieme: le più piccole si RAGGRUPPANO in "Altri",
+   * con la loro somma. Il totale resta giusto e nessun dato sparisce.
+   */
+  const raggruppa = <T extends {etichetta: Testo; valore: number}>(voci: T[], massimo: number): T[] => {
+    if (voci.length <= massimo) return voci;
+    const ordine = voci.map((v, i) => ({v, i})).sort((a, b) => b.v.valore - a.v.valore);
+    const tenute = ordine.slice(0, massimo - 1).sort((a, b) => a.i - b.i).map((x) => x.v);
+    const resto = ordine.slice(massimo - 1);
+    return [...tenute, {...resto[0].v, etichetta: {it: `Altri (${resto.length})`, en: `Others (${resto.length})`}, valore: resto.reduce((t, x) => t + x.v.valore, 0), colore: C.tenue} as T];
+  };
+  return {s, tempo, dice, parola, dopo, cifre, scorre, raggruppa, tre: tempo.impostazioni.stile === '3d'};
 }
 
 /** Grandezza del carattere perché `testo` stia in `larghezza` pixel (stima: non si può misurare prima di disegnare). */
@@ -102,9 +126,11 @@ function entro<T>(blocco: string, cosa: string, elenco: T[], massimo: number): T
 
 /** Come `righe`, ma se il testo non sta nelle righe a disposizione lo dice invece di tagliarne la coda. */
 function righeEntro(blocco: string, testo: string, perRiga: number, massimo: number): string[] {
-  const elenco = righe(testo, perRiga);
+  // la scritta si adatta: righe fino al 40% più lunghe (il carattere si rimpicciolisce di conseguenza, vedi `adatta`)
+  let elenco = righe(testo, perRiga);
+  for (const piu of [1.2, 1.4]) if (elenco.length > massimo) elenco = righe(testo, Math.round(perRiga * piu));
   if (elenco.length > massimo) {
-    throw new Error(`${blocco}: "${testo.slice(0, 40)}…" è di ${testo.length} caratteri, ne entrano circa ${perRiga * massimo} (${massimo} righe da ${perRiga}). Accorcia la scritta: a schermo vanno poche parole, il resto lo dice la voce.`);
+    throw new Error(`${blocco}: "${testo.slice(0, 40)}…" è di ${testo.length} caratteri, ne entrano circa ${Math.round(perRiga * 1.4) * massimo} anche rimpicciolendo il carattere (${massimo} righe). Accorcia la scritta: a schermo vanno poche parole, il resto lo dice la voce.`);
   }
   return elenco;
 }
@@ -207,8 +233,8 @@ export function bloccoNumero({valore, decimali = 0, prefisso = '', suffisso = ''
 /** Fino a cinque voci numerate che entrano una alla volta; l'ultima entrata resta accesa, le altre si attenuano. */
 export function bloccoLista({titolo, voci, colore = C.luce}: {titolo?: Testo; voci: {testo: Testo; segno?: Quando}[]; colore?: string}): ComponentType {
   return function Lista() {
-    const {s, dice, dopo} = useBlocco();
-    const elenco = entro('bloccoLista', 'voci', voci, 5);
+    const {s, dice, dopo, scorre} = useBlocco();
+    const elenco = scorre(voci, 5);
     const passo = elenco.length > 4 ? 142 : 158;
     const y0 = CY + (titolo ? 40 : 0) - ((elenco.length - 1) * passo) / 2;
     const tempi = elenco.map((v, i) => dopo(v.segno, i, elenco.length));
@@ -314,7 +340,7 @@ export function bloccoConfronto({sinistra, destra, titolo, fonte}: {sinistra: La
 export function bloccoBarre({titolo, dati, unita, decimali = 0, colori, fonte}: {titolo?: Testo; dati: {etichetta: Testo; valore: number; segno?: Quando}[]; unita?: Testo; decimali?: number; colori?: string[]; fonte?: Testo}): ComponentType {
   return function Barre() {
     const {s, dice, dopo, cifre, tre} = useBlocco();
-    const voci = entro('bloccoBarre', 'colonne', dati, 6);
+    const voci = entro('bloccoBarre', 'colonne', dati, 12);
     const n = voci.length;
     const tinte = colori ?? [C.luce, C.luce2, C.accento, C.positivo, '#C58BFF', C.negativo];
     const passo = Math.min(210, 820 / n);
@@ -400,8 +426,8 @@ export function bloccoAnello({valore, etichetta, segno, colore = C.luce, fonte}:
 /** Una linea verticale con i passi che si accendono uno dopo l'altro: procedure, cronologie, "come funziona". */
 export function bloccoPassi({titolo, passi, colore = C.luce}: {titolo?: Testo; passi: {testo: Testo; segno?: Quando}[]; colore?: string}): ComponentType {
   return function Passi() {
-    const {s, dice, dopo} = useBlocco();
-    const elenco = entro('bloccoPassi', 'passi', passi, 5);
+    const {s, dice, dopo, scorre} = useBlocco();
+    const elenco = scorre(passi, 5);
     const n = elenco.length;
     const passo = n > 4 ? 150 : 172;
     const y0 = CY + (titolo ? 40 : 0) - ((n - 1) * passo) / 2;
@@ -562,8 +588,8 @@ export function bloccoLinea({titolo, punti, unita, decimali = 0, prefisso = '', 
 /** Una ciambella che si apre, con la legenda sotto. `evidenzia` (con il suo segno) stacca una fetta e ne mette la percentuale al centro. */
 export function bloccoTorta({titolo, fette, segno, evidenzia, segnoEvidenzia, fonte}: {titolo?: Testo; fette: {etichetta: Testo; valore: number; colore?: string}[]; segno?: Quando; evidenzia?: number; segnoEvidenzia?: Quando; fonte?: Testo}): ComponentType {
   return function Torta() {
-    const {s, dice, dopo, cifre} = useBlocco();
-    const voci = entro('bloccoTorta', 'fette', fette, 6);
+    const {s, dice, dopo, cifre, raggruppa} = useBlocco();
+    const voci = raggruppa(fette, 6);
     const da = dopo(segno, 0, 3);
     const stacco = evidenzia === undefined ? 0 : rampa(segnoEvidenzia === undefined ? da - 1.6 : dopo(segnoEvidenzia), 0.5);
     const totale = voci.reduce((somma, f) => somma + Math.max(0, f.valore), 0) || 1;
@@ -593,14 +619,14 @@ export function bloccoTorta({titolo, fette, segno, evidenzia, segnoEvidenzia, fo
 /** Barre orizzontali, dalla prima all'ultima: chi ha di più, chi di meno. `evidenzia` (con il suo segno) ne accende una. */
 export function bloccoClassifica({titolo, voci, unita, decimali = 0, prefisso = '', suffisso = '', segno, evidenzia, segnoEvidenzia, colore = C.luce, fonte}: {titolo?: Testo; voci: {etichetta: Testo; valore: number; colore?: string}[]; unita?: Testo; decimali?: number; prefisso?: string; suffisso?: string; segno?: Quando; evidenzia?: number; segnoEvidenzia?: Quando; colore?: string; fonte?: Testo}): ComponentType {
   return function Classifica() {
-    const {s, dice, dopo} = useBlocco();
+    const {s, dice, dopo, raggruppa} = useBlocco();
     const da = dopo(segno, 0, 3);
     const acceso = evidenzia !== undefined && (segnoEvidenzia === undefined ? da > 2 : dopo(segnoEvidenzia) > 0);
     return (
       <ConFonte fonte={fonte} da={da}>
         <Bagliore x={CX} y={CY} raggio={560} colore={colore} forza={0.12} />
         <Cappello testo={[dice(titolo), dice(unita)].filter(Boolean).join(' · ')} y={CY - 376} da={s.t - 0.1} />
-        <GraficoClassifica x={CX} y={CY + 10} larghezza={820} voci={entro('bloccoClassifica', 'voci', voci, 6).map((v) => ({etichetta: dice(v.etichetta), valore: v.valore, colore: v.colore}))} p={rampa(da, 1.6)} colore={colore} decimali={decimali} prefisso={prefisso} suffisso={suffisso} evidenzia={acceso ? evidenzia : undefined} />
+        <GraficoClassifica x={CX} y={CY + 10} larghezza={820} voci={raggruppa(voci, 6).map((v) => ({etichetta: dice(v.etichetta), valore: v.valore, colore: v.colore}))} p={rampa(da, 1.6)} colore={colore} decimali={decimali} prefisso={prefisso} suffisso={suffisso} evidenzia={acceso ? evidenzia : undefined} />
       </ConFonte>
     );
   };
@@ -611,8 +637,8 @@ export function bloccoClassifica({titolo, voci, unita, decimali = 0, prefisso = 
 /** Da due a sei icone con il loro nome, che entrano una alla volta: "le tre cose da sapere", "cosa serve". */
 export function bloccoIcone({titolo, voci, colore = C.luce}: {titolo?: Testo; voci: {icona: DisegnoIcona; testo: Testo; segno?: Quando; colore?: string}[]; colore?: string}): ComponentType {
   return function Icone() {
-    const {s, dice, dopo} = useBlocco();
-    const lista = entro('bloccoIcone', 'voci', voci, 6);
+    const {s, dice, dopo, scorre} = useBlocco();
+    const lista = scorre(voci, 6);
     const n = lista.length;
     const perRiga = n <= 3 ? n : n === 4 ? 2 : 3;
     const righeTotali = Math.ceil(n / perRiga);
@@ -648,8 +674,8 @@ export function bloccoIcone({titolo, voci, colore = C.luce}: {titolo?: Testo; vo
  */
 export function bloccoScala({titolo, minimo = 0, massimo = 10, cursori, estremi, verso = 'male', decimali = 0, fonte}: {titolo?: Testo; minimo?: number; massimo?: number; cursori: {etichetta: Testo; valore: number; da?: number; segno?: Quando; colore?: string}[]; estremi?: [Testo, Testo]; verso?: 'male' | 'bene'; decimali?: number; fonte?: Testo}): ComponentType {
   return function Scala() {
-    const {s, dice, dopo, cifre} = useBlocco();
-    const lista = entro('bloccoScala', 'cursori', cursori, 3);
+    const {s, dice, dopo, cifre, scorre} = useBlocco();
+    const lista = scorre(cursori, 3);
     const X0 = 150;
     const X1 = 930;
     const Y = CY - 20;
@@ -701,8 +727,8 @@ export function bloccoScala({titolo, minimo = 0, massimo = 10, cursori, estremi,
 /** Due o tre schede affiancate con un numero ciascuna (gli studi, i piani, le versioni) e, se vuoi, il totale sotto. */
 export function bloccoSchede({titolo, schede, totale, fonte}: {titolo?: Testo; schede: {sopra?: Testo; valore: string | number; unita?: Testo; sotto?: Testo; colore?: string; segno?: Quando}[]; totale?: {valore: number; etichetta?: Testo; segno?: Quando; decimali?: number}; fonte?: Testo}): ComponentType {
   return function Schede() {
-    const {s, dice, dopo, cifre} = useBlocco();
-    const lista = entro('bloccoSchede', 'schede', schede, 3);
+    const {s, dice, dopo, cifre, scorre} = useBlocco();
+    const lista = scorre(schede, 3);
     const n = lista.length;
     const larga = n === 3 ? 280 : 400;
     const passo = larga + (n === 3 ? 26 : 60);
@@ -739,9 +765,9 @@ export function bloccoSchede({titolo, schede, totale, fonte}: {titolo?: Testo; s
 /** Il triangolo d'avviso con una frase e fino a tre righe sotto: rischi, effetti indesiderati, "attenzione a". */
 export function bloccoAvviso({titolo, sotto, punti = [], segno, colore = C.negativo, fonte}: {titolo: Testo; sotto?: Testo; punti?: {testo: Testo; segno?: Quando}[]; segno?: Quando; colore?: string; fonte?: Testo}): ComponentType {
   return function Avviso() {
-    const {s, dice, dopo} = useBlocco();
+    const {s, dice, dopo, scorre} = useBlocco();
     const da = segno === undefined ? s.t - 0.9 : dopo(segno);
-    const lista = entro('bloccoAvviso', 'punti', punti, 3);
+    const lista = scorre(punti, 3);
     const lato = 250;
     const h = lato * 0.87;
     const yTriangolo = lista.length ? 640 : 700;
@@ -837,8 +863,8 @@ export function bloccoPersone({titolo, quante = 10, accese, etichetta, segno, co
 /** Una linea del tempo con fino a quattro tappe: "settimana 1, settimana 24, settimana 68". Si disegna da sinistra. */
 export function bloccoTempo({titolo, tappe, colore = C.luce, fonte}: {titolo?: Testo; tappe: {quando: Testo; testo?: Testo; segno?: Quando; colore?: string}[]; colore?: string; fonte?: Testo}): ComponentType {
   return function Tempo() {
-    const {s, dice, dopo} = useBlocco();
-    const lista = entro('bloccoTempo', 'tappe', tappe, 4);
+    const {s, dice, dopo, scorre} = useBlocco();
+    const lista = scorre(tappe, 4);
     const n = lista.length;
     const y = CY - 40;
     const x0 = 150;
@@ -890,9 +916,9 @@ export function bloccoTempo({titolo, tappe, colore = C.luce, fonte}: {titolo?: T
  */
 export function bloccoSchermo({titolo, file, clip, segno, note = [], colore = C.luce, fonte}: {titolo?: Testo; file?: string; clip?: Clip; segno?: Quando; note?: {testo: Testo; segno?: Quando}[]; colore?: string; fonte?: Testo}): ComponentType {
   return function Schermo() {
-    const {s, dice, dopo} = useBlocco();
+    const {s, dice, dopo, scorre} = useBlocco();
     const da = segno === undefined ? s.t - 0.25 : dopo(segno);
-    const lista = entro('bloccoSchermo', 'note', note, 3);
+    const lista = scorre(note, 3);
     const entra = molla(s.t - 0.1, {rigidita: 170, smorzamento: 17});
     const x = lista.length ? 330 : CX;
     return (
@@ -981,9 +1007,9 @@ export function bloccoDomanda({domanda, sopra, sotto, segno, colore = C.accento}
  */
 export function bloccoStudio({rivista, titolo, dati = [], pagato, segno, segnoPagato, colore = C.luce2, fonte}: {rivista: Testo; titolo: Testo; dati?: {testo: Testo; segno?: Quando}[]; pagato?: Testo; segno?: Quando; segnoPagato?: Quando; colore?: string; fonte?: Testo}): ComponentType {
   return function Studio() {
-    const {s, dice, dopo} = useBlocco();
+    const {s, dice, dopo, scorre} = useBlocco();
     const da = segno === undefined ? s.t - 0.2 : dopo(segno);
-    const lista = entro('bloccoStudio', 'dati', dati, 3);
+    const lista = scorre(dati, 3);
     const p = molla(da, {rigidita: 180, smorzamento: 17});
     const testo = dice(titolo);
     const daPagato = pagato ? dopo(segnoPagato, lista.length + 1, lista.length + 2) : -1;
