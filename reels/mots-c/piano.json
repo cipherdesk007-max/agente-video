@@ -273,7 +273,8 @@
       "campo": "largo",
       "camera": "sinistra",
       "blocco": "soggetti",
-      "luogo": "vuoto"
+      "luogo": "vuoto",
+      "tinta": "#E8455A"
     },
     {
       "nome": "cosce",
@@ -487,7 +488,8 @@
       "campo": "largo",
       "camera": "destra",
       "blocco": "soggetti",
-      "luogo": "vuoto"
+      "luogo": "vuoto",
+      "tinta": "#5AA8FF"
     },
     {
       "nome": "risultati",
@@ -577,7 +579,8 @@
       "campo": "medio",
       "camera": "gira",
       "blocco": "soggetti",
-      "luogo": "vuoto"
+      "luogo": "vuoto",
+      "tinta": "#5AA8FF"
     },
     {
       "nome": "cyclette",
@@ -667,7 +670,8 @@
       "campo": "largo",
       "camera": "sale",
       "blocco": "soggetti",
-      "luogo": "vuoto"
+      "luogo": "vuoto",
+      "tinta": "#FFB347"
     },
     {
       "nome": "ruolo",

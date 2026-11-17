@@ -10,6 +10,11 @@
   chiude con `npm run richieste fatta <id>`.
 - **Pagine Riferimenti, Chiavi, Diario**; nel Catalogo i pezzi per nome e le frasi in banca.
 - **Il riuso parte da solo** alla fine di `npm run fai` e scrive una voce in `diario.md`.
+- **Primo avvio**: un comando lanciato prima di `npm install` non finisce più con un errore di Node: il kit dice
+  che è la prima volta e scrive i tre comandi da dare. Prova del primo avvio su un Mac pulito pronta su GitHub
+  (Actions, "primo-avvio-mac"), da lanciare a mano.
+- **Etichette dei soggetti dentro le zone sicure**: tre soggetti stanno più in alto, sopra la colonna delle icone
+  dell'app; un'etichetta lunga si sposta di lato invece di finire coperta.
 
 ## 2.0 · dal testo al reel con un comando
 

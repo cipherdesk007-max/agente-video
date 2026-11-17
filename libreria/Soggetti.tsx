@@ -408,7 +408,7 @@ export function SoggettoVivo({soggetto, x, y, lato, p, da, indice = 0, colpo = 0
         <img src={tempo.risorsa(soggetto.file)} alt="" style={{position: 'absolute', left: '5%', top: '5%', width: '90%', height: '90%', objectFit: 'contain', filter: `drop-shadow(0 0 ${Math.round(16 + 14 * battito)}px ${alfa(colore, 0.8)})`, opacity: 0.55 + 0.45 * limita(p.acceso ?? 1)}} />
       ) : soggetto.tipo === 'icona' && Icona ? (
         <div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', filter: `drop-shadow(0 0 ${Math.round(18 + 16 * battito)}px ${alfa(colore, 0.85)})`, opacity: 0.55 + 0.45 * limita(p.acceso ?? 1)}}>
-          <Icona size={lato * 0.62} color={colore} />
+          <Icona size={lato * 0.72} color={colore} />
         </div>
       ) : (
         <svg width={lato} height={lato} viewBox="-100 -100 200 200" style={{position: 'absolute', inset: 0, overflow: 'visible'}}>
@@ -421,7 +421,7 @@ export function SoggettoVivo({soggetto, x, y, lato, p, da, indice = 0, colpo = 0
             <img src={tempo.risorsa(soggetto.file)} alt="" style={{position: 'absolute', left: '5%', top: '5%', width: '90%', height: '90%', objectFit: 'contain'}} />
           ) : soggetto.tipo === 'icona' && Icona ? (
             <div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-              <Icona size={lato * 0.62} color="#fff" />
+              <Icona size={lato * 0.72} color="#fff" />
             </div>
           ) : (
             <svg width={lato} height={lato} viewBox="-100 -100 200 200" style={{position: 'absolute', inset: 0, overflow: 'visible'}}>
@@ -481,7 +481,19 @@ export function bloccoSoggetti({soggetti, titolo, fonte}: {soggetti: Soggetto[];
     const n = soggetti.length;
     const lato = n === 1 ? 800 : n === 2 ? 520 : 360;
     const passo = n === 2 ? 500 : 340;
-    const yCentro = CY - (n === 1 ? 50 : 40);
+    // tre soggetti stanno più in alto: così le loro etichette finiscono sopra la colonna delle icone dell'app e non
+    // devono stringersi una contro l'altra per evitarla
+    const yCentro = CY - (n === 1 ? 50 : n === 2 ? 40 : 170);
+    // Etichette e note restano dentro le zone sicure anche quando la camera scorre (fino a 26 pixel per parte); in
+    // basso a destra c'è la colonna delle icone dell'app, e lì il limite è più stretto. Se la scritta non ci sta
+    // sotto il suo soggetto, si sposta di lato quanto basta: meglio un'etichetta un po' fuori asse che una coperta.
+    const dentro = (x: number, larga: number, y: number): number => {
+      const destra = (y > stile.zone.icone.y - 50 ? stile.zone.icone.x : stile.zone.destra) - 40;
+      const sinistra = stile.zone.sinistra + 40;
+      return Math.max(sinistra + larga / 2, Math.min(destra - larga / 2, x));
+    };
+    const largaEtichetta = (testo: string) => testo.length * (n === 3 ? 28 : 36) * 0.76 + 60;
+    const largaNota = (testo: string) => testo.length * (n === 3 ? 26 : 32) * 0.56;
     return (
       <>
         {titolo ? (
@@ -499,12 +511,12 @@ export function bloccoSoggetti({soggetti, titolo, fonte}: {soggetti: Soggetto[];
             <div key={i}>
               <SoggettoVivo soggetto={sg} x={x} y={yCentro} lato={lato} p={statoSoggetto(sg, dopo)} da={da} indice={i} colpo={colpoSoggetto(sg, dopo)} />
               {etichetta && da > 0 ? (
-                <div data-fmlab-zona="testo" style={{position: 'absolute', left: x, top: yCentro + lato / 2 + (n === 1 ? 14 : n === 2 ? 30 : 44), transform: `translate(-50%, -50%) scale(${mix(0.7, 1, molla(da - 0.15, {rigidita: 200, smorzamento: 16})).toFixed(3)})`, opacity: rampa(da - 0.15, 0.2), padding: '10px 26px', borderRadius: 999, border: `3px solid ${colore}`, background: alfa('#06090D', 0.82), boxShadow: `0 0 22px ${alfa(colore, 0.55)}`, whiteSpace: 'nowrap', fontFamily: stile.font.titoli, fontWeight: 900, fontSize: n === 3 ? 28 : 36, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#fff'}}>
+                <div data-fmlab-zona="testo" style={{position: 'absolute', left: dentro(x, largaEtichetta(etichetta), yCentro + lato / 2 + (n === 1 ? 14 : n === 2 ? 30 : 44)), top: yCentro + lato / 2 + (n === 1 ? 14 : n === 2 ? 30 : 44), transform: `translate(-50%, -50%) scale(${mix(0.7, 1, molla(da - 0.15, {rigidita: 200, smorzamento: 16})).toFixed(3)})`, opacity: rampa(da - 0.15, 0.2), padding: '10px 26px', borderRadius: 999, border: `3px solid ${colore}`, background: alfa('#06090D', 0.82), boxShadow: `0 0 22px ${alfa(colore, 0.55)}`, whiteSpace: 'nowrap', fontFamily: stile.font.titoli, fontWeight: 900, fontSize: n === 3 ? 28 : 36, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#fff'}}>
                   {etichetta}
                 </div>
               ) : null}
               {nota && da > 0 ? (
-                <div data-fmlab-zona="testo" style={{position: 'absolute', left: x, top: yCentro + lato / 2 + (n === 1 ? 72 : n === 2 ? 88 : 100), transform: 'translate(-50%, -50%)', opacity: rampa(da - 0.3, 0.3), whiteSpace: 'nowrap', fontFamily: stile.font.titoli, fontWeight: 800, fontSize: n === 3 ? 26 : 32, color: colore}}>
+                <div data-fmlab-zona="testo" style={{position: 'absolute', left: dentro(x, largaNota(nota), yCentro + lato / 2 + (n === 1 ? 72 : n === 2 ? 88 : 100)), top: yCentro + lato / 2 + (n === 1 ? 72 : n === 2 ? 88 : 100), transform: 'translate(-50%, -50%)', opacity: rampa(da - 0.3, 0.3), whiteSpace: 'nowrap', fontFamily: stile.font.titoli, fontWeight: 800, fontSize: n === 3 ? 26 : 32, color: colore}}>
                   {nota}
                 </div>
               ) : null}

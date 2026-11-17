@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // FMLAB Reel Kit — tutti i comandi passano da qui:  npm run <comando> <reel> [opzioni]
-import {ErroreFmlab, elencoReel, leggiEnv} from './percorsi.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import {ErroreFmlab, RADICE, elencoReel, leggiEnv} from './percorsi.mjs';
 
 const AIUTO = `
 FMLAB Reel Kit — comandi
@@ -68,8 +70,29 @@ async function chiudiRegistro(ok, errore = null) {
   inCorso = null;
 }
 
+/**
+ * Il primo avvio su un computer: chi ha appena ricevuto la cartella non ha ancora installato niente, e senza questo
+ * controllo ogni comando finirebbe con un errore di Node incomprensibile. Qui si dice cosa fare, in due righe.
+ */
+function primoAvvio(comando) {
+  if (!comando || comando === 'aiuto') return null;
+  const versione = Number(process.versions.node.split('.')[0]);
+  if (versione < 20) return `Questo computer ha Node ${process.versions.node}: al kit serve Node 20 o più recente.\nScaricalo da https://nodejs.org (versione LTS), installalo e riprova.`;
+  let dipendenze = [];
+  try {
+    dipendenze = Object.keys(JSON.parse(fs.readFileSync(path.join(RADICE, 'package.json'), 'utf8')).dependencies ?? {});
+  } catch {
+    return null;
+  }
+  const mancano = dipendenze.filter((d) => !fs.existsSync(path.join(RADICE, 'node_modules', d, 'package.json')));
+  if (!mancano.length) return null;
+  return `È la prima volta su questo computer: il kit non è ancora installato (${mancano.length === dipendenze.length ? 'manca tutto' : `mancano: ${mancano.join(', ')}`}).\n\n  npm install        (una volta sola, un paio di minuti, serve la rete)\n  npm run collaudo   (controlla che Chrome, ffmpeg e la voce ci siano)\n  npm run stato      (accende la dashboard)\n\nPoi rilancia quello che volevi fare.`;
+}
+
 async function principale() {
   const [comando, ...argomenti] = process.argv.slice(2);
+  const avviso = primoAvvio(comando);
+  if (avviso) throw new ErroreFmlab(avviso);
   leggiEnv();
   if (!SENZA_REGISTRO.includes(comando)) {
     const {annota, adesso, senzaSegreti} = await import('./registro.mjs');

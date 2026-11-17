@@ -29,6 +29,9 @@ incollare all'agente) e `personaggi/dottore/prova.jpg` (pose e gesti del dottore
    (È il primo dei prompt pronti: gli altri sono in `PROMPT.md` e nel pannello.)
 
    (A mano: apri il Terminale nella cartella e lancia `npm install`, poi `npm run collaudo`.)
+
+   Se lanci un comando del kit prima di `npm install`, non succede niente di male: il kit dice che è la prima
+   volta su questo computer e scrive i tre comandi da dare.
 3. Quando il collaudo dice TUTTO OK, apri il pannello:
 
    ```
@@ -309,6 +312,13 @@ Scritti qui perché chi fa i reel sappia cosa non è stato ancora provato.
   velocizzazione per stare nella durata e le misure dell'audio vanno guardate al primo reel vero.
 - **La voce frase per frase è provata solo con un ElevenLabs finto.** Al primo reel vero va ascoltato se le frasi
   legano tra loro e con quelle della banca; se non legano, `ELEVENLABS_FRASI=no`.
+- **Il primo avvio su un Mac pulito non è ancora stato provato.** La prova è pronta: su GitHub, pagina Actions,
+  "primo-avvio-mac", "Run workflow". Su un Mac di GitHub (Apple Silicon) installa il kit da zero, passa le prove, fa
+  un reel di prova senza voce e accende la dashboard; in fondo lascia la bozza da scaricare e guardare. Dura una
+  decina di minuti e i minuti dei Mac contano dieci volte: per questo non parte da sola.
+- **Una prova lenta oscilla**: quella del metro che conta le parole dei sottotitoli è fallita una volta su tre giri
+  (47 parole contate contro 41 vere, il limite è 46). I fotogrammi sono identici da un giro all'altro: è il conteggio
+  del metro a essere al limite, non il video.
 - **La dashboard è provata nel browser su Linux**, non su un Mac: che si apra da sola nel browser e che "Apri la
   cartella" apra il Finder va guardato lì una volta.
 - **Mai provato con un servizio di immagini vero**, e nemmeno il ritaglio dal fondo magenta su un'immagine vera.

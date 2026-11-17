@@ -1,0 +1,48 @@
+# Il primo avvio su un Mac pulito (Apple Silicon), come lo vive chi riceve il kit: il kit dice cosa installare,
+# si installa, passa le prove, fa un reel di prova senza voce e accende la dashboard.
+# NON parte a ogni modifica: i minuti dei Mac di GitHub contano dieci volte quelli normali. Si lancia a mano dalla
+# pagina Actions ("Run workflow"), oppure spingendo sul ramo prova-mac. Una corsa dura una decina di minuti.
+name: primo-avvio-mac
+on:
+  workflow_dispatch:
+  push:
+    branches: [prova-mac]
+jobs:
+  mac:
+    runs-on: macos-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Prima dell'installazione il kit dice cosa fare, senza errori incomprensibili
+        run: |
+          node motore/cli.mjs stato > prima.txt 2>&1 || true
+          cat prima.txt
+          grep -q "npm install" prima.txt
+          ! grep -q "ERR_MODULE_NOT_FOUND" prima.txt
+      - name: Installazione, come la fa chi ha appena ricevuto la cartella
+        run: npm install --no-audit --no-fund
+      - name: Prove veloci
+        run: npm test
+      - name: Collaudo (Chrome, ffmpeg, voce del Mac)
+        run: npm run collaudo
+      - name: Un reel di prova dal testo al video, senza voce
+        run: node prove/lente.mjs "regista · salute"
+      - name: La dashboard si accende da sola e le sue pagine funzionano nel browser
+        run: node prove/lente.mjs dashboard
+      - name: Il reel MOTS-c in bozza, da guardare
+        run: npm run fai mots-c voce=stima bozza
+        env:
+          FMLAB_DASHBOARD: "no"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: primo-avvio-mac
+          if-no-files-found: ignore
+          path: |
+            reels/mots-c/mots-c.bozza.mp4
+            reels/mots-c/provini.jpg
+            reels/mots-c/verifica.md
+            prima.txt

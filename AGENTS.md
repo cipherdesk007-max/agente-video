@@ -3,6 +3,7 @@
 Leggi `SCHEDA.md` (una pagina: basta per fare un reel), `stile/appunti.md` e le ultime voci di `diario.md`.
 `FMLAB_AVVIA.md` è il manuale completo: aprilo solo per il capitolo che ti serve.
 `CATALOGO.md` elenca tutto quello che è già pronto (scene, oggetti 3D, grafici, icone): guardalo prima di disegnare.
+La prima volta su un computer: `npm install`, poi `npm run collaudo` (se manca qualcosa lo dice, e dice come metterlo).
 Prima di tutto, e dopo ogni passo: `npm run stato`. Accende la dashboard (chi ti guarda vede in diretta cosa fai) e
 ti mostra le richieste scritte lì: falle in ordine e chiudi ognuna con `npm run richieste fatta <id>`.
 Se il testo del reel è già scritto: non si tocca e non si scrive codice. `npm run fai <reel> testo=<file>`, poi si migliora

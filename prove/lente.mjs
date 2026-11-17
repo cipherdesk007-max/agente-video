@@ -466,7 +466,8 @@ await prova('dashboard: le pagine Adesso, Riferimenti, Chiavi, Catalogo e Diario
     assert.match(await pagina.textContent('#adesso-crediti'), /123 spesi/);
     assert.match(await pagina.textContent('#adesso-crediti'), /da spendere per la voce di reta-testo|non costa/);
     assert.match(await pagina.textContent('#fatti'), /ERRORE/);
-    assert.ok(await pagina.locator('#adesso-provini').count(), 'i provini del reel si vedono nella diretta');
+    // in una copia appena scaricata i provini non ci sono ancora (Git non li tiene): allora la pagina lo dice
+    assert.ok((await pagina.locator('#adesso-provini').count()) || /I provini non ci sono ancora/.test(await pagina.textContent('#adesso-vedi')), 'la diretta mostra i provini, o dice che mancano');
     // la coda: un pulsante e due parole, poi l'agente la legge con npm run stato e la chiude
     await pagina.selectOption('#coda-reel', 'reta-testo');
     await pagina.click('[data-scelta="narratore=nessuno"]');
