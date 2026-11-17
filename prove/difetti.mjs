@@ -1374,6 +1374,25 @@ await prova('B36 · giudica: su reta-testo l\'esito è noto riga per riga; una s
   }
 });
 
+// ───────────────────────── B37 · la riga della pagella in SCHEDA.md e AGENTS.md ─────────────────────────
+
+await prova('B37 · la riga "Prima di consegnare un piano…" è una sola, identica in SCHEDA.md, AGENTS.md e CLAUDE.md, e quello che nomina esiste', async () => {
+  const RIGA = 'Prima di consegnare un piano: npm run giudica <reel>, e docs/OCCHIO.md dice cosa guardare.';
+  const leggi = (f) => fs.readFileSync(path.join(K, f), 'utf8');
+  for (const f of ['SCHEDA.md', 'AGENTS.md', 'CLAUDE.md']) {
+    const righe = leggi(f).split('\n');
+    assert.equal(righe.filter((r) => r === RIGA).length, 1, `${f}: la riga c'è una volta sola, da sola`);
+    assert.equal(righe.filter((r) => r.includes('npm run giudica')).length, 1, `${f}: nient'altro sulla pagella`);
+  }
+  // negli agenti viene subito dopo la riga che dice cosa leggere (stile/appunti.md)
+  const agenti = leggi('AGENTS.md').split('\n');
+  assert.match(agenti[agenti.indexOf(RIGA) - 1], /^Leggi `SCHEDA\.md`.*`stile\/appunti\.md`/);
+  assert.equal(leggi('AGENTS.md'), leggi('CLAUDE.md'), 'AGENTS.md e CLAUDE.md restano identici');
+  // quello che la riga nomina c'è davvero
+  assert.ok(fs.existsSync(path.join(K, 'docs/OCCHIO.md')));
+  assert.equal(JSON.parse(leggi('package.json')).scripts.giudica, 'node motore/cli.mjs giudica');
+});
+
 if (pannello) await pannello.server.chiudi();
 cancella();
 const falliti = esiti.filter((e) => !e.ok);

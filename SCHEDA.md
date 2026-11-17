@@ -9,6 +9,7 @@ già accesa) e ne scrive l'indirizzo, così chi ti segue vede in diretta tappe, 
 **richieste** che quella persona ha scritto nella dashboard. Le richieste si fanno in ordine: se hanno una riga
 `→ npm run imposta …` lanciala così com'è, poi rifai quello che serve (`npm run fai <reel>`) e chiudi con
 `npm run richieste fatta <id>`. Leggi anche le ultime voci di `diario.md`: dicono cosa è andato storto negli ultimi reel.
+Prima di consegnare un piano: npm run giudica <reel>, e docs/OCCHIO.md dice cosa guardare.
 
 ## Dal testo al reel: il regista sei tu, il kit fa il resto
 
