@@ -311,6 +311,9 @@ export function spezzaComando(riga) {
 }
 
 const AZIONI = {
+  // il pulsante unico: dal testo al video a tappe (regia, monta, tempi, provini | voce, render, verifica, confronta).
+  // Riparte dalla tappa fallita; prima della voce a pagamento si ferma e dice i crediti: si riparte con voceSi.
+  fai: {titolo: 'Fai il reel', argomenti: (slug, lingua, o) => ['fai', slug, ...(o.bozza ? ['bozza'] : []), ...(o.voceSi ? ['voce=si'] : []), ...(o.comunque ? ['comunque'] : [])]},
   voce: {titolo: 'Voce', argomenti: (slug, lingua, o) => ['voce', slug, ...lingua, ...(['elevenlabs', 'mac', 'comando', 'stima'].includes(o.motore) ? [o.motore] : []), ...(o.nuova ? ['nuova'] : [])]},
   provini: {titolo: 'Provini', argomenti: (slug, lingua) => ['provini', slug, ...lingua]},
   bozza: {titolo: 'Video di bozza', argomenti: (slug, lingua) => ['render', slug, ...lingua, 'bozza']},

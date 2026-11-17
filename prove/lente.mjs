@@ -262,6 +262,14 @@ await prova('B01 · pannello: testo incollato, durata scritta a mano, ogni pulsa
     const rapporto = fs.readFileSync(path.join(REELS, slug, 'verifica.md'), 'utf8');
     assert.match(rapporto, /✓ Il testo del reel è quello dato, parola per parola/);
     assert.match(rapporto, /✓ Durata .*chiesti 15/);
+    // il pulsante unico: dal testo al video in otto tappe, con le tappe che si accendono una dopo l'altra
+    await carta.locator('button:has-text("Fai una bozza")').click();
+    await pagina.waitForFunction(() => /^Fai il reel/.test(document.querySelector('#reg-titolo').textContent) && !/ · \d+ s$/.test(document.querySelector('#reg-titolo').textContent), null, {timeout: 600000});
+    const esitoFai = await pagina.textContent('#reg-titolo');
+    assert.match(esitoFai, /fatto$/, `${esitoFai}\n${(await pagina.textContent('#reg-testo')).trim().split('\n').slice(-8).join('\n')}`);
+    assert.equal(await pagina.locator('#reg-tappe span').count(), 8);
+    assert.equal(await pagina.locator('#reg-tappe span:has-text("✓")').count(), 8);
+    assert.ok(fs.existsSync(path.join(REELS, slug, 'piano.json')), 'il pulsante unico scrive il piano di regia');
     // catalogo
     await pagina.click('nav button[data-vista=catalogo]');
     assert.ok((await pagina.locator('details.prompt').count()) > 5);

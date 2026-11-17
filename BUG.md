@@ -162,10 +162,9 @@ il difetto com'era; in fondo a ognuna, come è stato chiuso.
   generata)". L'audio misurato è a −24 LUFS: gli effetti ci sono.
 - **Chiuso:** la verifica elenca quello che c'è: voce, musica, numero di effetti.
 
-## B17 · Manca `package-lock.json` (bassa) — aperto
+## B17 · Manca `package-lock.json` (bassa) — chiuso il 17/11
 
-- `ffmpeg-static` è chiesto come `^5.2.0`. Senza file di blocco due installazioni possono dare versioni diverse.
-  Va creato da un computer collegato alla rete (`npm install --package-lock-only`).
+- Creato con `npm install --package-lock-only` e salvato: due installazioni danno le stesse versioni. Prova: `B17`.
 
 ## B18 · Nomi di assistenti in quattro file (bassa) — chiuso il 17/11
 

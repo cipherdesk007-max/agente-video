@@ -167,6 +167,8 @@
     <button class="secondario" id="reg-chiudi">Chiudi</button>
   </div>
   <div class="barra"><i id="reg-barra"></i></div>
+  <div id="reg-tappe" hidden style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px"></div>
+  <div id="reg-si" hidden style="margin:8px 0"></div>
   <pre id="reg-testo"></pre>
 </aside>
 
@@ -510,6 +512,8 @@ function cartaReel(r) {
       r.testoDato ? et('testo dato: parola per parola', 'si') : null),
     h('div', {class: 'azioni'},
       h('a', {class: 'secondario forte', href: versione.anteprima, target: '_blank'}, versione.conAudio ? 'Anteprima con audio' : 'Anteprima (ancora senza voce)'),
+      r.testoDato ? h('button', {class: 'secondario forte', type: 'button', disabled: occupato, title: 'Dal testo al video, a tappe: riparte da dove serve e si ferma prima di spendere', onclick: () => esegui(r.slug, 'fai', {lingua: versione.lingua})}, 'Fai il reel') : null,
+      r.testoDato ? b('Fai una bozza', 'fai', () => ({bozza: true})) : null,
       motore, b('Genera la voce', 'voce', () => ({motore: motore.value})), b('Provini', 'provini', nessuno), b('Bozza veloce', 'bozza', nessuno), b('Video finale', 'render', nessuno), b('Verifica', 'verifica', nessuno),
       stato.kit.agente && r.richiesta ? b('Avvia l\'agente', 'agente', nessuno) : null),
     collegamenti.length ? h('div', {class: 'collegamenti'}, collegamenti) : null,
@@ -530,7 +534,42 @@ let seguito = null;
 let righeLette = 0;
 let giro = null;
 
+// ───────── il pulsante unico: le otto tappe di "fai" ─────────
+const TAPPE = ['regia', 'monta', 'tempi', 'provini', 'voce', 'render', 'verifica', 'confronta'];
+let ultimoFai = null;
+function mostraTappe(l) {
+  const riquadro = $('#reg-tappe');
+  const si = $('#reg-si');
+  const testo = $('#reg-testo').textContent;
+  const viste = [...testo.matchAll(/── (\d)\/8 · (\w+)/g)];
+  if (!ultimoFai || !viste.length) { riquadro.hidden = true; si.hidden = true; return; }
+  const adesso = Number(viste[viste.length - 1][1]);
+  riquadro.hidden = false;
+  riquadro.replaceChildren(...TAPPE.map((nome, i) => {
+    const n = i + 1;
+    const fatta = l.stato === 'finito' || n < adesso;
+    const rotta = l.stato === 'errore' && n === adesso;
+    const colore = rotta ? '#ff4d5e' : fatta ? '#7cf26b' : n === adesso ? '#ffd23f' : '#56607f';
+    return h('span', {style: {border: `2px solid ${colore}`, color: colore, borderRadius: '999px', padding: '3px 10px', fontSize: '13px', fontWeight: 700}}, `${n} · ${nome}${fatta ? ' ✓' : rotta ? ' ✗' : ''}`);
+  }));
+  // fermo prima di spendere: il costo è scritto nel registro, il sì lo dà la persona
+  const costo = /costa circa (\d+) crediti/.exec(testo);
+  const cartelli = /Rischio cartelli (\d+) su 100/.exec(testo);
+  si.hidden = true;
+  if (l.stato === 'errore' && costo) {
+    si.hidden = false;
+    si.replaceChildren(h('button', {class: 'secondario forte', type: 'button', onclick: () => esegui(ultimoFai.slug, 'fai', {...ultimoFai.extra, voceSi: true})}, `Sì, genera la voce: circa ${costo[1]} crediti`));
+  } else if (l.stato === 'errore' && cartelli && adesso === 2) {
+    si.hidden = false;
+    si.replaceChildren(h('button', {class: 'secondario', type: 'button', onclick: () => esegui(ultimoFai.slug, 'fai', {...ultimoFai.extra, comunque: true})}, 'Vai avanti lo stesso (il reel resta una fila di scritte)'));
+  } else if (l.stato === 'errore') {
+    si.hidden = false;
+    si.replaceChildren(h('button', {class: 'secondario', type: 'button', onclick: () => esegui(ultimoFai.slug, 'fai', ultimoFai.extra)}, `Ho corretto: riparti dalla tappa ${adesso} (le altre non si rifanno)`));
+  }
+}
+
 async function esegui(slug, azione, extra = {}) {
+  ultimoFai = azione === 'fai' ? {slug, extra: {lingua: extra.lingua, bozza: extra.bozza}} : null;
   try {
     const r = await chiama('/api/esegui', {slug, azione, ...extra});
     segui(r.lavoro);
@@ -551,6 +590,7 @@ function mostraRegistro(l, aggiungi = false) {
   if (!aggiungi) pre.textContent = '';
   if (l.righe?.length) pre.append(l.righe.join('\n') + '\n');
   if (inFondo) pre.scrollTop = pre.scrollHeight;
+  mostraTappe(l);
 }
 
 function segui(lavoro) {

@@ -360,7 +360,7 @@ await prova('B16 · verifica: l\'audio viene descritto per quello che contiene',
 
 // ───────────────────────── B17 · B18 ─────────────────────────
 
-await rimandata('B17 · package-lock.json è salvato nel repository', 'serve un computer collegato alla rete', () => {
+await prova('B17 · package-lock.json è salvato nel repository', () => {
   // conta quello salvato in git: `npm install` ne crea uno sul momento, ma senza salvarlo ogni installazione fa da sé
   assert.equal(spawnSync('git', ['ls-files', 'package-lock.json'], {cwd: K, encoding: 'utf8'}).stdout.trim(), 'package-lock.json');
 });
