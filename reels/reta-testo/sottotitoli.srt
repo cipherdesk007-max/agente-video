@@ -1,163 +1,163 @@
 1
-00:00:00,250 --> 00:00:02,965
+00:00:00,250 --> 00:00:02,856
 Nei nuovi studi sulla Reta per il dolore al
 
 2
-00:00:02,965 --> 00:00:06,412
+00:00:02,856 --> 00:00:06,164
 ginocchio, anche chi ha ricevuto il placebo ha avuto
 
 3
-00:00:06,412 --> 00:00:07,512
+00:00:06,164 --> 00:00:07,229
 meno dolore.
 
 4
-00:00:07,642 --> 00:00:11,385
+00:00:07,344 --> 00:00:10,936
 Quindi, quanto di questo miglioramento è davvero merito della
 
 5
-00:00:11,385 --> 00:00:11,986
+00:00:10,936 --> 00:00:11,523
 Reta?
 
 6
-00:00:12,116 --> 00:00:13,918
+00:00:11,638 --> 00:00:13,377
 Vediamo cosa è successo.
 
 7
-00:00:14,048 --> 00:00:17,355
+00:00:13,492 --> 00:00:16,666
 Questo mese sono stati pubblicati due studi sull'uomo in
 
 8
-00:00:17,355 --> 00:00:20,709
+00:00:16,666 --> 00:00:19,894
 una delle riviste mediche più importanti al mondo.
 
 9
-00:00:20,839 --> 00:00:24,434
+00:00:20,009 --> 00:00:23,459
 Hanno coinvolto circa mille adulti con artrosi al ginocchio,
 
 10
-00:00:24,434 --> 00:00:26,291
+00:00:23,459 --> 00:00:25,251
 seguiti per oltre un anno.
 
 11
-00:00:26,421 --> 00:00:29,728
+00:00:25,366 --> 00:00:28,540
 Il dolore veniva valutato su una scala da zero
 
 12
-00:00:29,728 --> 00:00:33,277
+00:00:28,540 --> 00:00:31,956
 a dieci, dove dieci indicava il dolore più forte.
 
 13
-00:00:33,407 --> 00:00:36,410
+00:00:32,071 --> 00:00:34,952
 Con la Reta, il dolore è diminuito di quasi
 
 14
-00:00:36,410 --> 00:00:37,362
+00:00:34,952 --> 00:00:35,876
 quattro punti.
 
 15
-00:00:37,492 --> 00:00:39,091
+00:00:35,991 --> 00:00:37,525
 Ma anche con il placebo,
 
 16
-00:00:39,091 --> 00:00:41,430
+00:00:37,525 --> 00:00:39,770
 una sostanza senza principio attivo,
 
 17
-00:00:41,430 --> 00:00:43,638
+00:00:39,770 --> 00:00:41,899
 è diminuito di circa due punti.
 
 18
-00:00:43,768 --> 00:00:46,483
+00:00:42,014 --> 00:00:44,619
 È un po' come quando il pubblico inizia ad
 
 19
-00:00:46,483 --> 00:00:49,734
+00:00:44,619 --> 00:00:47,739
 applaudire prima ancora che la band salga sul palco:
 
 20
-00:00:49,734 --> 00:00:52,893
+00:00:47,739 --> 00:00:50,771
 a volte basta aspettarsi di stare meglio per provare
 
 21
-00:00:52,893 --> 00:00:54,251
+00:00:50,771 --> 00:00:52,084
 un po' di sollievo.
 
 22
-00:00:54,381 --> 00:00:57,617
+00:00:52,199 --> 00:00:55,305
 Quindi, per capire quanto funziona davvero la Reta,
 
 23
-00:00:57,617 --> 00:00:59,715
+00:00:55,305 --> 00:00:57,328
 bisogna guardare la differenza.
 
 24
-00:00:59,845 --> 00:01:02,996
+00:00:57,443 --> 00:01:00,467
 In entrambi gli studi, il dolore è diminuito da
 
 25
-00:01:02,996 --> 00:01:05,961
+00:01:00,467 --> 00:01:03,322
 uno a due punti in più rispetto al placebo.
 
 26
-00:01:06,091 --> 00:01:08,798
+00:01:03,437 --> 00:01:06,035
 Non è un miracolo, ma non è nemmeno un
 
 27
-00:01:08,798 --> 00:01:10,748
+00:01:06,035 --> 00:01:07,917
 risultato dovuto al caso.
 
 28
-00:01:10,878 --> 00:01:13,733
+00:01:08,031 --> 00:01:10,781
 C'è però un altro aspetto da considerare.
 
 29
-00:01:13,863 --> 00:01:17,614
+00:01:10,896 --> 00:01:14,496
 Gli autori hanno riportato che gli effetti collaterali gravi
 
 30
-00:01:17,614 --> 00:01:19,712
+00:01:14,496 --> 00:01:16,509
 erano più frequenti con la Reta,
 
 31
-00:01:19,712 --> 00:01:21,903
+00:01:16,509 --> 00:01:18,622
 soprattutto quelli gastrointestinali.
 
 32
-00:01:22,033 --> 00:01:25,480
+00:01:18,737 --> 00:01:22,045
 In conclusione, due studi sull'uomo hanno dimostrato che la
 
 33
-00:01:25,480 --> 00:01:28,889
+00:01:22,045 --> 00:01:25,326
 Reta riduce il dolore al ginocchio più del placebo.
 
 34
-00:01:29,019 --> 00:01:32,622
+00:01:25,441 --> 00:01:28,899
 Gli studi sono stati condotti con il coinvolgimento dell'azienda
 
 35
-00:01:32,622 --> 00:01:35,921
+00:01:28,899 --> 00:01:32,065
 che produce la Reta, e i dettagli sono importanti
 
 36
-00:01:35,921 --> 00:01:37,723
+00:01:32,065 --> 00:01:33,804
 tanto quanto i risultati.
 
 37
-00:01:37,853 --> 00:01:41,012
+00:01:33,919 --> 00:01:36,951
 Manda questo video a quell'amico a cui scricchiolano le
 
 38
-00:01:41,012 --> 00:01:43,423
+00:01:36,951 --> 00:01:39,274
 ginocchia ogni volta che fa le scale.
 
 39
-00:01:43,553 --> 00:01:47,008
+00:01:39,389 --> 00:01:42,705
 Commenta "MAPPA" per ricevere gratis il nostro database con
 
 40
-00:01:47,008 --> 00:01:50,463
+00:01:42,705 --> 00:01:46,021
 tutte le informazioni essenziali su questo e tanti altri
 
 41
-00:01:50,463 --> 00:01:51,212
+00:01:46,021 --> 00:01:46,750
 composti.

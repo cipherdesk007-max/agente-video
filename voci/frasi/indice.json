@@ -1,0 +1,200 @@
+{
+  "cosa": "Frasi già dette dalla voce dei reel: quando un reel ne contiene una scritta uguale, si usa questo audio e non si spende. Si riempie con: npm run frasi <audio> <testo.txt>",
+  "ritmo": {
+    "it": 1.042
+  },
+  "frasi": [
+    {
+      "testo": "Vediamo cosa è successo.",
+      "chiave": "vediamo cosa è successo",
+      "lingua": "it",
+      "file": "voci/frasi/it/vediamo-cosa-e-successo-7bb2a1.mp3",
+      "secondi": 1.37,
+      "parole": 4
+    },
+    {
+      "testo": "Vediamo cosa dicono gli studi.",
+      "chiave": "vediamo cosa dicono gli studi",
+      "lingua": "it",
+      "file": "voci/frasi/it/vediamo-cosa-dicono-gli-studi-a71cef.mp3",
+      "secondi": 1.62,
+      "parole": 5
+    },
+    {
+      "testo": "C'è però un altro aspetto da considerare.",
+      "chiave": "c è però un altro aspetto da considerare",
+      "lingua": "it",
+      "file": "voci/frasi/it/c-e-pero-un-altro-aspetto-da-considerare-e7a4d4.mp3",
+      "secondi": 2.31,
+      "parole": 7
+    },
+    {
+      "testo": "Ma c'è un dettaglio importante.",
+      "chiave": "ma c è un dettaglio importante",
+      "lingua": "it",
+      "file": "voci/frasi/it/ma-c-e-un-dettaglio-importante-dcef18.mp3",
+      "secondi": 1.65,
+      "parole": 5
+    },
+    {
+      "testo": "Ecco cosa significa in pratica.",
+      "chiave": "ecco cosa significa in pratica",
+      "lingua": "it",
+      "file": "voci/frasi/it/ecco-cosa-significa-in-pratica-dbcce6.mp3",
+      "secondi": 1.55,
+      "parole": 5
+    },
+    {
+      "testo": "I dettagli sono importanti tanto quanto i risultati.",
+      "chiave": "i dettagli sono importanti tanto quanto i risultati",
+      "lingua": "it",
+      "file": "voci/frasi/it/i-dettagli-sono-importanti-tanto-quanto--8a96a8.mp3",
+      "secondi": 3.08,
+      "parole": 8
+    },
+    {
+      "testo": "Questo non è un consiglio medico: parlane sempre con il tuo dottore.",
+      "chiave": "questo non è un consiglio medico parlane sempre con il tuo dottore",
+      "lingua": "it",
+      "file": "voci/frasi/it/questo-non-e-un-consiglio-medico-parlane-10069e.mp3",
+      "secondi": 3.63,
+      "parole": 12
+    },
+    {
+      "testo": "Salva questo video per rivederlo quando ti serve.",
+      "chiave": "salva questo video per rivederlo quando ti serve",
+      "lingua": "it",
+      "file": "voci/frasi/it/salva-questo-video-per-rivederlo-quando--0a5901.mp3",
+      "secondi": 2.4,
+      "parole": 8
+    },
+    {
+      "testo": "Manda questo video a chi ne ha bisogno.",
+      "chiave": "manda questo video a chi ne ha bisogno",
+      "lingua": "it",
+      "file": "voci/frasi/it/manda-questo-video-a-chi-ne-ha-bisogno-9fc01a.mp3",
+      "secondi": 1.77,
+      "parole": 8
+    },
+    {
+      "testo": "Commenta MAPPA per ricevere gratis il nostro database con tutte le informazioni essenziali su questo e tanti altri composti.",
+      "chiave": "commenta mappa per ricevere gratis il nostro database con tutte le informazioni essenziali su questo e tanti altri composti",
+      "lingua": "it",
+      "file": "voci/frasi/it/commenta-mappa-per-ricevere-gratis-il-no-72a992.mp3",
+      "secondi": 7.2,
+      "parole": 19
+    },
+    {
+      "testo": "Lo sapevi?",
+      "chiave": "lo sapevi?",
+      "lingua": "it",
+      "file": "voci/frasi/it/lo-sapevi-24ba23.mp3",
+      "secondi": 0.58,
+      "parole": 2
+    },
+    {
+      "testo": "Ogni giorno, nei laboratori di mezzo mondo, gli scienziati cercano risposte a domande che sembrano semplici.",
+      "chiave": "ogni giorno nei laboratori di mezzo mondo gli scienziati cercano risposte a domande che sembrano semplici",
+      "lingua": "it",
+      "file": "voci/frasi/it/ogni-giorno-nei-laboratori-di-mezzo-mond-8ac6e3.mp3",
+      "secondi": 5.71,
+      "parole": 16
+    },
+    {
+      "testo": "Che cosa funziona davvero?",
+      "chiave": "che cosa funziona davvero?",
+      "lingua": "it",
+      "file": "voci/frasi/it/che-cosa-funziona-davvero-7da7c8.mp3",
+      "secondi": 1.4,
+      "parole": 4
+    },
+    {
+      "testo": "Quanto, e per chi?",
+      "chiave": "quanto e per chi?",
+      "lingua": "it",
+      "file": "voci/frasi/it/quanto-e-per-chi-c4973b.mp3",
+      "secondi": 1.27,
+      "parole": 4
+    },
+    {
+      "testo": "Uno studio serio confronta sempre due gruppi: chi riceve il farmaco e chi riceve il placebo.",
+      "chiave": "uno studio serio confronta sempre due gruppi chi riceve il farmaco e chi riceve il placebo",
+      "lingua": "it",
+      "file": "voci/frasi/it/uno-studio-serio-confronta-sempre-due-gr-919f06.mp3",
+      "secondi": 5.43,
+      "parole": 16
+    },
+    {
+      "testo": "Poi si aspetta: settimane, mesi, a volte anni.",
+      "chiave": "poi si aspetta settimane mesi a volte anni",
+      "lingua": "it",
+      "file": "voci/frasi/it/poi-si-aspetta-settimane-mesi-a-volte-an-665231.mp3",
+      "secondi": 3.69,
+      "parole": 8
+    },
+    {
+      "testo": "Zero, uno, due, tre, quattro, cinque, sei, sette, otto, nove, dieci: sono i punti di una scala del dolore.",
+      "chiave": "zero uno due tre quattro cinque sei sette otto nove dieci sono i punti di una scala del dolore",
+      "lingua": "it",
+      "file": "voci/frasi/it/zero-uno-due-tre-quattro-cinque-sei-sett-15696e.mp3",
+      "secondi": 8.89,
+      "parole": 19
+    },
+    {
+      "testo": "Cento persone, mille adulti, il venti per cento, quasi la metà.",
+      "chiave": "cento persone mille adulti il venti per cento quasi la metà",
+      "lingua": "it",
+      "file": "voci/frasi/it/cento-persone-mille-adulti-il-venti-per--7970b4.mp3",
+      "secondi": 4.29,
+      "parole": 11
+    },
+    {
+      "testo": "Gli gnocchi della zia, lo zaino azzurro, la pioggia sul ghiaccio e un pesce che guizza nell'acqua: frasi strane, ma servono a far sentire tutti i suoni.",
+      "chiave": "gli gnocchi della zia lo zaino azzurro la pioggia sul ghiaccio e un pesce che guizza nell acqua frasi strane ma servono a far sentire tutti i suoni",
+      "lingua": "it",
+      "file": "voci/frasi/it/gli-gnocchi-della-zia-lo-zaino-azzurro-l-a902bf.mp3",
+      "secondi": 9.03,
+      "parole": 27
+    },
+    {
+      "testo": "Attenzione, però!",
+      "chiave": "attenzione però!",
+      "lingua": "it",
+      "file": "voci/frasi/it/attenzione-pero-403f33.mp3",
+      "secondi": 0.91,
+      "parole": 2
+    },
+    {
+      "testo": "Un risultato sorprendente non è una prova.",
+      "chiave": "un risultato sorprendente non è una prova",
+      "lingua": "it",
+      "file": "voci/frasi/it/un-risultato-sorprendente-non-e-una-prov-968140.mp3",
+      "secondi": 2.5,
+      "parole": 7
+    },
+    {
+      "testo": "Peptidi, proteine, ormoni, recettori, milligrammi, effetti collaterali: parole difficili, dette con calma.",
+      "chiave": "peptidi proteine ormoni recettori milligrammi effetti collaterali parole difficili dette con calma",
+      "lingua": "it",
+      "file": "voci/frasi/it/peptidi-proteine-ormoni-recettori-millig-4328ad.mp3",
+      "secondi": 7.63,
+      "parole": 12
+    },
+    {
+      "testo": "Fidati dei numeri, non delle promesse.",
+      "chiave": "fidati dei numeri non delle promesse",
+      "lingua": "it",
+      "file": "voci/frasi/it/fidati-dei-numeri-non-delle-promesse-8d52d3.mp3",
+      "secondi": 2.17,
+      "parole": 6
+    },
+    {
+      "testo": "E adesso, guardiamo insieme che cosa dicono i dati.",
+      "chiave": "e adesso guardiamo insieme che cosa dicono i dati",
+      "lingua": "it",
+      "file": "voci/frasi/it/e-adesso-guardiamo-insieme-che-cosa-dico-47f641.mp3",
+      "secondi": 2.64,
+      "parole": 9
+    }
+  ]
+}

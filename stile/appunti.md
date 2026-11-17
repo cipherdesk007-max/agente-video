@@ -63,3 +63,13 @@ Lezioni dai reel già fatti. Leggile prima di cominciarne uno nuovo; alla fine a
   l'elenco da cui partire.
 - Le braccia conserte stanno bene sulla frase che frena ("Ma anche con il placebo…"): il kit le mette lì da
   solo. Una volta o due per reel bastano: è una posa chiusa, non una posa per spiegare.
+
+## Voce
+
+- La voce dei reel è **Vittorio** (ElevenLabs), stabilità 50, somiglianza 75, modello v4: sono le regolazioni con cui
+  è stata registrata la banca delle frasi (`voci/frasi/`, 24 frasi, 17/11/2026). Nel file `.env` voce, modello e
+  regolazioni devono essere gli stessi, altrimenti le frasi della banca suonano diverse da quelle generate.
+- Passo misurato: nelle frasi è quasi quello che il kit stimava (1,04 volte). Il testo della Reta (284 parole) dura
+  circa 1 minuto e 48: per stare più corti si chiede una durata (`npm run imposta <reel> durata=75`, la voce viene
+  velocizzata fino a 1,4) o si accorcia il testo. Decide chi ha scritto il testo.
+- Frasi fisse in banca (scritte uguali non costano): `npm run frasi` le elenca.
