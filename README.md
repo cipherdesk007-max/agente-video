@@ -15,6 +15,5 @@ npm run collaudo
 npm run pannello rete
 ```
 
-## Lavori in corso
-
-L'incarico per portare il kit alla versione 2.0 è in `BRIEF_AGENTE.md`; l'analisi dei video di riferimento in `riferimenti/ANALISI.md`.
+Da un testo già scritto: `npm run fai <reel> testo=<file.txt>` (lo stesso fa il pulsante "Fai il reel" del pannello).
+Cosa non è ancora stato provato: [LEGGIMI.md](LEGGIMI.md), "Limiti noti".

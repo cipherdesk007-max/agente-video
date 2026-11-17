@@ -1,6 +1,14 @@
 # Novità
 
-## Verso la 2.0 · fase 3: il regista (in corso)
+## 2.0 · dal testo al reel con un comando
+
+- **Pannello: un pulsante solo**, "Fai il reel" (o "Fai una bozza"): le otto tappe di `fai` una dopo l'altra, con il
+  sì prima della spesa per la voce e la ripresa dalla tappa che si è fermata.
+- **Formati**: verticale 9:16, quadrato 1:1, orizzontale 16:9 (`npm run imposta <reel> formato=1:1`, o dal pannello).
+  Le scene sono le stesse: cambia la finestra e dove sta il narratore.
+- **Lingue scritte senza spazi** (giapponese, cinese, tailandese…): il testo si divide in parole da solo, i
+  sottotitoli le riattaccano.
+- **Narratore**: l'invito finale si prepara partendo dalla fine, così non resta fermo sull'ultima frase.
 
 - **Il piano di regia** (`reels/<reel>/piano.json`): chi fa la regia scrive un file solo. Scene, cosa si vede, su
   quale parola compare ogni cosa, luogo, inquadratura, movimento di camera, protagonista, suoni. `npm run monta` ne
@@ -23,11 +31,12 @@
   solo la figura, non il fondo che si muove dietro.
 - **Illustrazioni**: foglio di stile scritto sui riferimenti (`stile/FOGLIO_IMMAGINI.md`), fondo magenta per i
   soggetti verdi, elenco e comandi per `reta-testo`.
-- Chiusi B18, B19, B20.
+- Sottotitoli: il corpo si stringe da solo sulle parole lunghe (tedesco); le virgolette e le parentesi che aprono
+  vanno con la parola dopo; i nomi degli assistenti non compaiono più nei file del kit.
 - **`bloccoParole`**: le parole che contano una alla volta, ognuna sulla sua parola.
 - Il **grassetto** di un testo incollato (`**parola**`) diventa enfasi nei sottotitoli e non viene letto.
 
-## Verso la 2.0 · fase 2: il motore delle scene illustrate (in corso)
+## 2.0 · il motore delle scene illustrate
 
 - **Il mondo a livelli** dietro ogni scena (`libreria/Mondo.tsx`): trama lontana e vicina, luogo disegnato, luce,
   ognuno a una distanza diversa. La camera viaggia sempre, scatta a ogni cambio di scena e dà una spinta con un
@@ -39,9 +48,9 @@
 - **Immagini generate come materiale** (`motore/immagini.mjs`, `npm run immagine`): un'interfaccia, più fornitori
   scelti in `.env`, fondo trasparente fatto dal kit, biblioteca con impronta (la seconda volta costa zero).
 - **Le scene pronte si adattano**: scorrono, raggruppano, stringono, invece di fermarsi al primo elemento in più.
-- `reta-ginocchio` rifatto con il motore nuovo. I numeri prima e dopo sono in `STATO.md`.
+- `reta-ginocchio` rifatto con il motore nuovo.
 
-## Verso la 2.0 · fase 1: il metro
+## 2.0 · il metro
 
 - **`npm run confronta <video>`** misura un video qualsiasi e stampa una tabella: tagli netti, secondi tra una novità
   e l'altra, palco occupato e in movimento, sottotitoli (posizione, parole insieme, parole al minuto, contrasto,
@@ -49,11 +58,9 @@
   stesso file, stessi numeri.
 - **`npm run confronta riferimenti`** misura i video di riferimento e scrive `riferimenti/misure.json`: le soglie
   stanno lì (con il margine, 15%), non nel codice.
-- `riferimenti/ANALISI.md` ha i numeri dei tre riferimenti accanto a quelli del kit, e l'elenco dei lavori che ne esce.
+- `riferimenti/ANALISI.md` ha i numeri dei tre riferimenti e cosa si vede nei loro fotogrammi.
 
-## Verso la 2.0 · fase 0: i difetti del kit 1.5
-
-L'elenco completo, con i passi per riprodurli, è in `BUG.md`; a che punto è il lavoro, in `STATO.md`.
+## 2.0 · i difetti del kit 1.5, chiusi
 
 - **Il testo scritto nel pannello è il testo del reel**, parola per parola: diventa il copione e resta intatto in
   `testo.txt`. Voce e verifica si fermano se il copione dice altro. "È solo l'argomento" si sceglie a parte.
@@ -67,7 +74,7 @@ L'elenco completo, con i passi per riprodurli, è in `BUG.md`; a che punto è il
 - Nel copione `\[ \] \* \# \>` scrivono quei caratteri come testo.
 - Lista, mito e confronto non finiscono più sotto le icone dell'app. "Ferma" e Ctrl+C chiudono il render puliti.
   I pezzi del render non restano sul disco. `git` ignora provini, video e rapporti di verifica.
-- **Prove**: `npm test` ha una prova per ogni difetto (`prove/difetti.mjs`); `npm run prove:lente` fa quelle con il
+- **Prove**: `npm test` ha una prova per ogni difetto corretto (`prove/difetti.mjs`); `npm run prove:lente` fa quelle con il
   browser e i render (pannello dal telefono, modelli, durata con una voce finta, numeri e fonti).
 
 ## 1.5

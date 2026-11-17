@@ -58,26 +58,6 @@ della voce, che il kit non ha ancora).
   fotogramma (dito alzato, mani aperte, mano al mento, indica di lato, telefono in mano nella chiusura).
 - **Chiusura:** "Comment PAROLA" grande al centro, con il protagonista ancora in scena.
 
-## Dove il kit oggi è lontano (misurato)
-
-Dal confronto qui sopra, in ordine di distanza. È l'elenco dei lavori delle fasi 2, 3 e 4.
-
-1. **Il palco sta fermo.** Fermo per il 57% del tempo (riferimenti: da 0,2 a 6,4%), fino a 4,4 secondi di fila
-   (riferimenti: al massimo 1,5); movimento medio 0,62% contro 3,5-5%. Nei riferimenti la camera, la luce o un
-   oggetto si muovono sempre. → fase 2: scene a livelli, parallasse, camera che entra ed esce, particelle e fasci.
-2. **Le novità arrivano più di rado.** Una ogni 2,7 secondi contro 1,5-1,75. → fasi 2 e 3: stati degli oggetti e
-   più agganci per frase nel piano di regia.
-3. **Il narratore cambia poco.** 16 cambi al minuto contro 40-53; la stessa posa per 2,7 secondi contro 1,0-1,4, e
-   fino a 11,6 secondi contro 3,3. → fase 4: più pose, un gesto a ogni frase breve.
-4. **Niente musica né tappeto sotto la voce**, pochi effetti. → fase 4.
-5. **Voce più lenta** nei tempi stimati (147 parole al minuto contro 172-223): da rimisurare con la voce vera.
-6. Non si misura ma si vede: le scene pronte sono schede di interfaccia su fondo uniforme, gli oggetti 3D sono
-   solidi semplici, le scene si danno il cambio invece di trasformarsi, manca un protagonista ricorrente, le scene
-   le scrive un agente esterno. → fasi 2 e 3, con la prova cieca come giudice.
-
-Già allineati: nessun taglio, posizione e disegno dei sottotitoli, parole a schermo insieme, contrasto, luminosità
-del fondo, numero di tinte, palco occupato, volume della voce.
-
 ## Cosa si impara da chi fa video con i modelli (studiato il 17/11/2026)
 
 Due progetti letti per il metodo, su indicazione di Francesco. Nessuno dei due è dentro il kit.
@@ -103,7 +83,7 @@ fare il piano di regia.
 ### OpenMontage: l'agente fa il regista, il programma controlla
 
 Fonte: `github.com/OpenMontageInc/OpenMontage` (letti `lib/slideshow_risk.py`, `skills/pipelines/explainer/scene-director.md`,
-`skills/meta/reviewer.md`). Licenza AGPL-3.0: vedi `STATO.md`, "Da dove viene cosa".
+`skills/meta/reviewer.md`). Licenza AGPL-3.0: nel kit non c'è nessun loro file e nessuna riga copiata (vedi `LEGGIMI.md`, "Da dove vengono le idee").
 
 | Cosa fa OpenMontage | Cosa è diventato nel kit |
 |---|---|

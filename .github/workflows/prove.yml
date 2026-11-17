@@ -1,6 +1,6 @@
-# Prove veloci a ogni modifica: solo logica (copione, tempi, gesti, 3D, impostazioni, una prova per ogni difetto di
-# BUG.md), senza browser e senza render: una decina di secondi.
-# Le prove lente (browser, render, pannello) si lanciano a fine fase sul proprio computer:
+# Prove veloci a ogni modifica: solo logica (copione, tempi, gesti, 3D, impostazioni, una prova per ogni difetto
+# corretto), senza browser e senza render: una decina di secondi.
+# Le prove lente (browser, render, pannello) si lanciano sul proprio computer quando si tocca il kit:
 #   npm run collaudo        npm run prove:lente
 name: prove
 on:

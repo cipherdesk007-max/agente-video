@@ -36,21 +36,24 @@ Per ultimo `npm run riuso <nome-del-reel>`: porta in libreria i pezzi nuovi che 
 
 ## Nuovo reel da un testo già scritto
 
-Quando il copione lo hai scritto tu: lui controlla i fatti e fa le scene.
+Quando il testo lo hai scritto tu: non si tocca. Lui fa la regia e il kit fa il resto.
 
 ```text
-Leggi SCHEDA.md e FMLAB_AVVIA.md. Questo è il testo del reel, già scritto da me:
+Leggi SCHEDA.md. Questo è il testo del reel, già scritto da me: va detto così com'è, parola per parola.
 
 <incolla qui il testo>
 
 Fai così:
-1. controlla ogni numero e ogni affermazione sulla fonte originale e riempi fonti.md; se una frase non regge,
-   NON cambiarla da solo: proponimi la correzione più piccola possibile e segnala l'originale;
-2. metti il testo in copione.md con scene, [segni] ed *enfasi*, senza toccare le parole;
-3. costruisci le scene con i pezzi di CATALOGO.md, fai i provini e guardali;
-4. `npm run voce`, `npm run render`, `npm run verifica`.
-Alla fine dimmi: le frasi ritoccate (prima e dopo), le scritte che hai aggiunto in grafica e gli avvisi rimasti.
-Per ultimo `npm run riuso <nome-del-reel>`: porta in libreria i pezzi nuovi che possono riservire e dimmi quali.
+1. salva il testo in un file e lancia `npm run fai <nome-del-reel> testo=<file> "Titolo"`
+   (scelte, se le voglio: durata=60 · regalo=mappa · formato=1:1 · narratore=nessuno);
+2. migliora `reels/<nome-del-reel>/piano.json` scena per scena come dice il primo capitolo di SCHEDA.md
+   (soggetti grandi in primo piano, una cosa nuova ogni 2-3 secondi, ogni numero a schermo con la sua riga in
+   fonti.md) e rilancia `npm run fai <nome-del-reel>` finché `npm run piano` non dà errori;
+3. guarda i provini e `npm run affianca <nome-del-reel>` prima di andare avanti: giudica l'occhio, poi i numeri;
+4. prima della voce a pagamento fermati e dimmi quanti crediti costa.
+Non scrivere codice e non cambiare le parole. I dubbi sui fatti non li correggi: li elenchi alla fine e in fonti.md.
+Alla fine dimmi: dove sta il video, la durata, i crediti spesi, errori e avvisi della verifica.
+Per ultimo `npm run riuso <nome-del-reel>`.
 ```
 
 ## Voce e video finale

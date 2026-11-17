@@ -1,7 +1,7 @@
-// FMLAB Reel Kit — una prova per ogni difetto di BUG.md. Veloci, senza browser.
+// FMLAB Reel Kit — una prova per ogni difetto trovato e corretto (B01, B02…). Veloci, senza browser.
 //   npm test
 // Ogni prova porta il numero del difetto. Una prova "rimandata" è un difetto ancora aperto: oggi deve fallire,
-// e se un giorno passa lo dice, così la voce di BUG.md viene chiusa e la prova diventa normale.
+// e se un giorno passa lo dice, così la prova diventa normale.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -37,7 +37,7 @@ async function rimandata(nome, fase, f) {
     return;
   }
   esiti.push({nome, ok: false});
-  console.log('  NO', nome, `\n       adesso passa: chiudi la voce in BUG.md e togli "rimandata"`);
+  console.log('  NO', nome, `\n       adesso passa: il difetto è chiuso, togli "rimandata"`);
 }
 
 /** Un reel usa e getta dentro reels/, cancellato alla fine. */
@@ -390,7 +390,7 @@ await prova('B17 · package-lock.json è salvato nel repository', () => {
 });
 await prova('B18 · nessun nome di assistente nei file del kit (resta solo il nome del file di istruzioni che un agente pretende)', () => {
   const nomi = new RegExp(['clau' + 'de', 'cod' + 'ex', 'chat' + 'gpt', 'open' + 'ai', 'gem' + 'ini', 'copi' + 'lot'].join('|'), 'i');
-  const file = spawnSync('git', ['ls-files', '--', '.', ':!BRIEF_AGENTE.md', ':!BUG.md', ':!STATO.md'], {cwd: K, encoding: 'utf8'}).stdout.split('\n').filter((f) => f && !/\.(jpg|png|mp3|wav|woff2?|ttf)$/i.test(f));
+  const file = spawnSync('git', ['ls-files'], {cwd: K, encoding: 'utf8'}).stdout.split('\n').filter((f) => f && !/\.(jpg|png|mp3|wav|woff2?|ttf)$/i.test(f));
   const trovati = file.filter((f) => nomi.test(fs.readFileSync(path.join(K, f), 'utf8').replace(/CLAU[D]E\.md/g, '')));
   assert.deepEqual(trovati, []);
 });

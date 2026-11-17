@@ -5,8 +5,9 @@ esatta, sottotitoli, narratore che parla e gesticola, video mp4 1080x1920. Il la
 programmazione (quello che usi di solito), seguendo le istruzioni che trova nella cartella; tu chiedi e
 controlli.
 
-Dentro ci sono già due reel: `reels/gps/` ("Come fa il GPS a sapere dove sei"), in italiano e in inglese, e
-`reels/reta-ginocchio/`, fatto da un testo già scritto, con i numeri di due studi.
+Dentro ci sono già tre reel: `reels/gps/` ("Come fa il GPS a sapere dove sei"), in italiano e in inglese,
+`reels/reta-ginocchio/`, con i numeri di due studi, e `reels/reta-testo/`, fatto da un testo già scritto con un
+comando solo (`npm run fai`): è il modello da guardare per i prossimi.
 
 Tre file da aprire subito: `catalogo.jpg` (tutto quello che è già pronto, disegnato), `PROMPT.md` (le frasi da
 incollare all'agente) e `personaggi/dottore/prova.jpg` (pose e gesti del dottore).
@@ -67,6 +68,11 @@ Alcuni agenti vogliono che la cartella sia un repository Git: una volta sola, ne
   già cosa suggerisce);
 - premi "Crea il reel": ottieni la frase da dare all'agente. Lui legge la tua richiesta e fa tutto il resto.
 
+Un reel nato da un testo già scritto ha un pulsante solo, **"Fai il reel"** (accanto, "Fai una bozza", più veloce):
+otto tappe una dopo l'altra (regia, monta, tempi, provini, voce, render, verifica, confronta), ognuna con il suo
+segno. Prima della voce a pagamento si ferma e ti dice quanti crediti costa: parte solo se tocchi "Sì". Se una
+tappa si ferma, leggi perché, correggi e riparti da lì: quelle già fatte non si rifanno.
+
 **I miei reel**
 
 - "Scegli la voce": il motore e la voce per quel reel, con l'ascolto di prova (gli assaggi non costano);
@@ -75,7 +81,8 @@ Alcuni agenti vogliono che la cartella sia un repository Git: una volta sola, ne
 - "Provini", "Bozza veloce", "Video finale", "Verifica": partono con un tocco e vedi l'avanzamento;
 - il video finito si guarda e si scarica da lì;
 - "Narratore, grandezza e stile": le stesse scelte, per un reel che esiste già; in più la **seconda mano** del
-  dottore (da sola, aperta, alzata, giù) e il **volume della musica**.
+  dottore (da sola, aperta, alzata, giù), il **volume della musica** e il **formato** (verticale, quadrato,
+  orizzontale).
 
 **Catalogo e prompt**
 
@@ -108,6 +115,13 @@ video: le scene si riallineano da sole alle parole.
 | `npm run pannello` | il pannello nel browser (`rete` in fondo per aprirlo anche dal telefono) |
 | `npm run stato` | a che punto è ogni reel e qual è il prossimo passo |
 | `npm run collaudo` | controlla che il kit funzioni su questo computer |
+| `npm run fai ginocchio testo=testo.txt "Titolo"` | dal testo al video in otto tappe; poi `npm run fai ginocchio` riparte da dove serve (`bozza` per fare prima) |
+| `npm run piano ginocchio` | controlla il piano di regia (`piano.json`) e dà il rischio cartelli da 0 a 100 |
+| `npm run regalo` | cosa si può regalare in chiusura (ebook, mappa, PDF) e come aggiungerne uno |
+| `npm run affianca ginocchio` | dodici fotogrammi del reel accanto a dodici del video di riferimento: si guarda prima di misurare |
+| `npm run prova-cieca` | dieci spezzoni mescolati, kit e riferimenti, da far guardare a tre persone |
+| `npm run confronta ginocchio` | misura il video (novità, movimento, sottotitoli, narratore) e lo mette accanto ai riferimenti |
+| `npm run immagine ginocchio "descrizione"` | un'illustrazione generata, ritagliata e messa in biblioteca (costa crediti: chiede prima) |
 | `npm run nuovo cuore "Titolo" lista` | crea un reel nuovo da un modello (senza niente: elenco dei modelli) |
 | `npm run imposta gps` | mostra narratore e stile del reel |
 | `npm run imposta gps narratore=nessuno` | li cambia: `narratore=dottore` `grandezza=80` `lato=sinistra` `alza=60` `mano=giu` `stile=3d` `musica=30` |
@@ -125,7 +139,11 @@ video: le scene si riallineano da sole alle parole.
 | `npm run riuso gps` | a fine reel: cosa è scritto a mano e può entrare in libreria |
 | `npm test` | prove veloci del kit (pochi secondi, senza browser) |
 
-Per un'altra lingua aggiungi il codice dopo il nome: `npm run render gps en`.
+Per un'altra lingua aggiungi il codice dopo il nome: `npm run render gps en`. Le lingue scritte senza spazi
+(giapponese, cinese, tailandese) si dividono in parole da sole.
+
+Il **formato** si sceglie per reel: `npm run imposta gps formato=1:1` (quadrato) o `formato=16:9` (orizzontale);
+`formato=9:16` torna al verticale. Le scene sono le stesse: cambia la finestra e dove sta il narratore.
 
 ## La voce
 
@@ -222,12 +240,76 @@ SCHEDA.md           la pagina sola che basta all'agente per fare un reel
 libreria/           i pezzi pronti per le scene: luci, scritte, camera, oggetti 2D e 3D, sottotitoli, narratore
 stile/              il look: colori, caratteri, scelte di partenza, appunti
 motore/             il motore: pannello, voce, render, verifica (non serve toccarlo)
+riferimenti/        i numeri dei video di riferimento e cosa si vede nei loro fotogrammi (i video li metti tu: Git li ignora)
 ```
+
+## Voce vera e illustrazioni: i comandi, in ordine
+
+Si fanno sul tuo computer, con le chiavi nel file `.env` (mai altrove). Ogni spesa è una riga sola e il kit chiede
+prima.
+
+```
+git pull
+npm install
+npm test                              # 80 prove veloci: devono passare tutte
+npm run collaudo                      # controlla Chrome, ffmpeg, voce su questo computer
+npm run fai reta-testo                # gratis: regia, monta, tempi, provini; si ferma prima della voce e dice il costo
+npm run fai reta-testo voce=si        # SPESA: circa 1.750 crediti ElevenLabs (un credito a carattere), una volta sola
+npm run affianca reta-testo           # gratis: il foglio da guardare (servono i tuoi video in riferimenti/)
+npm run riuso reta-testo              # gratis: chiude il reel
+```
+
+Cosa guardare dopo la voce: la durata (deve stare entro 5 secondi da quella chiesta), `verifica.md` senza errori, e
+nella tabella di `confronta` le cinque righe che senza voce restano vuote (volume, ritardo dei sottotitoli, musica,
+effetti). Se sposti segni, enfasi o suoni la voce non si rifà e non costa.
+
+Le illustrazioni (facoltative: i soggetti disegnati dal kit ci sono già). Nel `.env`: `FMLAB_IMMAGINI=higgsfield`,
+`HF_API_KEY_ID`, `HF_API_KEY_SECRET`. Elenco, descrizioni e comandi pronti sono in `reels/reta-testo/immagini.md`.
+
+```
+npm run immagine reta-testo "<la prima descrizione dell'elenco>"     # SPESA: una generazione
+```
+
+Fanne **una sola**, guardala (fondo tolto bene? stile del foglio `stile/FOGLIO_IMMAGINI.md`?), poi le altre sei.
+Costo: il prezzo a immagine va letto sul listino di Higgsfield prima di lanciare; le stime trovate vanno da 0,02 a
+0,14 dollari, quindi da 0,40 a 2,80 dollari per una ventina di tentativi. Non è verificato. La stessa descrizione,
+la seconda volta, esce dalla biblioteca e non costa.
+
+## Limiti noti
+
+Scritti qui perché chi fa i reel sappia cosa non è stato ancora provato.
+
+- **Mai provato con la voce vera.** Il kit è stato finito su un computer senza chiavi: voce ElevenLabs, voce del Mac,
+  velocizzazione per stare nella durata e le misure dell'audio vanno guardate al primo reel vero.
+- **Mai provato con un servizio di immagini vero**, e nemmeno il ritaglio dal fondo magenta su un'immagine vera.
+- **Mai provato sul Mac del 2017**: i tempi di render scritti qui (circa 14 minuti per un reel di 112 secondi) sono
+  di un computer a due processori.
+- **Nessun altro agente ha ancora fatto un reel seguendo solo `SCHEDA.md`.** È la prova che conta: dagli un testo,
+  la frase di `PROMPT.md` e guarda se arriva al video senza aiuto.
+- **La prova cieca non l'ha fatta nessuno** (`npm run prova-cieca`, tre persone). Parere di chi ha costruito il kit:
+  oggi i reel del kit si distinguono dai riferimenti. I soggetti sono disegni piatti con un alone, là sono
+  illustrazioni con volume; il verde del kit è acqua, là è lime; il narratore là è più grande.
+- **Formati 1:1 e 16:9**: provati su un reel breve e guardati su pochi fotogrammi. Zone sicure e narratore sopra le
+  scritte lì non vengono controllati dalla verifica: guarda i provini.
+- **Lingue**: giapponese provato sul testo e sui sottotitoli, non con la voce. Arabo ed ebraico (da destra a
+  sinistra) non provati. Il corpo che si stringe sulle parole lunghe è provato sul calcolo, non su un video tedesco.
+- **Il regista di serie** (`npm run regia`) fa un piano valido ma semplice: il reel bello viene dal piano
+  migliorato a mano, scena per scena.
+
+## Da dove vengono le idee
+
+- **LTX-2.5** (Lightricks): studiato come si descrive una ripresa (inquadratura, movimento di camera con il suo
+  nome, azione). Da lì `campo` e `camera` di ogni scena. Nel kit non c'è né il modello né una riga del loro codice.
+- **OpenMontage** (licenza AGPL-3.0): studiati il punteggio contro i video fatti di cartelli e le regole di
+  varietà. Sono riscritti qui da zero sul piano del kit: **nessun loro file e nessuna riga copiata**. Se un giorno
+  si copia un loro file va scritto qui con il percorso, perché da quel momento chi riceve il kit ha diritto al
+  sorgente.
+- La tabella di cosa è diventato cosa è in `riferimenti/ANALISI.md`.
 
 ## Da sapere
 
-- I due reel non hanno ancora la voce: i tempi delle parole sono stimati e i video non sono nella cartella.
-  Per farli: `npm run voce reta-ginocchio`, poi `npm run render reta-ginocchio` (o i due pulsanti del pannello).
+- I reel inclusi non hanno ancora la voce: i tempi delle parole sono stimati e i video non sono nella cartella.
+  Per farli: `npm run fai reta-testo`, oppure `npm run voce gps` e poi `npm run render gps` (o i pulsanti del pannello).
 - Il pannello si apre solo con il codice che compare nel Terminale. Con `rete` è raggiungibile da chi sta sulla
   tua stessa rete Wi-Fi e conosce quel codice: non usarlo su reti pubbliche.
 - La musica puoi aggiungerla dall'app quando pubblichi, oppure metterla nel video con un file `musica.mp3`.
