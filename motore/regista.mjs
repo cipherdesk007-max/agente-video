@@ -13,8 +13,27 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {ErroreFmlab, cartellaReel, rel} from './percorsi.mjs';
-import {CAMERE, CAMPI, LUOGHI, PAUSA_MASSIMA, RITMO_PRUDENTE, controllaPiano, leggiRegali, paroleDelTesto} from './piano.mjs';
+import {CAMERE, CAMPI, LUOGHI, controllaPiano, leggiRegali, paroleDelTesto} from './piano.mjs';
 import {leggiImpostazioni} from './impostazioni.mjs';
+import {stimaTempi} from './copione.mjs';
+
+// Il ritmo del piano di serie, in secondi di voce stimati (non in parole: una parola lunga o una virgola pesano).
+// Nei reel di riferimento una scena dura quattro-cinque secondi e sul palco cambia qualcosa ogni due o tre.
+/** Una scena più lunga di così si spezza in due. */
+export const SCENA_LUNGA = 6.5;
+/** Ogni quanto si cerca di far comparire qualcosa. */
+const SEGNO_OGNI = 2.3;
+/**
+ * Mai più di così tra due segni, nei tempi stimati. La promessa del kit è 4 secondi: il margine è per la voce
+ * vera, che può essere più lenta della stima e fa pause più lunghe dopo i punti.
+ */
+export const SEGNO_MASSIMO = 3.0;
+
+/** L'istante stimato in cui comincia la parola i (dopo l'ultima: la fine del testo). */
+export function orologio(parole) {
+  const tempi = stimaTempi(parole);
+  return (i) => (i >= tempi.length ? (tempi[tempi.length - 1]?.fine ?? 0) : tempi[Math.max(0, i)].inizio);
+}
 
 const VUOTE = new Set(
   (
@@ -68,7 +87,7 @@ export function numeroDi(parola) {
 }
 
 /** Divide il testo in scene: a capo, domande e invito finale aprono una scena; quelle troppo corte si uniscono. */
-export function dividiInScene(parole) {
+export function dividiInScene(parole, quando = orologio(parole)) {
   // 1 · le frasi
   const frasi = [];
   let da = 0;
@@ -99,33 +118,63 @@ export function dividiInScene(parole) {
       scene.splice(i, 1);
     }
   }
+  // 4 · una scena che dura troppo si spezza in due (e poi ancora, se serve): alla fine di una frase, o dopo una
+  //     virgola, nel punto più vicino alla metà. Ogni metà deve avere almeno cinque parole e due secondi.
+  for (let i = 0; i < scene.length; i++) {
+    const sc = scene[i];
+    if (sc.invito || quando(sc.a) - quando(sc.da) <= SCENA_LUNGA) continue;
+    const meta = (quando(sc.da) + quando(sc.a)) / 2;
+    const buono = (k) => k - sc.da >= 5 && sc.a - k >= 5 && quando(k) - quando(sc.da) >= 2 && quando(sc.a) - quando(k) >= 2;
+    const tagli = (regola) => {
+      const adatti = [];
+      for (let k = sc.da + 1; k < sc.a; k++) if (regola(parole[k - 1]) && buono(k)) adatti.push(k);
+      return adatti.sort((x, y) => Math.abs(quando(x) - meta) - Math.abs(quando(y) - meta));
+    };
+    const taglio = tagli(fineFrase)[0] ?? tagli((p) => /[,;:]["”»)]*$/.test(p.testo))[0];
+    if (taglio === undefined) continue; // una frase sola senza virgole: resta intera, i segni la tengono viva
+    const domandaIn = (da, a) => parole.slice(da, a).some((p) => /\?["”»)]*$/.test(p.testo));
+    scene.splice(i, 1, {...sc, a: taglio, domanda: domandaIn(sc.da, taglio)}, {...sc, da: taglio, capoverso: parole[taglio].capoverso, domanda: domandaIn(taglio, sc.a)});
+    i--; // la prima metà si riguarda: può essere ancora lunga
+  }
   return scene;
 }
 
-/** Sceglie le parole su cui far comparire qualcosa: una ogni due secondi e mezzo circa, mai più di PAUSA_MASSIMA. */
-function scegliAncore(parole, da, a) {
-  const quante = Math.max(1, Math.round((a - da) / RITMO_PRUDENTE / 2.3));
-  const passo = (a - da) / quante;
-  const voto = (p, i) => (numeroDi(p) !== null && p.chiave !== 'uno' && p.chiave !== 'one' ? 6 : 0) + (p.enfasi ? 5 : 0) + (/^\p{Lu}/u.test(p.testo) && i > da && !fineFrase(parole[i - 1]) ? 4 : 0) + Math.min(p.chiave.length, 10) * 0.4 + (pieno(p) || numeroDi(p) !== null ? 3 : -4);
+/**
+ * Sceglie le parole su cui far comparire qualcosa: una ogni due secondi e mezzo circa, e mai più di SEGNO_MASSIMO
+ * secondi (stimati) tra una e l'altra, né dall'inizio della scena alla prima, né dall'ultima alla fine.
+ */
+function scegliAncore(parole, da, a, quando = orologio(parole)) {
+  const durata = quando(a) - quando(da);
+  const quante = Math.max(1, Math.round(durata / SEGNO_OGNI));
+  const voto = (p, i) => (numeroDi(p) !== null && p.chiave !== 'uno' && p.chiave !== 'one' ? 6 : 0) + (p.enfasi ? 5 : 0) + (/^\p{Lu}/u.test(p.testo) && i > da && !fineFrase(parole[i - 1]) ? 4 : 0) + Math.min(3, p.chiave.length / 4) - (VUOTE.has(p.chiave) ? 9 : 0);
+  // la parola migliore tra quelle che cominciano dentro una fetta di tempo
+  const migliore = (dalle, alle, tra = [da, a]) => {
+    let meglio = -1;
+    for (let i = tra[0]; i < tra[1]; i++) {
+      if (quando(i) < dalle || quando(i) >= alle) continue;
+      if (meglio < 0 || voto(parole[i], i) > voto(parole[meglio], meglio)) meglio = i;
+    }
+    return meglio;
+  };
   const scelte = [];
   for (let k = 0; k < quante; k++) {
-    const inizio = Math.round(da + k * passo);
-    const fine = Math.max(inizio + 1, Math.round(da + (k + 1) * passo));
-    let meglio = inizio;
-    for (let i = inizio; i < fine && i < a; i++) if (voto(parole[i], i) > voto(parole[meglio], meglio)) meglio = i;
-    scelte.push(meglio);
+    const i = migliore(quando(da) + (k * durata) / quante, quando(da) + ((k + 1) * durata) / quante);
+    if (i >= 0) scelte.push(i);
   }
-  // nessun buco più lungo della pausa massima, nemmeno verso la fine della scena
-  const limite = Math.floor((PAUSA_MASSIMA - 0.3) * RITMO_PRUDENTE);
-  const punti = [da, ...scelte, a];
+  if (!scelte.length) scelte.push(da);
+  // nessun buco più lungo del massimo: dove c'è, si aggiunge un segno verso la metà del buco
+  const punti = [da, ...[...new Set(scelte)].sort((x, y) => x - y), a];
   for (let k = 0; k < punti.length - 1; k++) {
-    if (punti[k + 1] - punti[k] > limite) {
-      const meta = Math.round((punti[k] + punti[k + 1]) / 2);
-      let meglio = meta;
-      for (let i = meta - 2; i <= meta + 2; i++) if (i > punti[k] && i < punti[k + 1] && voto(parole[i], i) > voto(parole[meglio], meglio)) meglio = i;
-      punti.splice(k + 1, 0, meglio);
-      k--;
+    if (quando(punti[k + 1]) - quando(punti[k]) <= SEGNO_MASSIMO) continue;
+    const meta = (quando(punti[k]) + quando(punti[k + 1])) / 2;
+    let i = migliore(meta - 0.5, meta + 0.5, [punti[k] + 1, punti[k + 1]]);
+    if (i < 0) {
+      // nessuna parola comincia proprio lì (una parola lunga, una pausa): la più vicina alla metà
+      for (let j = punti[k] + 1; j < punti[k + 1]; j++) if (i < 0 || Math.abs(quando(j) - meta) < Math.abs(quando(i) - meta)) i = j;
     }
+    if (i < 0) continue; // tra i due punti non c'è nessuna parola: non si può fare di più
+    punti.splice(k + 1, 0, i);
+    k--;
   }
   return [...new Set(punti.slice(1, -1))].sort((x, y) => x - y);
 }
@@ -151,7 +200,8 @@ function scrittaDi(parole, i, a) {
 export function regia(testo, {titolo = '', regalo = 'auto'} = {}) {
   const parole = paroleDelTesto(testo);
   if (parole.length < 3) throw new ErroreFmlab('Il testo è troppo corto per farne un reel: servono almeno una frase intera.');
-  const tratti = dividiInScene(parole);
+  const quando = orologio(parole);
+  const tratti = dividiInScene(parole, quando);
   const regali = leggiRegali();
   const salute = parole.filter((p) => SALUTE.test(senzaAccenti(p.chiave))).length >= 2;
   const nomi = new Set();
@@ -176,7 +226,7 @@ export function regia(testo, {titolo = '', regalo = 'auto'} = {}) {
     const invito = mie.findIndex((p) => INVITO.test(p.chiave));
     const frena = mie.some((p) => FRENA.test(senzaAccenti(p.chiave)));
     const sc = {nome: nomeLibero(ultima && invito >= 0 ? 'chiusura' : n === 0 ? 'aggancio' : frena ? 'attenzione' : t.domanda ? 'domanda' : `scena${n + 1}`.replace('scena', 'parte')), da: mie.slice(0, Math.min(4, mie.length)).map((p) => p.testo).join(' ')};
-    const ancore = scegliAncore(parole, t.da, t.a);
+    const ancore = scegliAncore(parole, t.da, t.a, quando);
     const segni = {};
     const nomeDi = new Map();
     for (const i of ancore) {
@@ -233,10 +283,24 @@ export function regia(testo, {titolo = '', regalo = 'auto'} = {}) {
         sc.poi = ancore.filter((i) => i !== t.da + frase.inizio).map((i) => nomeDi.get(i));
         for (const nome of sc.poi) sc.segni[nome] = segni[nome];
       } else {
-        // per non fare quattro scene uguali di fila: con tre o più cose da dire, una volta sì e una no è un elenco
-        const elenco = voci.length >= 3 && scene[scene.length - 1]?.blocco === 'parole';
-        sc.blocco = elenco ? 'lista' : 'parole';
-        sc.dati = elenco ? {voci: voci.map((v) => ({testo: v.testo, segno: v.segno}))} : {parole: voci.map((v) => ({testo: v.testo, segno: v.segno}))};
+        // Le scene sono corte: per non farne quattro uguali di fila si gira tra i pezzi pronti che si possono
+        // riempire senza capire il testo. Una cosa sola da dire: una frase grande. Una scena che frena: un "attenzione"
+        // con i suoi punti. Altrimenti parole ed elenco, una volta l'uno e una volta l'altro.
+        const prima = scene[scene.length - 1]?.blocco;
+        const semplici = voci.map((v) => ({testo: v.testo, segno: v.segno}));
+        if (voci.length === 1 && prima !== 'titolo') {
+          sc.blocco = 'titolo';
+          sc.dati = {titolo: voci[0].testo, segno: voci[0].segno};
+        } else if (frena && voci.length >= 2 && voci.length <= 4 && prima !== 'avviso') {
+          sc.blocco = 'avviso';
+          sc.dati = {titolo: voci[0].testo, segno: voci[0].segno, punti: semplici.slice(1)};
+        } else if (voci.length >= 2 && prima === 'parole') {
+          sc.blocco = 'lista';
+          sc.dati = {voci: semplici};
+        } else {
+          sc.blocco = 'parole';
+          sc.dati = {parole: semplici};
+        }
         sc.segni = segni;
         for (const v of voci) {
           if (v.numero === null) continue;

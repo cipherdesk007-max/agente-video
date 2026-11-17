@@ -265,6 +265,8 @@ Gli effetti sonori stanno in `suoni/` e si chiamano dal copione con `[suono:nome
   `CATALOGO.md`; poi `npm run catalogo` e `npm test`. Il prossimo reel lo trova già fatto. Una riga in
   `stile/appunti.md` su cosa hai imparato.
 - `npm run stato <reel>` invece di riaprire i file. Un foglio di provini invece di tante foto.
+- Tetto di spesa: se la voce costerebbe più di `FMLAB_MAX_CARATTERI` (di serie 50000) il kit si ferma prima di
+  chiamare ElevenLabs. Non alzarlo da solo: è una spesa, si chiede.
 - Tempi stimati fino alla fine; la voce a pagamento una volta sola. ElevenLabs lavora frase per frase: le frasi
   già pagate (`voci/pagate/`) e quelle della banca (`voci/frasi/`, `npm run frasi` le elenca) non si ripagano, una
   frase cambiata costa solo i suoi caratteri. Spostare segni ed enfasi è gratis. Se nel testo c'è una frase fissa

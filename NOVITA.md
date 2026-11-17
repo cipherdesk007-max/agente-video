@@ -1,5 +1,18 @@
 # Novità
 
+## 2.2 · più sicuro con i servizi esterni
+
+- **Nessuna chiamata resta appesa**: voce e immagini hanno 90 secondi per rispondere (`FMLAB_ATTESA_FORNITORE`), poi
+  il kit dice di riprovare. Si riprova da soli solo su 429 e 5xx, tre volte al massimo, aspettando il tempo che il
+  servizio chiede. Una frase già arrivata resta salvata e non si richiede di nuovo.
+- **Tetto di spesa**: `FMLAB_MAX_CARATTERI` (di serie 50000, 0 lo spegne). Sopra, il kit si ferma prima di chiamare
+  ElevenLabs e dice quanto sarebbe costato.
+- **Crediti**: il totale sta in `.fmlab/crediti.json` e non si perde quando il registro viene accorciato.
+- **File `.env` scritto a mano**: `NOME=valore # nota` non porta più la nota dentro il valore.
+- **Regista di serie**: scene di quattro-sei secondi invece di otto-dieci, un segno al massimo ogni tre secondi
+  stimati (mai più di quattro, anche con una voce lenta), e quattro pezzi pronti che si alternano (parole, elenco,
+  frase grande, attenzione). Resta un piano di scritte: i soggetti li sceglie chi fa la regia.
+
 ## 2.1 · la dashboard in diretta
 
 - **`npm run stato` accende la dashboard** e la apre nel browser: chi usa un agente nel terminale vede in diretta

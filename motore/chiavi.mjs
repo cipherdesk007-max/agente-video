@@ -5,7 +5,7 @@
 // Le regolazioni che non sono segrete (il modello della voce, chi genera le immagini) si vedono.
 import fs from 'node:fs';
 import path from 'node:path';
-import {ErroreFmlab, RADICE} from './percorsi.mjs';
+import {ErroreFmlab, RADICE, righeEnv as leggiRighe} from './percorsi.mjs';
 
 export const CHIAVI = [
   {nome: 'ELEVENLABS_API_KEY', gruppo: 'Voce · ElevenLabs', cosa: 'la chiave del tuo account ElevenLabs', segreto: true},
@@ -30,13 +30,8 @@ function righeEnv() {
     return [];
   }
 }
-const valoreDi = (righe, nome) => {
-  for (const r of righe) {
-    const m = r.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
-    if (m && m[1] === nome) return m[2].trim().replace(/^(["'])(.*)\1$/, '$2');
-  }
-  return '';
-};
+// lo stesso modo di leggere del kit: una nota in fondo alla riga non fa parte del valore
+const valoreDi = (righe, nome) => leggiRighe(righe.join('\n')).find(([n]) => n === nome)?.[1] ?? '';
 
 /** Per ogni chiave: se c'è. Il valore torna solo per le regolazioni che non sono segrete. */
 export function statoChiavi() {

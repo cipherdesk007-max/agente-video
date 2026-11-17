@@ -853,6 +853,196 @@ await prova('prova cieca: stesso seme stessa prova, spezzoni che non si toccano,
   assert.match(html, /persone\.every\(\(n\) => n <= 6\)/);
 });
 
+await prova('B24 · regista di serie: mai più di 4 secondi senza un segno (anche con una voce lenta), scene corte come nei riferimenti, mai quattro uguali di fila', async () => {
+  const {regia, SCENA_LUNGA, SEGNO_MASSIMO} = await carica('motore/regista.mjs');
+  const {controllaPiano, paroleDelTesto} = await carica('motore/piano.mjs');
+  const {stimaTempi} = await carica('motore/copione.mjs');
+  assert.ok(SEGNO_MASSIMO <= 3 && SCENA_LUNGA <= 7);
+  const testi = {...TESTI_DI_PROVA, reta: TESTO_RETA};
+  for (const [nome, testo] of Object.entries(testi)) {
+    const {piano} = regia(testo, {titolo: nome});
+    const parole = paroleDelTesto(testo);
+    // una voce più lenta della stima di un quarto: la promessa dei 4 secondi deve reggere lo stesso
+    for (const ritmo of [1, 0.8]) {
+      const tempi = stimaTempi(parole, {ritmo});
+      const quando = (i) => (i >= tempi.length ? tempi[tempi.length - 1].fine : tempi[i].inizio);
+      const esito = controllaPiano(piano, testo, {tempi: quando});
+      assert.deepEqual(esito.errori, [], `${nome}: il piano di serie deve passare il controllo`);
+      for (const s of esito.scene) {
+        const novita = [s.inizio, ...s.segni.filter((x) => s.usati.has(x.nome)).map((x) => x.indice), s.fine].sort((a, b) => a - b);
+        for (let k = 0; k < novita.length - 1; k++) {
+          const buco = quando(novita[k + 1]) - quando(novita[k]);
+          assert.ok(buco <= 4, `${nome} (voce ${ritmo}), ${s.dove}: ${buco.toFixed(1)} secondi senza un segno da "${parole.slice(novita[k], novita[k] + 3).map((p) => p.testo).join(' ')}…"`);
+        }
+      }
+      if (ritmo !== 1) continue;
+      const durate = esito.scene.map((s) => quando(s.fine) - quando(s.inizio));
+      const media = durate.reduce((a, b) => a + b, 0) / durate.length;
+      assert.ok(media <= 6, `${nome}: le scene durano in media ${media.toFixed(1)} secondi (nei riferimenti quattro-cinque)`);
+      // una scena più lunga di SCENA_LUNGA resta solo se è una frase sola senza virgole né punti dove spezzarla
+      esito.scene.forEach((s, i) => {
+        if (durate[i] <= SCENA_LUNGA || piano.scene[i].blocco === 'ebook' || piano.scene[i].blocco === 'chiusura') return;
+        const dentro = parole.slice(s.inizio, s.fine - 1);
+        const tagli = dentro.map((p, k) => ({k: k + 1, qui: /[.!?…,;:]["”»)]*$/.test(p.testo)})).filter((x) => x.qui && x.k >= 5 && dentro.length + 1 - x.k >= 5);
+        assert.ok(tagli.every((x) => quando(s.inizio + x.k) - quando(s.inizio) < 2 || quando(s.fine) - quando(s.inizio + x.k) < 2), `${nome}, ${s.dove}: dura ${durate[i].toFixed(1)} s e si poteva spezzare`);
+      });
+      assert.deepEqual(esito.avvisi.filter((a) => /di fila/.test(a)), [], `${nome}: mai quattro scene dello stesso tipo di fila`);
+      assert.ok(new Set(piano.scene.map((s) => s.blocco)).size >= (piano.scene.length >= 6 ? 3 : 2), `${nome}: i pezzi pronti si alternano (${[...new Set(piano.scene.map((s) => s.blocco))].join(', ')})`);
+    }
+  }
+});
+
+// ───────────────────────── B21–B23, B25, B26 · fornitori, tetto di spesa, .env, crediti ─────────────────────────
+// Un fornitore finto in casa: nessuna rete, nessun credito. Ogni percorso si comporta in un modo e conta le richieste.
+{
+  const http = await import('node:http');
+  const viste = [];
+  const fornitore = {guasto: true};
+  const server = http.createServer((req, res) => {
+    let corpo = '';
+    req.on('data', (d) => (corpo += d));
+    req.on('end', () => {
+      const quante = viste.filter((v) => v.percorso === req.url).length;
+      viste.push({percorso: req.url, corpo});
+      const rispondi = (stato, testate = {}, dati = '{}') => res.writeHead(stato, {'Content-Type': 'application/json', ...testate}).end(dati);
+      if (req.url === '/muto') return; // non risponde mai
+      if (req.url === '/a-meta') return void res.writeHead(200, {'Content-Type': 'application/json'}).write('{"inizio":'); // comincia e si ferma
+      if (req.url === '/due-429') return quante < 2 ? rispondi(429, {'Retry-After': '0.1'}) : rispondi(200, {}, '{"ok":true}');
+      if (req.url === '/sempre-500') return rispondi(500);
+      if (req.url === '/503-senza-testata') return quante < 1 ? rispondi(503) : rispondi(200);
+      const rifiuto = /^\/rifiuto-(\d+)$/.exec(req.url);
+      if (rifiuto) return rispondi(Number(rifiuto[1]));
+      if (/\/v1\/text-to-speech\//.test(req.url)) {
+        const testo = JSON.parse(corpo).text;
+        if (fornitore.guasto && /seconda/.test(testo)) return rispondi(500);
+        const caratteri = [...testo];
+        return rispondi(200, {}, JSON.stringify({audio_base64: Buffer.from('audio finto').toString('base64'), alignment: {characters: caratteri, character_start_times_seconds: caratteri.map((_, i) => i * 0.05), character_end_times_seconds: caratteri.map((_, i) => (i + 1) * 0.05)}}));
+      }
+      rispondi(404);
+    });
+  });
+  await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fmlab-fornitori-'));
+  const prima = {...process.env};
+  Object.assign(process.env, {FMLAB_ATTESA_FORNITORE: '0.4', FMLAB_ATTESA_RIPROVA: '0.05', FMLAB_FRASI_PAGATE: path.join(tmp, 'pagate'), FMLAB_FRASI: path.join(tmp, 'banca'), FMLAB_REGISTRO: path.join(tmp, 'registro'), FMLAB_ENV: path.join(tmp, 'env')});
+  delete process.env.FMLAB_MAX_CARATTERI;
+  const richieste = (percorso) => viste.filter((v) => v.percorso === percorso).length;
+  const {chiamaFornitore, attesaRiprova} = await carica('motore/rete.mjs');
+  const voce = await carica('motore/voce.mjs');
+  const zitto = async (f) => {
+    const stampa = console.log;
+    console.log = () => {};
+    try {
+      return await f();
+    } finally {
+      console.log = stampa;
+    }
+  };
+  try {
+    await prova('B21 · fornitori: una chiamata che non risponde (o che si ferma a metà risposta) scade, e l\'errore dice di riprovare', async () => {
+      for (const percorso of ['/muto', '/a-meta']) {
+        const inizio = Date.now();
+        await assert.rejects(chiamaFornitore('Il fornitore finto', base + percorso), /Il fornitore finto non ha risposto entro 0,4 secondi\. Riprova/);
+        assert.ok(Date.now() - inizio < 3000, `${percorso}: ha aspettato ${Date.now() - inizio} ms`);
+        assert.equal(richieste(percorso), 1, 'dopo una scadenza non si riprova da soli');
+      }
+      // di serie sono 90 secondi, e nessuna chiamata a un fornitore passa fuori da qui
+      delete process.env.FMLAB_ATTESA_FORNITORE;
+      await assert.rejects(chiamaFornitore('X', 'http://127.0.0.1:9/'), /Non riesco a raggiungere X/);
+      process.env.FMLAB_ATTESA_FORNITORE = '0.4';
+      assert.match(fs.readFileSync(path.join(K, 'motore/rete.mjs'), 'utf8'), /numero\('FMLAB_ATTESA_FORNITORE', 90\)/);
+      for (const file of ['motore/voce.mjs', 'motore/immagini.mjs']) assert.doesNotMatch(fs.readFileSync(path.join(K, file), 'utf8'), /\bfetch\(/, `${file} chiama un fornitore senza limite di tempo`);
+    });
+
+    await prova('B22 · fornitori: si riprova solo su 429 e 5xx, tre volte al massimo, aspettando Retry-After; una frase già arrivata non si richiede più', async () => {
+      const inizio = Date.now();
+      const r = await zitto(() => chiamaFornitore('F', `${base}/due-429`));
+      assert.deepEqual([r.ok, r.tentativi, richieste('/due-429')], [true, 3, 3]);
+      assert.ok(Date.now() - inizio >= 190, 'ha aspettato i secondi chiesti dal servizio');
+      const guasto = await zitto(() => chiamaFornitore('F', `${base}/sempre-500`));
+      assert.deepEqual([guasto.status, guasto.tentativi, richieste('/sempre-500')], [500, 3, 3]);
+      assert.equal((await zitto(() => chiamaFornitore('F', `${base}/503-senza-testata`))).tentativi, 2);
+      for (const stato of [401, 402, 404, 422]) {
+        const no = await chiamaFornitore('F', `${base}/rifiuto-${stato}`);
+        assert.deepEqual([no.status, no.tentativi, richieste(`/rifiuto-${stato}`)], [stato, 1, 1], `su ${stato} non si riprova`);
+      }
+      assert.deepEqual([attesaRiprova('7'), attesaRiprova(null, 20), attesaRiprova('99999')], [7, 20, 300]);
+      // tre frasi: la seconda fallisce sempre. La prima è arrivata ed è salvata: la volta dopo non si chiede di nuovo.
+      const piano = () => ['prima frase.', 'seconda frase.', 'terza frase.'].map((testo, i) => {
+        const file = path.join(tmp, 'pagate', `f${i}.mp3`);
+        const tempi = path.join(tmp, 'pagate', `f${i}.json`);
+        return {testo, origine: fs.existsSync(file) && fs.existsSync(tempi) ? 'deposito' : 'elevenlabs', file, tempi};
+      });
+      const chieste = (testo) => viste.filter((v) => /text-to-speech/.test(v.percorso) && JSON.parse(v.corpo).text === testo).length;
+      await assert.rejects(zitto(() => voce.scaricaFrasiElevenLabs(piano(), 'v', 'chiave-finta', {base})), /ElevenLabs ha risposto 500.*dopo 3 tentativi/s);
+      assert.deepEqual([chieste('prima frase.'), chieste('seconda frase.'), chieste('terza frase.')], [1, 3, 0]);
+      fornitore.guasto = false;
+      const dopo = await voce.scaricaFrasiElevenLabs(piano(), 'v', 'chiave-finta', {base});
+      assert.deepEqual([chieste('prima frase.'), chieste('seconda frase.'), chieste('terza frase.')], [1, 4, 1], 'la prima frase era già pagata');
+      assert.equal(dopo.caratteri, 'seconda frase.'.length + 'terza frase.'.length);
+      assert.equal((await voce.scaricaFrasiElevenLabs(piano(), 'v', 'chiave-finta', {base})).caratteri, 0);
+    });
+
+    await prova('B23 · tetto di spesa: sopra FMLAB_MAX_CARATTERI ci si ferma prima di chiamare ElevenLabs, dicendo il costo e come alzarlo', async () => {
+      const lungo = [{testo: 'x'.repeat(40), origine: 'elevenlabs', file: path.join(tmp, 'pagate', 'lungo.mp3'), tempi: path.join(tmp, 'pagate', 'lungo.json')}];
+      const prime = viste.length;
+      process.env.FMLAB_MAX_CARATTERI = '30';
+      await assert.rejects(voce.scaricaFrasiElevenLabs(lungo, 'v', 'chiave-finta', {base}), /costerebbe circa 40 crediti: supera il tetto di 30 \(FMLAB_MAX_CARATTERI\)\. Non ho chiamato ElevenLabs[\s\S]*FMLAB_MAX_CARATTERI=1000/);
+      assert.equal(viste.length, prime, 'nessuna richiesta deve essere partita');
+      // quello che è già pagato o in banca non conta: si guarda solo quello che si pagherebbe adesso
+      assert.doesNotThrow(() => voce.controllaTetto(30));
+      process.env.FMLAB_MAX_CARATTERI = '0';
+      assert.doesNotThrow(() => voce.controllaTetto(10_000_000), '0 spegne il tetto');
+      delete process.env.FMLAB_MAX_CARATTERI;
+      assert.equal(voce.tettoCaratteri(), 50000);
+      assert.doesNotThrow(() => voce.controllaTetto(50000));
+      assert.throws(() => voce.controllaTetto(50001), /supera il tetto di 50000/);
+      assert.match(fs.readFileSync(path.join(K, '.env.esempio'), 'utf8'), /FMLAB_MAX_CARATTERI=50000/);
+    });
+
+    await prova('B25 · .env scritto a mano: la nota in fondo alla riga non entra nel valore (solo dopo uno spazio, e non tra virgolette)', async () => {
+      const {valoreEnv, righeEnv} = await carica('motore/percorsi.mjs');
+      assert.equal(valoreEnv('eleven_v4 # il modello della banca'), 'eleven_v4');
+      assert.equal(valoreEnv('eleven_v4\t# nota'), 'eleven_v4');
+      assert.equal(valoreEnv('colore#5CF2C8'), 'colore#5CF2C8', 'senza spazio il cancelletto fa parte del valore');
+      assert.equal(valoreEnv('"valore # non è una nota"'), 'valore # non è una nota');
+      assert.equal(valoreEnv("'a b' # nota"), 'a b');
+      assert.equal(valoreEnv('  semplice  '), 'semplice');
+      assert.equal(valoreEnv('# solo una nota'), '# solo una nota', 'un valore che comincia con il cancelletto resta com\'è');
+      assert.deepEqual(righeEnv('# titolo\nA=1 # uno\n B = due\nnon una riga\nC="tre # 3"\n'), [['A', '1'], ['B', 'due'], ['C', 'tre # 3']]);
+      // la dashboard legge il file allo stesso modo
+      const chiavi = await carica('motore/chiavi.mjs');
+      fs.writeFileSync(process.env.FMLAB_ENV, 'ELEVENLABS_MODEL=eleven_v4 # come la banca\n');
+      assert.equal(chiavi.statoChiavi().find((c) => c.nome === 'ELEVENLABS_MODEL').valore, 'eleven_v4');
+    });
+
+    await prova('B26 · crediti: il totale non si perde quando il registro viene accorciato, e una spesa non si conta due volte', async () => {
+      const r = await carica('motore/registro.mjs');
+      const registro = path.join(process.env.FMLAB_REGISTRO, 'registro.jsonl');
+      // un registro di prima del contatore: si parte da quello che ricorda
+      fs.mkdirSync(process.env.FMLAB_REGISTRO, {recursive: true});
+      fs.writeFileSync(registro, `${JSON.stringify({t: '2026-01-01T00:00:00.000Z', tipo: 'spesa', reel: 'vecchio', caratteri: 30})}\n`);
+      assert.deepEqual(r.creditiSpesi(), {totale: 30, perReel: {vecchio: 30}});
+      r.annota('spesa', {reel: 'uno', caratteri: 100});
+      assert.deepEqual(r.creditiSpesi(), {totale: 130, perReel: {vecchio: 30, uno: 100}}, 'la spesa appena scritta non va sommata due volte');
+      // il registro viene tagliato (qui: buttato via del tutto): il totale resta
+      fs.rmSync(registro);
+      r.annota('spesa', {reel: 'uno', caratteri: 50});
+      assert.deepEqual(r.creditiSpesi(), {totale: 180, perReel: {vecchio: 30, uno: 150}});
+      assert.equal(r.creditiDalRegistro().totale, 50, 'il registro da solo ricorda solo gli ultimi tempi');
+    });
+  } finally {
+    server.closeAllConnections?.();
+    server.close();
+    for (const k of ['FMLAB_ATTESA_FORNITORE', 'FMLAB_ATTESA_RIPROVA', 'FMLAB_FRASI_PAGATE', 'FMLAB_FRASI', 'FMLAB_REGISTRO', 'FMLAB_ENV', 'FMLAB_MAX_CARATTERI', 'ELEVENLABS_MODEL']) {
+      if (prima[k] === undefined) delete process.env[k];
+      else process.env[k] = prima[k];
+    }
+    fs.rmSync(tmp, {recursive: true, force: true});
+  }
+}
+
 if (pannello) await pannello.server.chiudi();
 cancella();
 const falliti = esiti.filter((e) => !e.ok);

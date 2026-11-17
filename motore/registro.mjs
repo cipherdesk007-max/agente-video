@@ -19,6 +19,7 @@ const base = () => (process.env.FMLAB_REGISTRO ? path.resolve(process.env.FMLAB_
 const fileRegistro = () => path.join(base(), 'registro.jsonl');
 const fileAdesso = () => path.join(base(), 'adesso.json');
 const fileCoda = () => path.join(base(), 'coda.json');
+const fileCrediti = () => path.join(base(), 'crediti.json');
 export const fileDiario = () => (process.env.FMLAB_DIARIO ? path.resolve(process.env.FMLAB_DIARIO) : path.join(RADICE, 'diario.md'));
 const MASSIMO = 1_500_000;
 
@@ -49,6 +50,9 @@ export function annota(tipo, dati = {}) {
       const righe = fs.readFileSync(file, 'utf8').split('\n');
       fs.writeFileSync(file, righe.slice(Math.floor(righe.length / 2)).join('\n'));
     }
+    // il conto dei crediti si porta avanti PRIMA di scrivere la riga: così, anche se è la prima volta, il conto
+    // ricostruito dal registro non contiene ancora questa spesa e non la somma due volte
+    if (tipo === 'spesa' && dati.caratteri > 0) sommaCrediti(dati.reel ?? '?', dati.caratteri);
     fs.appendFileSync(file, `${JSON.stringify({t: new Date().toISOString(), tipo, ...dati})}\n`);
   } catch {
     // il registro non è mai un motivo per fermarsi
@@ -100,8 +104,26 @@ export function leggiAdesso() {
   return a;
 }
 
-/** I crediti spesi, in tutto e per reel, contati dalle spese scritte nel registro. */
+/**
+ * I crediti spesi, in tutto e per reel. Il registro viene accorciato quando cresce, quindi non basta per contare:
+ * il totale sta in un file a parte (.fmlab/crediti.json) che non si accorcia mai e cresce a ogni spesa.
+ * Chi ha un registro di prima di questo conto parte dalle spese che il registro ricorda ancora.
+ */
 export function creditiSpesi() {
+  const conto = leggi(fileCrediti(), null);
+  if (conto && typeof conto.totale === 'number' && conto.perReel) return {totale: conto.totale, perReel: conto.perReel};
+  return creditiDalRegistro();
+}
+
+function sommaCrediti(reel, caratteri) {
+  const conto = creditiSpesi();
+  conto.totale += caratteri;
+  conto.perReel[reel] = (conto.perReel[reel] ?? 0) + caratteri;
+  scrivi(fileCrediti(), {cosa: 'Crediti spesi per la voce, in tutto e per reel. Lo aggiorna il kit a ogni spesa: non si accorcia mai.', ...conto, aggiornato: new Date().toISOString()});
+}
+
+/** Le spese che il registro ricorda ancora (quelle più vecchie possono essere state tagliate). */
+export function creditiDalRegistro() {
   let righe;
   try {
     righe = fs.readFileSync(fileRegistro(), 'utf8').trim().split('\n');

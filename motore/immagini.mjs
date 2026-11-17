@@ -17,6 +17,7 @@
 //
 // Il fondo trasparente lo fa il kit: al fornitore si chiede il soggetto su un fondo verde pieno, e ffmpeg toglie
 // il verde. Così funziona con tutti i fornitori, anche con quelli che non sanno fare la trasparenza.
+import {chiamaFornitore} from './rete.mjs';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -90,9 +91,9 @@ export function elencoBiblioteca(cartella = CARTELLA_IMMAGINI) {
 // ───────────────────────── i fornitori ─────────────────────────
 
 async function scarica(indirizzo, uscita) {
-  const r = await fetch(indirizzo);
+  const r = await chiamaFornitore('Il servizio delle immagini', indirizzo);
   if (!r.ok) throw new ErroreFmlab(`Non riesco a scaricare l'immagine generata (${r.status}).`);
-  fs.writeFileSync(uscita, Buffer.from(await r.arrayBuffer()));
+  fs.writeFileSync(uscita, r.corpo);
 }
 
 /** Cerca l'indirizzo dell'immagine in una risposta di cui non si conosce a memoria la forma. */
@@ -118,8 +119,15 @@ const fornitori = {
     const base = (process.env.FMLAB_HIGGSFIELD_URL ?? 'https://api.higgsfield.ai').replace(/\/+$/, '');
     const modello = process.env.FMLAB_HIGGSFIELD_MODELLO ?? 'higgsfield-ai/soul/standard';
     const testate = {Authorization: `Key ${chiave}:${segreto}`, 'Content-Type': 'application/json', Accept: 'application/json'};
-    const invio = await fetch(`${base}/${modello}`, {method: 'POST', headers: testate, body: JSON.stringify({prompt, aspect_ratio: formato})});
-    const primo = await invio.json().catch(() => ({}));
+    const leggi = (r) => {
+      try {
+        return r.json();
+      } catch {
+        return {};
+      }
+    };
+    const invio = await chiamaFornitore('Higgsfield', `${base}/${modello}`, {method: 'POST', headers: testate, body: JSON.stringify({prompt, aspect_ratio: formato})});
+    const primo = leggi(invio);
     if (!invio.ok) throw new ErroreFmlab(`Higgsfield ha rifiutato la richiesta (${invio.status}): ${JSON.stringify(primo).slice(0, 300)}`);
     let stato = primo;
     const controlla = primo.status_url ?? (primo.request_id ? `${base}/requests/${primo.request_id}/status` : null);
@@ -127,8 +135,8 @@ const fornitori = {
     for (let giro = 0; giro < 120 && !['completed', 'failed', 'nsfw', 'canceled'].includes(stato.status); giro++) {
       if (!controlla) break;
       await new Promise((r) => setTimeout(r, attesa));
-      const r = await fetch(controlla, {headers: testate});
-      stato = await r.json().catch(() => ({}));
+      const r = await chiamaFornitore('Higgsfield', controlla, {headers: testate});
+      stato = leggi(r);
       if (!r.ok) throw new ErroreFmlab(`Higgsfield non risponde sullo stato della richiesta (${r.status}).`);
     }
     if (stato.status !== 'completed') throw new ErroreFmlab(`Higgsfield non ha finito l'immagine (stato: ${stato.status ?? 'sconosciuto'}).${stato.status === 'nsfw' ? ' Il prompt è stato bloccato dal loro filtro.' : ''}`);
@@ -147,9 +155,9 @@ const fornitori = {
     modulo.append('prompt', prompt);
     modulo.append('aspect_ratio', formato);
     modulo.append('output_format', 'png');
-    const r = await fetch(`${base}/v2beta/stable-image/generate/core`, {method: 'POST', headers: {Authorization: `Bearer ${chiave}`, Accept: 'image/*'}, body: modulo});
-    if (!r.ok) throw new ErroreFmlab(`Stability ha rifiutato la richiesta (${r.status}): ${(await r.text()).slice(0, 300)}`);
-    fs.writeFileSync(uscita, Buffer.from(await r.arrayBuffer()));
+    const r = await chiamaFornitore('Stability', `${base}/v2beta/stable-image/generate/core`, {method: 'POST', headers: {Authorization: `Bearer ${chiave}`, Accept: 'image/*'}, body: modulo});
+    if (!r.ok) throw new ErroreFmlab(`Stability ha rifiutato la richiesta (${r.status}): ${r.testo().slice(0, 300)}`);
+    fs.writeFileSync(uscita, r.corpo);
     return {modello: 'stable-image-core'};
   },
 

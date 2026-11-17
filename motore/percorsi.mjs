@@ -52,17 +52,37 @@ export function cartellaReel(slug) {
 }
 
 /** Legge .env (se c'è) senza sovrascrivere le variabili già impostate. */
+/**
+ * Il valore di una riga del file .env, come lo intende chi la scrive a mano.
+ *   NOME=valore # nota        → "valore"        (la nota in fondo si toglie: ma solo se prima c'è uno spazio)
+ *   NOME=colore#5CF2C8        → "colore#5CF2C8" (senza spazio il cancelletto fa parte del valore)
+ *   NOME="valore # non nota"  → "valore # non nota"  (tra virgolette non si tocca niente)
+ */
+export function valoreEnv(grezzo) {
+  const valore = String(grezzo ?? '').trim();
+  const tra = /^(["'])(.*)\1$/.exec(valore);
+  if (tra) return tra[2];
+  // virgolette chiuse e poi una nota:  NOME="a b"  # nota
+  const conNota = /^(["'])(.*?)\1\s+#.*$/.exec(valore);
+  if (conNota) return conNota[2];
+  return valore.replace(/\s+#.*$/, '').trim();
+}
+
+/** Le righe NOME=valore di un file .env, nell'ordine in cui sono scritte. */
+export function righeEnv(testo) {
+  const voci = [];
+  for (const riga of String(testo).split(/\r?\n/)) {
+    const m = riga.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=(.*)$/);
+    if (m) voci.push([m[1], valoreEnv(m[2])]);
+  }
+  return voci;
+}
+
 export function leggiEnv() {
   const file = path.join(RADICE, '.env');
   if (!fs.existsSync(file)) return;
-  for (const riga of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
-    const m = riga.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
-    if (!m) continue;
-    let valore = m[2].trim();
-    if ((valore.startsWith('"') && valore.endsWith('"')) || (valore.startsWith("'") && valore.endsWith("'"))) {
-      valore = valore.slice(1, -1);
-    }
-    if (process.env[m[1]] === undefined && valore !== '') process.env[m[1]] = valore;
+  for (const [nome, valore] of righeEnv(fs.readFileSync(file, 'utf8'))) {
+    if (process.env[nome] === undefined && valore !== '') process.env[nome] = valore;
   }
 }
 

@@ -10,6 +10,7 @@ import {spawnSync} from 'node:child_process';
 import {CACHE, ErroreFmlab, RADICE, leggiEnv, leggiJson, rel, scriviJson, sec} from './percorsi.mjs';
 import {cercaFrase, leggiBanca, ritmoMisurato} from './frasi.mjs';
 import {annota} from './registro.mjs';
+import {chiamaFornitore} from './rete.mjs';
 import {leggiImpostazioni} from './impostazioni.mjs';
 import {apriReel, estraiVariante} from './reel.mjs';
 import {componiDati, confrontaTesto, leggiCopione, testoDaDire, pausaDopo, pesoParola, stimaTempi, tempiDaCaratteri} from './copione.mjs';
@@ -38,14 +39,9 @@ export const baseElevenLabs = () => (process.env.FMLAB_ELEVENLABS_URL || 'https:
 export async function elencoVociElevenLabs() {
   const chiave = process.env.ELEVENLABS_API_KEY;
   if (!chiave) return [];
-  let risposta;
-  try {
-    risposta = await fetch(`${baseElevenLabs()}/v1/voices`, {headers: {'xi-api-key': chiave, Accept: 'application/json'}});
-  } catch (e) {
-    throw new ErroreFmlab(`Non riesco a raggiungere ElevenLabs (${e.cause?.code ?? e.message}).`);
-  }
+  const risposta = await chiamaFornitore('ElevenLabs', `${baseElevenLabs()}/v1/voices`, {headers: {'xi-api-key': chiave, Accept: 'application/json'}});
   if (!risposta.ok) throw new ErroreFmlab(`ElevenLabs ha risposto ${risposta.status} alla richiesta dell'elenco delle voci.`);
-  const dati = await risposta.json();
+  const dati = risposta.json();
   return (dati.voices ?? []).map((v) => ({
     id: v.voice_id,
     nome: v.name,
@@ -75,7 +71,7 @@ function regoleElevenLabs() {
 }
 
 // Le frasi pagate non stanno tra i file di servizio (.fmlab/ si può buttare): stanno in voci/pagate/, che Git ignora.
-const DEPOSITO_ELEVENLABS = process.env.FMLAB_FRASI_PAGATE ? path.resolve(process.env.FMLAB_FRASI_PAGATE) : path.join(RADICE, 'voci', 'pagate');
+const depositoElevenLabs = () => (process.env.FMLAB_FRASI_PAGATE ? path.resolve(process.env.FMLAB_FRASI_PAGATE) : path.join(RADICE, 'voci', 'pagate'));
 const frasiDi = (copione) => {
   const gruppi = [];
   copione.parole.forEach((p) => (gruppi[p.frase] ??= []).push(p.testo));
@@ -94,8 +90,8 @@ export function pianoFrasiElevenLabs(copione, lingua, voce, {nuova = false} = {}
     const inBanca = conBanca ? cercaFrase(testo, lingua, banca) : null;
     if (inBanca) return {testo, origine: 'banca', file: path.join(RADICE, inBanca.file)};
     const chiave = impronta({voce, ...regole, text: testo});
-    const mp3 = path.join(DEPOSITO_ELEVENLABS, `${chiave}.mp3`);
-    const tempi = path.join(DEPOSITO_ELEVENLABS, `${chiave}.json`);
+    const mp3 = path.join(depositoElevenLabs(), `${chiave}.mp3`);
+    const tempi = path.join(depositoElevenLabs(), `${chiave}.json`);
     if (!nuova && fs.existsSync(mp3) && fs.existsSync(tempi)) return {testo, origine: 'deposito', file: mp3, tempi};
     return {testo, origine: 'elevenlabs', file: mp3, tempi};
   });
@@ -110,51 +106,67 @@ export function preventivoElevenLabs(copione, lingua, scelte = {}) {
   return {caratteri: daFare.reduce((s, f) => s + f.testo.length, 0), daFare: daFare.length, pronte: piano.length - daFare.length};
 }
 
-async function chiediElevenLabs(base, voce, chiave, corpo) {
-  let risposta;
-  try {
-    risposta = await fetch(`${base}/v1/text-to-speech/${encodeURIComponent(voce)}/with-timestamps?output_format=mp3_44100_128`, {
-      method: 'POST',
-      headers: {'xi-api-key': chiave, 'Content-Type': 'application/json', Accept: 'application/json'},
-      body: JSON.stringify(corpo),
-    });
-  } catch (e) {
-    throw new ErroreFmlab(`Non riesco a raggiungere ElevenLabs (${e.cause?.code ?? e.message}). Controlla la connessione e riprova.`);
-  }
+export async function chiediElevenLabs(base, voce, chiave, corpo) {
+  // 90 secondi per rispondere; si riprova da soli solo su 429 e 5xx (motore/rete.mjs)
+  const risposta = await chiamaFornitore('ElevenLabs', `${base}/v1/text-to-speech/${encodeURIComponent(voce)}/with-timestamps?output_format=mp3_44100_128`, {
+    method: 'POST',
+    headers: {'xi-api-key': chiave, 'Content-Type': 'application/json', Accept: 'application/json'},
+    body: JSON.stringify(corpo),
+  });
   if (!risposta.ok) {
-    const testo = (await risposta.text()).slice(0, 600);
+    const testo = risposta.testo().slice(0, 600);
     const motivi = {
       401: 'chiave API non valida o scaduta (ELEVENLABS_API_KEY)',
       402: 'crediti insufficienti o piano che non include questa funzione',
       404: 'voce non trovata: controlla ELEVENLABS_VOICE_ID',
       422: 'richiesta non accettata: controlla modello e impostazioni nel file .env',
-      429: 'troppe richieste o crediti finiti: aspetta un momento e riprova',
+      429: `troppe richieste o crediti finiti, anche dopo ${risposta.tentativi} tentativi: aspetta qualche minuto e riprova`,
     };
-    const errore = new ErroreFmlab(`ElevenLabs ha risposto ${risposta.status}: ${motivi[risposta.status] ?? 'errore'}.\n${testo}`);
+    const errore = new ErroreFmlab(`ElevenLabs ha risposto ${risposta.status}: ${motivi[risposta.status] ?? (risposta.status >= 500 ? `il servizio ha un problema, anche dopo ${risposta.tentativi} tentativi: riprova più tardi` : 'errore')}.\n${testo}`);
     errore.stato = risposta.status;
     throw errore;
   }
-  const dati = await risposta.json();
+  let dati;
+  try {
+    dati = risposta.json();
+  } catch {
+    throw new ErroreFmlab('La risposta di ElevenLabs non si legge. Riprova.');
+  }
   if (!dati.audio_base64) throw new ErroreFmlab('La risposta di ElevenLabs non contiene l\'audio.');
   return dati;
 }
 
+/** Il tetto di spesa per una voce, in caratteri (un carattere = un credito). 0 = nessun tetto. */
+export const tettoCaratteri = () => {
+  const n = Number(String(process.env.FMLAB_MAX_CARATTERI ?? '').replace(',', '.'));
+  return process.env.FMLAB_MAX_CARATTERI !== undefined && process.env.FMLAB_MAX_CARATTERI !== '' && Number.isFinite(n) && n >= 0 ? Math.floor(n) : 50000;
+};
+
+/** Si ferma PRIMA di chiamare ElevenLabs se la voce costerebbe più del tetto: un errore di battitura non svuota il conto. */
+export function controllaTetto(caratteri) {
+  const tetto = tettoCaratteri();
+  if (tetto > 0 && caratteri > tetto) {
+    throw new ErroreFmlab(
+      `La voce di questo testo costerebbe circa ${caratteri} crediti: supera il tetto di ${tetto} (FMLAB_MAX_CARATTERI). Non ho chiamato ElevenLabs e non ho speso niente.\n` +
+        `Se è giusto così, alza il tetto nel file .env:  FMLAB_MAX_CARATTERI=${Math.ceil((caratteri * 1.2) / 1000) * 1000}   (0 lo spegne)`
+    );
+  }
+}
+
 /**
- * ElevenLabs frase per frase. Ogni frase pagata resta nel deposito (voci/pagate/): se cambi una frase
- * del testo paghi solo quella, e una frase che torna uguale in un altro reel non si paga più. Le frasi della banca
- * (voci/frasi/) non si pagano mai. A ogni richiesta si dice a ElevenLabs cosa viene prima e cosa viene dopo, perché
- * l'intonazione leghi; se il modello non lo accetta, si rifà la richiesta senza.
+ * Chiede a ElevenLabs le frasi che mancano, una alla volta, e salva ognuna appena arriva: se una richiesta fallisce,
+ * quelle già arrivate restano nel deposito e la volta dopo non si pagano di nuovo. Torna i caratteri pagati adesso.
  */
-async function voceElevenLabsAFrasi(copione, reel, voce, chiave, {nuova = false} = {}) {
-  const ff = await trovaFfmpeg();
-  const base = baseElevenLabs();
-  const regole = regoleElevenLabs();
-  fs.mkdirSync(DEPOSITO_ELEVENLABS, {recursive: true});
-  const piano = pianoFrasiElevenLabs(copione, reel.lingua, voce, {nuova});
+export async function scaricaFrasiElevenLabs(piano, voce, chiave, {base = baseElevenLabs(), regole = regoleElevenLabs()} = {}) {
+  const daFare = piano.filter((f) => f.origine === 'elevenlabs');
+  controllaTetto(daFare.reduce((s, f) => s + f.testo.length, 0));
+  if (daFare.length) fs.mkdirSync(depositoElevenLabs(), {recursive: true});
   let conContesto = true;
   let caratteri = 0;
   for (const [i, f] of piano.entries()) {
     if (f.origine !== 'elevenlabs') continue;
+    // la stessa frase due volte nello stesso testo: la seconda è già nel deposito
+    if (fs.existsSync(f.file) && fs.existsSync(f.tempi) && piano.slice(0, i).some((x) => x.file === f.file)) continue;
     const corpo = {text: f.testo, ...regole};
     const contesto = {...(piano[i - 1] ? {previous_text: piano[i - 1].testo} : {}), ...(piano[i + 1] ? {next_text: piano[i + 1].testo} : {})};
     let dati;
@@ -169,6 +181,19 @@ async function voceElevenLabsAFrasi(copione, reel, voce, chiave, {nuova = false}
     scriviJson(f.tempi, {testo: f.testo, voce, creata: new Date().toISOString(), allineamento: dati.alignment ?? dati.normalized_alignment});
     caratteri += f.testo.length;
   }
+  return {caratteri, conContesto};
+}
+
+/**
+ * ElevenLabs frase per frase. Ogni frase pagata resta nel deposito (voci/pagate/): se cambi una frase
+ * del testo paghi solo quella, e una frase che torna uguale in un altro reel non si paga più. Le frasi della banca
+ * (voci/frasi/) non si pagano mai. A ogni richiesta si dice a ElevenLabs cosa viene prima e cosa viene dopo, perché
+ * l'intonazione leghi; se il modello non lo accetta, si rifà la richiesta senza.
+ */
+async function voceElevenLabsAFrasi(copione, reel, voce, chiave, {nuova = false} = {}) {
+  const ff = await trovaFfmpeg();
+  const piano = pianoFrasiElevenLabs(copione, reel.lingua, voce, {nuova});
+  const {caratteri, conContesto} = await scaricaFrasiElevenLabs(piano, voce, chiave);
   const inWav = (file) => {
     const r = spawnSync(ff.percorso, ['-hide_banner', '-nostdin', '-v', 'error', '-i', file, '-ac', '1', '-ar', '44100', '-c:a', 'pcm_s16le', '-f', 'wav', '-'], {maxBuffer: 256 * 1024 * 1024});
     if (r.status !== 0 || !r.stdout?.length) throw new ErroreFmlab(`Non riesco a leggere l'audio ${rel(file)}: ${String(r.stderr || '').trim().slice(0, 200)}`);
@@ -233,6 +258,7 @@ async function voceElevenLabs(copione, reel, scelte = {}, {nuova = false} = {}) 
     }
   }
 
+  controllaTetto(copione.testoParlato.length);
   const dati = await chiediElevenLabs(base, voce, chiave, corpo);
   const allineamento = dati.alignment ?? dati.normalized_alignment;
   const tempi = tempiDaCaratteri(copione.testoParlato, allineamento);
