@@ -45,7 +45,9 @@ torna nella scena: `{"su": "dieci", "volta": 2}`) · un segno conta solo se fa c
 **Ogni scena è una ripresa, non un cartello** (è il metodo con cui si descrive una ripresa a un generatore di video):
 
 1. **un perché** (`perche`): cosa deve far capire. Se non lo sai dire in una riga, la scena decora e basta;
-2. **un soggetto che si può mostrare**: numero, grafico, oggetto 3D, icone. Le scritte da sole sono l'ultima scelta;
+2. **un soggetto grande che si può mostrare** e che torna: prima scelta il blocco `soggetti` (uno o due soggetti che
+   riempiono il palco, lo stesso soggetto in più scene con uno stato diverso), poi numero, grafico, oggetto 3D. Sul
+   palco solo etichette a pillola: elenchi e righe da leggere sono l'ultima scelta;
 3. **un'azione**: qualcosa che *cambia* su una parola (un valore che sale, un oggetto che cambia stato con `cambia`,
    il protagonista che si accende), almeno ogni 3 secondi. Descrivi verbi, non aspetti;
 4. **un'inquadratura** (`campo`: largo → medio → stretto, mai due scene uguali di fila) e **un movimento di camera con
@@ -136,6 +138,7 @@ della scena, oppure niente (si distribuiscono da soli).
 | `bloccoCitazione` | `testo`, `autore?`, `segno?` |
 | `bloccoSigla` | `nome?`, `sotto?`, `segno?` · il logo della pagina (`stile/logo.png`) con il nome |
 | `bloccoEbook` | `regalo?`, `invito?`, `sopra?`, `sotto?`, `segno?`, `segnoSopra?`, `segnoSotto?` · il regalo su un tablet 3D che gira: per "Commenta MAPPA" (`npm run regalo` li elenca) |
+| `bloccoSoggetti` | `soggetti: [{tipo, etichetta?, nota?, colore?, segno?, stato?, cambia?}]` · **la prima scelta**: da 1 a 3 soggetti grandi che non si fermano mai (`ginocchio` dolore · `quadrante` valore, massimo · `batteria` livello · `stomaco` irritato · `riflettori` luci · `foglio` evidenzia · `scale` passo · `icona` + `icona`), ognuno cambia stato su una parola |
 | `bloccoParole` | `parole: [{testo, segno?, colore?}]`, `titolo?` · le parole che contano, una alla volta, ognuna sulla sua parola |
 | `bloccoDomanda` | `domanda`, `sopra?`, `sotto?`, `segno?` · l'aggancio in forma di domanda |
 | `bloccoStudio` | `rivista`, `titolo`, `dati?: [{testo, segno?}]` (max 3), `pagato?`, `fonte?` |

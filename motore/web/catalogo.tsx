@@ -69,6 +69,7 @@ const SCENE: Voce[] = [
   {nome: 'bloccoCitazione', cosa: 'una frase tra virgolette', disegno: scena(L.bloccoCitazione({testo: 'I dettagli contano quanto i risultati', autore: 'la regola del kit'}))},
   {nome: 'bloccoEbook', cosa: "l'ebook regalo sul tablet 3D che gira", disegno: scena(L.bloccoEbook({invito: 'Commenta MAPPA', sotto: 'te lo mando gratis'}))},
   {nome: 'bloccoSigla', cosa: 'il logo della pagina con il nome', disegno: scena(L.bloccoSigla({sotto: 'la mappa dei peptidi'}))},
+  {nome: 'bloccoSoggetti', cosa: 'da 1 a 3 soggetti grandi e illustrati che non si fermano mai e cambiano stato su una parola', disegno: scena(L.bloccoSoggetti({soggetti: [{tipo: 'ginocchio', etichetta: 'Reta', stato: {dolore: 0.2}}, {tipo: 'quadrante', etichetta: 'Dolore', colore: '#C9D4E0', stato: {valore: 6}}]}))},
   {nome: 'bloccoParole', cosa: 'le parole che contano, una alla volta, ognuna sulla sua parola', disegno: scena(L.bloccoParole({parole: [{testo: 'Placebo'}, {testo: 'Meno dolore'}, {testo: 'Non è un caso'}]}))},
   {nome: 'bloccoDomanda', cosa: 'una domanda grande: l\'aggancio', disegno: scena(L.bloccoDomanda({sopra: 'Reta e ginocchio', domanda: 'Quanto è merito del farmaco?'}))},
   {nome: 'bloccoStudio', cosa: 'la scheda di uno studio', disegno: scena(L.bloccoStudio({rivista: 'New England Journal of Medicine', titolo: 'Retatrutide negli adulti con artrosi del ginocchio', dati: [{testo: '8 nov 2026'}, {testo: '1.019 persone'}, {testo: '68-80 settimane'}], pagato: 'finanziato da Eli Lilly'}))},

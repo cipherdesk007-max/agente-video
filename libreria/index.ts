@@ -26,3 +26,4 @@ export type {Posa, Regia} from './Personaggio';
 export type {Gesto} from './gesti';
 export type {Impostazioni, Ingombro, StileVideo} from './impostazioni';
 export {stile} from '../stile/stile';
+export * from './Soggetti';

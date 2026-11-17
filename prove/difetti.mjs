@@ -590,6 +590,8 @@ await prova('metro: le soglie si ricavano dai riferimenti con il margine scritto
 
 const TESTO_RETA = fs.readFileSync(path.join(K, 'prove/sostegno/testo-reta.txt'), 'utf8');
 const PIANO_RETA = () => JSON.parse(fs.readFileSync(path.join(K, 'prove/sostegno/piano-reta.json'), 'utf8'));
+// lo stesso testo con un piano fatto di blocchi diversi (confronto, oggetto 3D, icone, studio, barre): serve a provarli tutti
+const PIANO_BLOCCHI = () => JSON.parse(fs.readFileSync(path.join(K, 'prove/sostegno/piano-blocchi.json'), 'utf8'));
 
 await prova('testo dato: il **grassetto** incollato diventa enfasi, le parole restano quelle', async () => {
   const {testoDaDire, copioneDaTesto, leggiCopione, confrontaTesto} = await carica('motore/copione.mjs');
@@ -625,7 +627,7 @@ await prova('piano: il copione montato dice il testo dato parola per parola, con
 await prova('piano: ogni errore dice in che scena, in che campo e cosa fare; con un errore non si scrive niente', async () => {
   const {controllaPiano} = await carica('motore/piano.mjs');
   const rotto = (cambia) => {
-    const piano = PIANO_RETA();
+    const piano = PIANO_BLOCCHI();
     cambia(piano);
     return controllaPiano(piano, TESTO_RETA).errori.join('\n');
   };
@@ -644,7 +646,7 @@ await prova('piano: ogni errore dice in che scena, in che campo e cosa fare; con
 
 await prova('piano: le scene scritte dal piano si disegnano senza che nessuno scriva codice (oggetto 3D che cambia stato, icone, regalo)', async () => {
   const {controllaPiano, scriviScene} = await carica('motore/piano.mjs');
-  const piano = PIANO_RETA();
+  const piano = PIANO_BLOCCHI();
   const sorgente = scriviScene(piano, controllaPiano(piano, TESTO_RETA));
   assert.match(sorgente, /ginocchio3d\(\{dolore: mix\(1, 0\.3, rampa\(s\.dopo\("meno"\), 1\.2\)\)/);
   assert.match(sorgente, /import \{FaFaceSmile, FaGuitar, FaHeartPulse, FaUsers\} from 'react-icons\/fa6';/);
@@ -708,6 +710,34 @@ await prova('rischio cartelli: una fila di scritte con la camera ferma non arriv
   assert.equal(esito.rischio.livello, 'alto');
   assert.ok(esito.rischio.punti >= 80, `punti ${esito.rischio.punti}`);
   assert.ok(esito.rischio.voci.some((v) => v.nome === 'camera ferma') && esito.rischio.voci.some((v) => v.nome === 'scene di sole scritte'));
+});
+
+await prova('soggetti: grandi, vivi, con uno stato che cambia su una parola; il piano li controlla e li scrive', async () => {
+  const {bloccoSoggetti, statoSoggetto, SOGGETTI, disegna} = await ts('prove/sostegno/soggetti.tsx');
+  const {controllaPiano, scriviScene, SOGGETTI: nelPiano} = await carica('motore/piano.mjs');
+  // il piano conosce gli stessi soggetti e gli stessi numeri della libreria
+  assert.deepEqual(Object.fromEntries(Object.entries(SOGGETTI).map(([k, v]) => [k, Object.keys(v.stato)])), nelPiano);
+  // lo stato va dal numero di partenza a quello nuovo, sul suo segno
+  const ginocchio = {tipo: 'ginocchio', stato: {dolore: 1}, cambia: [{segno: 'meno', stato: {dolore: 0.2}, durata: 1}]};
+  assert.equal(statoSoggetto(ginocchio, () => -1).dolore, 1);
+  assert.ok(Math.abs(statoSoggetto(ginocchio, () => 5).dolore - 0.2) < 1e-9);
+  const meta = statoSoggetto(ginocchio, () => 0.5).dolore;
+  assert.ok(meta < 1 && meta > 0.2, 'a metà del cambio il numero è a metà strada');
+  // sul palco: un soggetto solo è largo almeno 700 pixel, due almeno 500; due istanti diversi non sono mai uguali
+  const scena = bloccoSoggetti({soggetti: [{tipo: 'quadrante', etichetta: 'Dolore', stato: {valore: 6}}]});
+  const html = disegna(scena, {t: 2});
+  assert.match(html, /width:800px/);
+  assert.match(html, />Dolore</);
+  assert.notEqual(html, disegna(scena, {t: 2.2}), 'il soggetto si è fermato');
+  assert.match(disegna(bloccoSoggetti({soggetti: [{tipo: 'batteria'}, {tipo: 'stomaco'}]}), {t: 2}), /width:520px/);
+  assert.throws(() => bloccoSoggetti({soggetti: [1, 2, 3, 4].map(() => ({tipo: 'scale'}))}), /da 1 a 3/);
+  // il piano: errori chiari, e le scene scritte usano il blocco
+  const piano = PIANO_RETA();
+  const esito = controllaPiano(piano, TESTO_RETA);
+  assert.deepEqual(esito.errori, []);
+  assert.match(scriviScene(piano, esito), /bloccoSoggetti\(\{\n\s+soggetti: \[/);
+  piano.scene[0].dati.soggetti[0].stato = {febbre: 1};
+  assert.match(controllaPiano(piano, TESTO_RETA).errori.join('\n'), /"ginocchio" non ha "febbre"\. Il suo stato: dolore/);
 });
 
 // ───────────────────────── il giudice è l'occhio: il foglio affiancato ─────────────────────────

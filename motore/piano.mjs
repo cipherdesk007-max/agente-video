@@ -85,6 +85,7 @@ export const BLOCCHI = {
   sigla: {fn: 'bloccoSigla', cosa: 'il logo della pagina con il nome', campi: {nome: [T], sotto: [T], segno: [S]}},
   chiusura: {fn: 'bloccoChiusura', cosa: 'il cartello finale "Commenta PAROLA"', campi: {parola: [X, 1], sopra: [T], sotto: [T], segno: [S], colore: [C], logo: [B]}},
   ebook: {fn: 'bloccoEbook', cosa: 'il regalo sul tablet 3D (npm run regalo: elenco)', campi: {regalo: [{regalo: 1}], invito: [T], sopra: [T], sotto: [T], segno: [S], segnoSopra: [S], segnoSotto: [S], segnoGiro: [S], gira: [N]}},
+  soggetti: {fn: 'bloccoSoggetti', cosa: 'da 1 a 3 soggetti GRANDI e illustrati che non si fermano mai e cambiano stato su una parola: la scena di base', speciale: true},
   oggetto: {fn: 'bloccoOggetto', cosa: 'un oggetto 3D che gira e cambia stato, con etichette', speciale: true},
   mano: {fn: null, cosa: 'una scena scritta a mano in mano.tsx: {"componente": "Nome"}', speciale: true},
 };
@@ -110,6 +111,18 @@ export const OGGETTI = {
   telefono: ['schermo', 'scocca'],
   satellite: ['corpo', 'pannello', 'acceso'],
   barre: ['valori', 'colori', 'cresci', 'larghezza', 'passo', 'altezzaMax'],
+};
+
+/** I soggetti grandi (libreria/Soggetti.tsx) e i numeri del loro stato. */
+export const SOGGETTI = {
+  ginocchio: ['dolore'],
+  quadrante: ['valore', 'massimo'],
+  batteria: ['livello', 'accesa'],
+  icona: ['acceso'],
+  stomaco: ['irritato'],
+  riflettori: ['luci'],
+  foglio: ['evidenzia'],
+  scale: ['passo'],
 };
 
 const CAMPI_SCENA = ['nome', 'da', 'blocco', 'dati', 'segni', 'enfasi', 'suoni', 'luogo', 'entra', 'campo', 'camera', 'tinta', 'protagonista', 'narratore', 'perche', 'nota'];
@@ -268,6 +281,41 @@ function controllaOggetto(dati, dove, esito) {
   }
 }
 
+function controllaSoggetti(dati, dove, esito) {
+  if (!dati || typeof dati !== 'object' || !Array.isArray(dati.soggetti) || dati.soggetti.length < 1 || dati.soggetti.length > 3) {
+    return void esito.errori.push(`${dove}: servono da 1 a 3 soggetti: {"soggetti": [{"tipo": "ginocchio", "etichetta": "Reta", "stato": {"dolore": 1}}]}. Tipi: ${Object.keys(SOGGETTI).join(', ')}.`);
+  }
+  for (const k of Object.keys(dati)) if (!['soggetti', 'titolo', 'fonte'].includes(k)) esito.errori.push(`${dove}: il campo "${k}" non esiste. Campi: soggetti, titolo, fonte.`);
+  controllaCampi({titolo: dati.titolo, fonte: dati.fonte}, {titolo: [T], fonte: [T]}, dove, esito);
+  dati.soggetti.forEach((sg, i) => {
+    const qui = `${dove} · soggetto ${i + 1}`;
+    const numeri = SOGGETTI[sg?.tipo];
+    if (!numeri) return void esito.errori.push(`${qui}: il tipo ${JSON.stringify(sg?.tipo)} non esiste. Tipi: ${Object.keys(SOGGETTI).join(', ')}.`);
+    const {tipo: _t, stato: _s, cambia: _c, icona: _i, ...semplici} = sg;
+    controllaCampi(semplici, {etichetta: [T], nota: [T], colore: [C], segno: [S]}, qui, esito);
+    if (sg.tipo === 'icona') controllaValore(sg.icona, I, `${qui} · icona`, esito);
+    else if (sg.icona !== undefined) esito.errori.push(`${qui}: "icona" serve solo con il tipo "icona".`);
+    const controllaNumeri = (st, q) => {
+      if (st === undefined) return;
+      if (!st || typeof st !== 'object' || Array.isArray(st)) return void esito.errori.push(`${q}: lo stato è un oggetto di numeri, es. {"${numeri[0]}": 1}.`);
+      for (const [k, v] of Object.entries(st)) {
+        if (!numeri.includes(k)) esito.errori.push(`${q}: "${sg.tipo}" non ha "${k}". Il suo stato: ${numeri.join(', ')}.`);
+        else if (typeof v !== 'number') esito.errori.push(`${q}: "${k}" è un numero.`);
+      }
+    };
+    controllaNumeri(sg.stato, `${qui} · stato`);
+    if (sg.cambia !== undefined && !Array.isArray(sg.cambia)) esito.errori.push(`${qui} · cambia: è un elenco [{"segno": "…", "stato": {…}}].`);
+    for (const [k, c] of (Array.isArray(sg.cambia) ? sg.cambia : []).entries()) {
+      const q = `${qui} · cambia ${k + 1}`;
+      if (typeof c?.segno !== 'string') esito.errori.push(`${q}: manca il "segno" su cui il soggetto cambia.`);
+      else esito.segniUsati.push({nome: c.segno, dove: q});
+      if (c?.stato === undefined) esito.errori.push(`${q}: manca lo "stato" verso cui cambia.`);
+      controllaNumeri(c?.stato, q);
+      if (c?.durata !== undefined && (typeof c.durata !== 'number' || c.durata < 0)) esito.errori.push(`${q}: "durata" è in secondi.`);
+    }
+  });
+}
+
 function controllaStato(stato, dove, esito, conSegno) {
   if (!stato || typeof stato !== 'object' || Array.isArray(stato)) return void esito.errori.push(`${dove}: lo stato del protagonista è un oggetto, es. {"acceso": 0.2, "onda": 1.5}.`);
   for (const [k, v] of Object.entries(stato)) {
@@ -391,6 +439,7 @@ export function controllaPiano(piano, testo, {cartella = null, fonti = null, tem
     const blocco = BLOCCHI[sc.blocco];
     if (!blocco) errori.push(`${dove}: il blocco ${JSON.stringify(sc.blocco)} non esiste. Blocchi: ${Object.keys(BLOCCHI).join(', ')}.`);
     else if (sc.blocco === 'oggetto') controllaOggetto(sc.dati, dove, esito);
+    else if (sc.blocco === 'soggetti') controllaSoggetti(sc.dati, dove, esito);
     else if (sc.blocco === 'mano') {
       const nome = sc.dati?.componente;
       const file = cartella ? path.join(cartella, 'mano.tsx') : null;
@@ -459,14 +508,16 @@ export function controllaPiano(piano, testo, {cartella = null, fonti = null, tem
   const SOLO_SCRITTE = ['titolo', 'domanda', 'parole', 'lista', 'passi', 'citazione', 'avviso', 'chiusura'];
   const quota = (conta) => scene.filter(conta).length / scene.length;
   const buchi = new Set(avvisi.filter((a) => a.includes('senza niente di nuovo')).map((a) => a.split(':')[0])).size / scene.length;
-  const diversi = new Set(scene.map((s) => s.definizione.blocco)).size;
+  // il "tipo" di una scena, per la varietà: il blocco; per i soggetti, quali soggetti (due ginocchia non sono un quadrante)
+  const genere = (s) => (s.definizione.blocco === 'soggetti' ? `soggetti:${(s.definizione.dati?.soggetti ?? []).map((x) => x.tipo).join('+')}` : s.definizione.blocco);
+  const diversi = new Set(scene.map(genere)).size;
   const cambia = piano.protagonista && scene.some((s) => s.definizione.protagonista !== undefined);
   const conta = (cosa) => {
     const quante = new Map();
     for (const s of scene) quante.set(cosa(s), (quante.get(cosa(s)) ?? 0) + 1);
     return Math.max(...quante.values()) / scene.length;
   };
-  const unTipo = scene.length >= 3 ? conta((s) => s.definizione.blocco) : 0;
+  const unTipo = scene.length >= 3 ? conta(genere) : 0;
   const unCampo = scene.length >= 3 ? conta((s) => s.definizione.campo ?? 'medio') : 0;
   // le sei voci ricalcano il controllo "slideshow risk" di OpenMontage (ripetizione, scritte, movimento, intenzione)
   const voci = [
@@ -481,7 +532,7 @@ export function controllaPiano(piano, testo, {cartella = null, fonti = null, tem
   const punti = Math.round(voci.reduce((t, [, peso, q]) => t + peso * q, 0));
   const rischio = {punti, livello: punti >= 60 ? 'alto' : punti >= 35 ? 'medio' : 'basso', voci: voci.filter(([, peso, q]) => peso * q >= 5).map(([nome, peso, q, cura]) => ({nome, punti: Math.round(peso * q), cura}))};
   for (let i = 3; i < scene.length; i++) {
-    if ([1, 2, 3].every((k) => scene[i - k].definizione.blocco === scene[i].definizione.blocco)) avvisi.push(`${scene[i].dove}: è la quarta scena "${scene[i].definizione.blocco}" di fila. Mai più di tre scene dello stesso tipo una dopo l'altra.`);
+    if ([1, 2, 3].every((k) => genere(scene[i - k]) === genere(scene[i]))) avvisi.push(`${scene[i].dove}: è la quarta scena "${scene[i].definizione.blocco}" di fila. Mai più di tre scene dello stesso tipo una dopo l'altra.`);
   }
   if (scene.length >= 4 && diversi < 3) avvisi.push(`Il reel usa solo ${diversi === 1 ? 'un tipo' : 'due tipi'} di scena: ne servono almeno tre diversi.`);
   if (!scene.some((s) => s.enfasi.length) && !parole.some((p) => p.enfasi)) avvisi.push('Nessuna enfasi: metti nel riquadro dei sottotitoli le 4-8 parole che contano ("enfasi").');
@@ -688,10 +739,10 @@ export async function comandoPiano(slug) {
   if (!slug) {
     console.log('\nBlocchi che il piano può usare ("blocco": nome, "dati": i campi; * = obbligatorio):\n');
     for (const [nome, b] of Object.entries(BLOCCHI)) {
-      const campi = b.campi ? Object.entries(b.campi).map(([k, [, obb]]) => (obb ? `${k}*` : k)).join(', ') : nome === 'oggetto' ? 'oggetto*, parametri, cambia, etichette, titolo, zoom, fonte' : 'componente*';
+      const campi = b.campi ? Object.entries(b.campi).map(([k, [, obb]]) => (obb ? `${k}*` : k)).join(', ') : nome === 'oggetto' ? 'oggetto*, parametri, cambia, etichette, titolo, zoom, fonte' : nome === 'soggetti' ? 'soggetti* [{tipo*, etichetta, nota, colore, segno, stato, cambia: [{segno*, stato*, durata}], icona}], titolo, fonte' : 'componente*';
       console.log(`  ${nome.padEnd(11)} ${b.cosa}\n  ${''.padEnd(11)} ${campi}`);
     }
-    console.log(`\nOggetti 3D: ${Object.keys(OGGETTI).join(', ')}\nLuoghi: ${LUOGHI.join(', ')} · entra: ${VERSI.join(', ')}\nInquadratura (campo): ${CAMPI.join(', ')} · movimento (camera): ${CAMERE.join(', ')}\nProtagonista: ${PROTAGONISTI.join(', ')} · stato: ${CAMPI_STATO.join(', ')}\nRegali: ${Object.keys(leggiRegali()).join(', ') || '(nessuno)'}\n`);
+    console.log(`\nSoggetti grandi: ${Object.entries(SOGGETTI).map(([k, v]) => `${k} (${v.join(', ')})`).join(' · ')}\nOggetti 3D: ${Object.keys(OGGETTI).join(', ')}\nLuoghi: ${LUOGHI.join(', ')} · entra: ${VERSI.join(', ')}\nInquadratura (campo): ${CAMPI.join(', ')} · movimento (camera): ${CAMERE.join(', ')}\nProtagonista: ${PROTAGONISTI.join(', ')} · stato: ${CAMPI_STATO.join(', ')}\nRegali: ${Object.keys(leggiRegali()).join(', ') || '(nessuno)'}\n`);
     return;
   }
   const {esito, tempiVeri} = leggiPiano(slug);

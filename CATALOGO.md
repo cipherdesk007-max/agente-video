@@ -38,6 +38,7 @@ Una scena intera in una riga, dentro `definisciReel({scene: {nome: bloccoâ€¦({â€
 | `bloccoCitazione` | una frase tra virgolette | `testo`, `autore?`, `segno?` |
 | `bloccoSigla` | il logo della pagina che si accende, con il nome sotto | `nome?`, `sotto?`, `segno?` |
 | `bloccoEbook` | il regalo (ebook, mappa, PDF: `npm run regalo`) su un tablet 3D che entra girando e oscilla, con l'invito sotto | `regalo?`, `invito?`, `sotto?`, `sopra?`, `segno?`, `segnoSopra?`, `segnoSotto?`, `gira?` |
+| `bloccoSoggetti` | **la scena di base di un reel illustrato**: da 1 a 3 soggetti grandi in primo piano (ginocchio, quadrante, batteria, stomaco, riflettori, foglio, scale, o un'icona qualsiasi), con bagliore, scintille e riflesso che non si fermano mai; ognuno ha uno stato di numeri che cambia su una parola e un'etichetta a pillola | `soggetti: [{tipo, etichetta?, nota?, colore?, segno?, stato?, cambia?: [{segno, stato, durata?}], icona?}]`, `titolo?`, `fonte?` |
 | `bloccoParole` | le parole che contano, una alla volta: quella nuova grande al centro, le precedenti salgono e rimpiccioliscono | `parole: [{testo, segno?, colore?}]`, `titolo?` |
 | `bloccoDomanda` | una domanda grande con il punto interrogativo dietro: l'aggancio | `domanda`, `sopra?`, `sotto?`, `segno?` |
 | `bloccoStudio` | la scheda di uno studio: rivista, titolo, dati, chi ha pagato | `rivista`, `titolo`, `dati?: [{testo, segno?}]` (max 3), `pagato?`, `segnoPagato?`, `fonte?` |
