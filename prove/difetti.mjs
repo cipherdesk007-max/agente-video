@@ -1202,6 +1202,26 @@ await prova('B31 · voci: gli esempi di voci/COME-FARE.md si leggono come li leg
   assert.match(leggimi, /FMLAB_VOCE_COMANDO/);
 });
 
+// ───────────────────────── B32 · la pagella (docs/OCCHIO.md) ─────────────────────────
+
+await prova('B32 · docs/OCCHIO.md: otto voci, ognuna con il suo controllo; i numeri sono quelli che il kit usa davvero; tre domande in fondo', async () => {
+  const occhio = fs.readFileSync(path.join(K, 'docs/OCCHIO.md'), 'utf8');
+  const righe = occhio.split('\n').filter((r) => /^\| \d \|/.test(r));
+  assert.equal(righe.length, 8);
+  for (const r of righe) assert.ok(r.split('|')[3].trim().length > 20, `la voce non dice come si controlla: ${r.slice(0, 60)}`);
+  const virgola = (n) => String(n).replace('.', ',');
+  const {PAUSA_MASSIMA} = await carica('motore/piano.mjs');
+  const {TOLLERANZA} = await carica('motore/durata.mjs');
+  const soglie = JSON.parse(fs.readFileSync(path.join(K, 'riferimenti/misure.json'), 'utf8')).soglie;
+  assert.ok(occhio.includes(`oltre ${virgola(PAUSA_MASSIMA)} secondi senza novità`), 'la pausa massima è quella di npm run piano');
+  assert.ok(occhio.includes(`soglia ${virgola(soglie['narratore.stessaPosaMassimo'].max)} secondi`), 'la soglia della posa è quella dei riferimenti');
+  assert.ok(occhio.includes(`entro ${TOLLERANZA} secondi`) && occhio.includes(`Fuori dai ${TOLLERANZA} secondi`.toLowerCase()) || occhio.includes(`fuori dai ${TOLLERANZA} secondi`), 'lo scarto di durata è quello della verifica');
+  assert.match(fs.readFileSync(path.join(K, 'motore/verifica.mjs'), 'utf8'), /primaFrase\.length > 14/);
+  assert.match(fs.readFileSync(path.join(K, 'motore/piano.mjs'), 'utf8'), /punti >= 60 \? 'alto' : punti >= 35 \? 'medio' : 'basso'/);
+  assert.ok(occhio.includes('supera le 14') && occhio.includes('sotto 35') && occhio.includes('da 60 in su'));
+  assert.equal(occhio.slice(occhio.indexOf('## Tre domande')).split('\n').filter((r) => /^\d\. .+\?/.test(r)).length, 3);
+});
+
 if (pannello) await pannello.server.chiudi();
 cancella();
 const falliti = esiti.filter((e) => !e.ok);
