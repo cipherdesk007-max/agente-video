@@ -86,8 +86,8 @@ L'elenco completo, con i passi per riprodurli, è in `BUG.md`; a che punto è il
 - **Colori del video più fedeli**: nel passaggio dai fotogrammi al video il bianco diventava 252, 255, 252 (un
   filo più scuro e verdino). Ora il bianco resta bianco e i colori arrivano entro un livello su 255; c'è una
   prova che lo controlla.
-- **Codex e Claude Code**: `AGENTS.md` e `CLAUDE.md` dicono la stessa cosa e ognuno dei due agenti legge il suo.
-  `LEGGIMI.md` spiega come avviarli dal pannello (`.env.esempio` ha i due comandi pronti).
+- **Due file di istruzioni per gli agenti**: `AGENTS.md` e `CLAUDE.md` dicono la stessa cosa e ogni agente legge il suo.
+  `LEGGIMI.md` spiega come avviarlo dal pannello.
 - Il bordo di sotto del narratore, quando è alzato, sfuma più dolcemente.
 
 ## 1.4

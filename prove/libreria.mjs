@@ -477,19 +477,17 @@ await prova('prompt pronti: PROMPT.md si legge, ogni prompt ha titolo e testo e 
     for (const comando of p.testo.match(/npm run (\w+)/g) ?? []) assert.ok(JSON.parse(fs.readFileSync(path.join(K, 'package.json'), 'utf8')).scripts[comando.slice(8)], `il prompt "${p.titolo}" usa ${comando}, che non esiste`);
   }
 });
-await prova('agenti: il file per Codex (AGENTS.md) e quello per Claude Code (CLAUDE.md) ci sono, dicono la stessa cosa e rimandano a file che esistono', () => {
-  const codex = fs.readFileSync(path.join(K, 'AGENTS.md'), 'utf8');
-  const claude = fs.readFileSync(path.join(K, 'CLAUDE.md'), 'utf8');
-  assert.equal(codex, claude, 'AGENTS.md e CLAUDE.md devono restare uguali: copia la modifica anche nell\'altro');
-  for (const file of codex.match(/[\w\/-]+\.md\b/g) ?? []) assert.ok(fs.existsSync(path.join(K, file)), `AGENTS.md nomina ${file}, che non esiste`);
-  assert.ok(/npm run stato/.test(codex) && /npm run riuso/.test(codex));
+await prova('agenti: i due file di istruzioni ci sono, dicono la stessa cosa e rimandano a file che esistono', () => {
+  const [uno, due] = ['AGENTS.md', 'CLAUDE.md'].map((f) => fs.readFileSync(path.join(K, f), 'utf8'));
+  assert.equal(uno, due, 'i due file di istruzioni devono restare uguali: copia la modifica anche nell\'altro');
+  for (const file of uno.match(/[\w\/-]+\.md\b/g) ?? []) assert.ok(fs.existsSync(path.join(K, file)), `il file di istruzioni nomina ${file}, che non esiste`);
+  assert.ok(/npm run stato/.test(uno) && /npm run riuso/.test(uno));
   const leggimi = fs.readFileSync(path.join(K, 'LEGGIMI.md'), 'utf8');
-  assert.ok(leggimi.includes('codex exec') && leggimi.includes('claude -p') && leggimi.includes('git init'));
-  // i due comandi scritti in .env.esempio si spezzano bene (virgolette comprese) quando il pannello li avvia
+  assert.ok(leggimi.includes('FMLAB_AGENTE') && leggimi.includes('git init'));
+  // un comando con le virgolette si spezza bene quando il pannello lo avvia
+  assert.deepEqual(spezzaComando('agente -p --permessi "Leggi,Scrivi, Esegui"').slice(-2), ['--permessi', 'Leggi,Scrivi, Esegui']);
   const esempio = fs.readFileSync(path.join(K, '.env.esempio'), 'utf8');
-  const comandi = [...esempio.matchAll(/FMLAB_AGENTE=(.+)$/gm)].map((m) => m[1].trim());
-  assert.ok(comandi.some((c) => c.startsWith('codex exec')) && comandi.some((c) => c.startsWith('claude -p')));
-  assert.deepEqual(spezzaComando(comandi.find((c) => c.startsWith('claude -p'))).slice(-2), ['--allowedTools', 'Bash,Read,Write,Edit']);
+  assert.match(esempio, /FMLAB_AGENTE=/);
 });
 await prova('modelli di reel: ognuno ha copione e scene con gli stessi segni', async () => {
   const {leggiCopione} = await import(`${K}/motore/copione.mjs`);

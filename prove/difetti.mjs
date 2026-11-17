@@ -364,10 +364,11 @@ await rimandata('B17 · package-lock.json è salvato nel repository', 'serve un 
   // conta quello salvato in git: `npm install` ne crea uno sul momento, ma senza salvarlo ogni installazione fa da sé
   assert.equal(spawnSync('git', ['ls-files', 'package-lock.json'], {cwd: K, encoding: 'utf8'}).stdout.trim(), 'package-lock.json');
 });
-await rimandata('B18 · nessun nome di assistente fuori dai due file di istruzioni', 'fase 4', () => {
-  const nomi = ['clau' + 'de', 'cod' + 'ex', 'chat' + 'gpt', 'open' + 'ai', 'gem' + 'ini', 'copi' + 'lot'].join('\\|');
-  const r = spawnSync('git', ['grep', '-il', nomi, '--', '.', ':!BRIEF_AGENTE.md', ':!BUG.md', ':!STATO.md'], {cwd: K, encoding: 'utf8'});
-  assert.equal(r.stdout.trim(), '');
+await prova('B18 · nessun nome di assistente nei file del kit (resta solo il nome del file di istruzioni che un agente pretende)', () => {
+  const nomi = new RegExp(['clau' + 'de', 'cod' + 'ex', 'chat' + 'gpt', 'open' + 'ai', 'gem' + 'ini', 'copi' + 'lot'].join('|'), 'i');
+  const file = spawnSync('git', ['ls-files', '--', '.', ':!BRIEF_AGENTE.md', ':!BUG.md', ':!STATO.md'], {cwd: K, encoding: 'utf8'}).stdout.split('\n').filter((f) => f && !/\.(jpg|png|mp3|wav|woff2?|ttf)$/i.test(f));
+  const trovati = file.filter((f) => nomi.test(fs.readFileSync(path.join(K, f), 'utf8').replace(/CLAU[D]E\.md/g, '')));
+  assert.deepEqual(trovati, []);
 });
 
 // ───────────────────────── il mondo a livelli (fase 2) ─────────────────────────

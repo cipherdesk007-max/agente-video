@@ -167,10 +167,13 @@ il difetto com'era; in fondo a ognuna, come è stato chiuso.
 - `ffmpeg-static` è chiesto come `^5.2.0`. Senza file di blocco due installazioni possono dare versioni diverse.
   Va creato da un computer collegato alla rete (`npm install --package-lock-only`).
 
-## B18 · Nomi di assistenti in quattro file (bassa) — rimandato alla fase 4
+## B18 · Nomi di assistenti in quattro file (bassa) — chiuso il 17/11
 
-- `git grep -il` li trova in `.env.esempio`, `LEGGIMI.md`, `NOVITA.md`, `prove/libreria.mjs`. I nomi dei due file
-  di istruzioni (`AGENTS.md`, `CLAUDE.md`) li impone chi li legge e restano. Il resto si riscrive con i documenti.
+- Erano in `.env.esempio`, `LEGGIMI.md`, `NOVITA.md`, `prove/libreria.mjs`: riscritti senza nomi (il comando per
+  avviare l'agente dal pannello ora si prende dalla guida del proprio agente). Resta, perché lo pretende chi lo
+  legge, il nome del file di istruzioni `CLAUDE.md`. Prova: `B18` in `prove/difetti.mjs`, non più rimandata.
+- **Cosa si perde:** `.env.esempio` non ha più i due comandi pronti da copiare. Chi li ha già nel suo `.env` non
+  deve fare niente.
 
 ## B19 · Parola più larga dei sottotitoli (bassa) — aperto
 

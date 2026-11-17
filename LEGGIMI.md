@@ -36,21 +36,18 @@ incollare all'agente) e `personaggi/dottore/prova.jpg` (pose e gesti del dottore
 
    Nel Terminale compaiono l'indirizzo e un codice. Aprilo dal computer o dal telefono (stessa rete Wi-Fi).
 
-## Con Codex o con Claude Code
+## Con un agente che lavora nella cartella
 
-Il kit funziona con tutti e due, e non devi preparare niente: ognuno legge da solo il suo file di istruzioni,
-che sta nella cartella del kit.
+Il kit funziona con gli agenti da riga di comando, e non devi preparare niente: l'agente legge da solo il suo file
+di istruzioni, che sta nella cartella del kit. Ce ne sono due, `AGENTS.md` e `CLAUDE.md`, perché agenti diversi
+cercano nomi diversi: dicono la stessa cosa (leggi `SCHEDA.md`, parti da `npm run stato`, chiudi con
+`npm run riuso`). Se ne cambi uno, copia la modifica nell'altro. I prompt di `PROMPT.md` vanno bene per tutti.
 
-| Agente | File che legge da solo | Per avviarlo dal pannello, nel file `.env` |
-|---|---|---|
-| Codex | `AGENTS.md` | `FMLAB_AGENTE=codex exec --full-auto` |
-| Claude Code | `CLAUDE.md` | `FMLAB_AGENTE=claude -p --permission-mode acceptEdits --allowedTools "Bash,Read,Write,Edit"` |
+Per avviarlo dal pannello con un tocco, nel file `.env` scrivi in `FMLAB_AGENTE` il comando con cui lo avvii dal
+Terminale senza finestra e con il permesso di lavorare da solo nella cartella (è nella guida del tuo agente).
 
-I due file dicono la stessa cosa (leggi `SCHEDA.md`, parti da `npm run stato`, chiudi con `npm run riuso`): se
-ne cambi uno, copia la modifica nell'altro. I prompt di `PROMPT.md` vanno bene per entrambi.
-
-Con Codex la cartella deve essere un repository Git: una volta sola, nel Terminale dentro la cartella,
-`git init` (oppure aggiungi `--skip-git-repo-check` al comando).
+Alcuni agenti vogliono che la cartella sia un repository Git: una volta sola, nel Terminale dentro la cartella,
+`git init`.
 
 ## Il pannello
 
@@ -211,8 +208,8 @@ Li cambi una volta e valgono per tutti i reel dal render successivo.
 ## Dove sono le cose
 
 ```
-AGENTS.md           il file che Codex legge da solo (rimanda alla scheda)
-CLAUDE.md           lo stesso, per Claude Code
+AGENTS.md           il file che l'agente legge da solo (rimanda alla scheda)
+CLAUDE.md           lo stesso, con il nome che cercano altri agenti
 FMLAB_AVVIA.md      le istruzioni che segue l'agente
 PROMPT.md           le frasi pronte da incollare all'agente
 CATALOGO.md         tutto quello che è già pronto, con i nomi e come si usa (catalogo.jpg: lo stesso, disegnato)
