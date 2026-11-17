@@ -6,6 +6,7 @@ import {ScenaCtx, TempoCtx, creaScena, creaTempo} from '../../libreria/tempo';
 import type {DatiReel, Scena, Tempo} from '../../libreria/tempo';
 import type {AtmosferaScena, DefinizioneScena, Reel} from '../../libreria/reel';
 import {Atmosfera, tramaFumo} from '../../libreria/Atmosfera';
+import {valoriAtmosfera} from '../comune/atmosfere.mjs';
 import {Mondo, cameraMondo} from '../../libreria/Mondo';
 import type {NomeLuogo, Verso} from '../../libreria/Mondo';
 import {Protagonista, STATO_BASE, statoProtagonista} from '../../libreria/Protagonista';
@@ -97,8 +98,10 @@ function parti(def: DefinizioneScena | undefined) {
   return {componente: def.componente, dottore: def.dottore, atmosfera: def.atmosfera};
 }
 
-function atmosferaDi(reel: Reel, nome: string) {
-  const a = {...(reel.atmosfera ?? {}), ...(parti(reel.scene[nome]).atmosfera ?? {})};
+// L'atmosfera scelta a mano per il reel (npm run imposta <reel> atmosfera=<nome>) vince su quella scritta nel reel;
+// quello che chiede la singola scena (il rosso di un "attenzione") vince su tutte e due.
+function atmosferaDi(reel: Reel, nome: string, scelta?: string) {
+  const a = {...(reel.atmosfera ?? {}), ...(scelta && scelta !== 'auto' ? valoriAtmosfera(scelta) ?? {} : {}), ...(parti(reel.scene[nome]).atmosfera ?? {})};
   return {tinta: a.tinta ?? stile.colori.foschia, densita: a.densita ?? 1, raggi: a.raggi ?? 0, luogo: (a.luogo ?? 'vuoto') as NomeLuogo};
 }
 
@@ -229,11 +232,11 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
     : null;
 
   // atmosfera, umore e presenza del narratore si mescolano durante il passaggio
-  let aria = atmosferaDi(reel, corrente.nome);
+  let aria = atmosferaDi(reel, corrente.nome, impostazioni.atmosfera);
   let luogoPrima: NomeLuogo | undefined;
   let stato = umore(regiaDi(reel, corrente.nome));
   if (precedente) {
-    const a0 = atmosferaDi(reel, precedente.nome);
+    const a0 = atmosferaDi(reel, precedente.nome, impostazioni.atmosfera);
     const s0 = umore(regiaDi(reel, precedente.nome));
     luogoPrima = a0.luogo;
     aria = {tinta: miscela(a0.tinta, aria.tinta, p), densita: mix(a0.densita, aria.densita, p), raggi: mix(a0.raggi, aria.raggi, p), luogo: aria.luogo};

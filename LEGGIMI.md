@@ -252,6 +252,18 @@ il manuale e i prompt pronti lo chiedono come ultimo passo di ogni reel.
 `stile/impostazioni.json` contiene le scelte di partenza per i reel nuovi (narratore, grandezza, stile).
 Li cambi una volta e valgono per tutti i reel dal render successivo.
 
+**Un'atmosfera per reel.** Il fondo (foschia, pulviscolo, luci) ha cinque varianti: `classica` (il fondo di sempre),
+`serra`, `abisso`, `alba`, `notte`. Cambiano tre cose che il fondo sapeva già fare: il colore della foschia, quanto è
+densa, quanti raggi scendono dall'alto. Lo stile resta quello: fondo scuro, un colore solo.
+
+- Di serie è `auto`: quando il regista di serie scrive il piano (`npm run fai`, `npm run regia`) sceglie l'atmosfera
+  dal nome del reel. Lo stesso nome dà sempre la stessa; se è quella del reel che viene prima nella cartella, prende
+  la successiva dell'elenco. La scelta resta scritta in `piano.json` (`"atmosfera": "serra"`).
+- A mano: `npm run imposta <reel> atmosfera=alba`. Vince su quella del piano. Un nome sbagliato dà l'elenco dei nomi.
+- I reel che c'erano già (`gps`, `reta-ginocchio`, `reta-testo`, `mots-c`) non hanno un'atmosfera scritta e restano
+  sul fondo di sempre: i loro fotogrammi sono identici a prima.
+- Una scena che chiede il suo colore (il rosso di un "attenzione") lo tiene, in qualunque atmosfera.
+
 ## Dove sono le cose
 
 ```

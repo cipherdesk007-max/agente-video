@@ -1043,6 +1043,70 @@ await prova('B24 · regista di serie: mai più di 4 secondi senza un segno (anch
   }
 }
 
+// ───────────────────────── B27–B29 · un'atmosfera per reel ─────────────────────────
+
+await prova('B27 · atmosfera: dal nome del reel esce sempre la stessa, diversa da quella del reel che lo precede; i reel esistenti restano com\'erano', async () => {
+  const {atmosferaDalNome, NOMI_ATMOSFERE} = await carica('motore/comune/atmosfere.mjs');
+  const {atmosferaPerReel, atmosferaInUso} = await carica('motore/regista.mjs');
+  const nomi = Array.from({length: 200}, (_, i) => `reel-di-prova-${i}`);
+  for (const n of nomi) {
+    assert.equal(atmosferaDalNome(n), atmosferaDalNome(n), 'lo stesso nome dà la stessa atmosfera');
+    assert.ok(NOMI_ATMOSFERE.includes(atmosferaDalNome(n)));
+    assert.notEqual(atmosferaDalNome(n, atmosferaDalNome(n)), atmosferaDalNome(n), 'mai quella del reel precedente');
+  }
+  assert.deepEqual([...new Set(nomi.map((n) => atmosferaDalNome(n)))].sort(), [...NOMI_ATMOSFERE].sort(), 'su molti nomi escono tutte');
+  // nella cartella: conta il reel che viene subito prima, in ordine di nome
+  const sua = atmosferaDalNome('b-reel');
+  const altra = NOMI_ATMOSFERE.find((a) => a !== sua);
+  assert.equal(atmosferaPerReel('b-reel', ['b-reel'], () => sua), sua, 'da solo nella cartella: quella del suo nome');
+  assert.equal(atmosferaPerReel('b-reel', ['a-reel', 'b-reel', 'c-reel'], (r) => (r === 'a-reel' ? altra : sua)), sua, 'il reel dopo non conta');
+  assert.notEqual(atmosferaPerReel('b-reel', ['a-reel', 'b-reel'], () => sua), sua, 'il reel prima ha la stessa: se ne prende un\'altra');
+  assert.equal(atmosferaPerReel('b-reel', ['a-reel', 'b-reel'], () => sua), atmosferaPerReel('b-reel', ['a-reel', 'b-reel'], () => sua), 'e resta quella');
+  // i reel che c'erano già non hanno un'atmosfera scritta: restano sul fondo di sempre
+  for (const reel of ['gps', 'reta-ginocchio', 'reta-testo', 'mots-c']) {
+    assert.equal(atmosferaInUso(reel), 'classica', reel);
+    assert.doesNotMatch(fs.readFileSync(path.join(K, 'reels', reel, 'impostazioni.json'), 'utf8'), /atmosfera/, `${reel}: le impostazioni non sono state toccate`);
+  }
+});
+
+await prova('B28 · atmosfere: da quattro a sei nomi, fatte solo di tinta, densità e raggi; "classica" è il fondo di sempre; il piano le scrive nel reel', async () => {
+  const {ATMOSFERE, NOMI_ATMOSFERE, valoriAtmosfera} = await carica('motore/comune/atmosfere.mjs');
+  const {stile} = await ts('stile/stile.ts');
+  assert.deepEqual(NOMI_ATMOSFERE, ['classica', 'serra', 'abisso', 'alba', 'notte']);
+  assert.ok(NOMI_ATMOSFERE.length >= 4 && NOMI_ATMOSFERE.length <= 6);
+  for (const [nome, a] of Object.entries(ATMOSFERE)) {
+    assert.deepEqual(Object.keys(a).sort(), ['cosa', 'densita', 'raggi', 'tinta'], `${nome}: solo quello che il fondo sa già fare`);
+    assert.match(a.tinta, /^#[0-9A-F]{6}$/);
+    assert.ok(a.densita >= 0.5 && a.densita <= 1.3 && a.raggi >= 0 && a.raggi <= 1, nome);
+  }
+  assert.equal(new Set(Object.values(ATMOSFERE).map((a) => a.tinta)).size, NOMI_ATMOSFERE.length, 'ogni atmosfera ha il suo colore');
+  assert.deepEqual(valoriAtmosfera('classica'), {tinta: stile.colori.foschia, densita: 1, raggi: 0});
+  assert.equal(valoriAtmosfera('tramonto'), null);
+  // nel piano si scrive il nome; nel reel montato finiscono i tre valori
+  const {regia} = await carica('motore/regista.mjs');
+  const {controllaPiano, scriviScene} = await carica('motore/piano.mjs');
+  const {piano} = regia(TESTO_RETA);
+  assert.equal(piano.atmosfera, undefined, 'il regista puro non sceglie: sceglie il comando, che conosce il nome del reel');
+  piano.atmosfera = 'alba';
+  const esito = controllaPiano(piano, TESTO_RETA);
+  assert.deepEqual(esito.errori, []);
+  assert.match(scriviScene(piano, esito), /atmosfera: \{tinta: "#F2A93C", densita: 0\.85, raggi: 0\.5\},/);
+  piano.atmosfera = 'tramonto';
+  assert.match(controllaPiano(piano, TESTO_RETA).errori.join('\n'), /l'atmosfera "tramonto" non esiste\. Puoi scegliere: classica, serra, abisso, alba, notte/);
+});
+
+await prova('B29 · atmosfera scritta male nelle impostazioni: l\'errore dice i nomi che esistono', async () => {
+  const {sistema} = await carica('motore/impostazioni.mjs');
+  assert.equal(sistema({}, {}).atmosfera, 'auto', 'di serie decide il regista');
+  assert.equal(sistema({atmosfera: ' ALBA '}, {}).atmosfera, 'alba');
+  assert.throws(() => sistema({atmosfera: 'tramonto'}, {}, 'reels/x/impostazioni.json'), /reels\/x\/impostazioni\.json: l'atmosfera "tramonto" non esiste\. Puoi scegliere: auto, classica, serra, abisso, alba, notte\./);
+  // dalla riga di comando: stesso errore, e niente viene salvato
+  const r = spawnSync(process.execPath, [path.join(K, 'motore/cli.mjs'), 'imposta', 'gps', 'atmosfera=tramonto'], {cwd: K, encoding: 'utf8', env: {...process.env, FMLAB_REGISTRO: path.join(os.tmpdir(), `fmlab-b29-${process.pid}`), FMLAB_DASHBOARD: 'no'}});
+  assert.match(`${r.stdout}${r.stderr}`, /l'atmosfera "tramonto" non esiste\. Puoi scegliere: auto, classica, serra, abisso, alba, notte\./);
+  assert.doesNotMatch(fs.readFileSync(path.join(K, 'reels/gps/impostazioni.json'), 'utf8'), /atmosfera/);
+  fs.rmSync(path.join(os.tmpdir(), `fmlab-b29-${process.pid}`), {recursive: true, force: true});
+});
+
 if (pannello) await pannello.server.chiudi();
 cancella();
 const falliti = esiti.filter((e) => !e.ok);

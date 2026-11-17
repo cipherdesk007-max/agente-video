@@ -12,7 +12,8 @@
 // stretto) e restano uguali il protagonista e i colori dei soggetti.
 import fs from 'node:fs';
 import path from 'node:path';
-import {ErroreFmlab, cartellaReel, rel} from './percorsi.mjs';
+import {ErroreFmlab, cartellaReel, elencoReel, rel} from './percorsi.mjs';
+import {atmosferaDalNome} from './comune/atmosfere.mjs';
 import {CAMERE, CAMPI, LUOGHI, controllaPiano, leggiRegali, paroleDelTesto} from './piano.mjs';
 import {leggiImpostazioni} from './impostazioni.mjs';
 import {stimaTempi} from './copione.mjs';
@@ -373,6 +374,33 @@ export function regia(testo, {titolo = '', regalo = 'auto'} = {}) {
 }
 
 /** npm run regia <reel> [nuova] [regalo=nome|nessuno] */
+/** L'atmosfera che un reel ha già: quella scelta a mano, altrimenti quella del suo piano, altrimenti il fondo di sempre. */
+export function atmosferaInUso(slug) {
+  try {
+    const scelta = leggiImpostazioni(slug).atmosfera;
+    if (scelta && scelta !== 'auto') return scelta;
+  } catch {
+    // impostazioni non leggibili: si guarda il piano
+  }
+  try {
+    return JSON.parse(fs.readFileSync(path.join(cartellaReel(slug), 'piano.json'), 'utf8')).atmosfera ?? 'classica';
+  } catch {
+    return 'classica';
+  }
+}
+
+/**
+ * L'atmosfera che il regista di serie dà a un reel: dal nome (sempre la stessa), ma diversa da quella del reel che
+ * lo precede nella cartella, in ordine di nome.
+ * @param {string} slug
+ * @param {string[]} reel  i nomi dei reel nella cartella
+ * @param {(slug: string) => string} inUso  l'atmosfera di un altro reel
+ */
+export function atmosferaPerReel(slug, reel = elencoReel(), inUso = atmosferaInUso) {
+  const prima = [...reel].filter((r) => r !== slug && r < slug).sort().pop();
+  return atmosferaDalNome(slug, prima ? inUso(prima) : null);
+}
+
 export async function comandoRegia(slug, argomenti = []) {
   if (!slug) throw new ErroreFmlab('Quale reel? Esempio: npm run regia reta-ginocchio');
   const dir = cartellaReel(slug);
@@ -389,10 +417,18 @@ export async function comandoRegia(slug, argomenti = []) {
     // impostazioni non leggibili: regalo di serie
   }
   const {piano} = regia(testo, {titolo: (scritto ?? '').trim(), regalo: regalo ?? 'auto'});
+  // l'atmosfera del fondo: se nessuno l'ha scelta a mano la decide il nome del reel, e resta scritta nel piano
+  let scelta = 'auto';
+  try {
+    scelta = leggiImpostazioni(slug).atmosfera ?? 'auto';
+  } catch {
+    scelta = 'auto';
+  }
+  if (scelta === 'auto') piano.atmosfera = atmosferaPerReel(slug);
   const esito = controllaPiano(piano, testo, {cartella: dir});
   if (esito.errori.length) throw new ErroreFmlab(`Il regista di serie ha scritto un piano che non passa il controllo (è un difetto del kit, segnalalo):\n${esito.errori.map((e) => '  ✗ ' + e).join('\n')}`);
   fs.writeFileSync(file, JSON.stringify(piano, null, 2) + '\n');
-  console.log(`Scritto ${rel(file)}: ${piano.scene.length} scene (${piano.scene.map((s) => s.blocco).join(', ')}).`);
+  console.log(`Scritto ${rel(file)}: ${piano.scene.length} scene (${piano.scene.map((s) => s.blocco).join(', ')}).${piano.atmosfera ? ` Atmosfera: ${piano.atmosfera} (a mano: npm run imposta ${slug} atmosfera=<nome>).` : ''}`);
   for (const a of esito.avvisi) console.log(`  ! ${a}`);
   console.log(`È il piano di serie, fatto di regole: leggilo e miglioralo scena per scena (npm run piano: i blocchi), poi  npm run monta ${slug}`);
   return piano;

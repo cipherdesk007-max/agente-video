@@ -71,6 +71,7 @@ La persona può fare tutto anche senza Terminale, da una pagina nel browser (anc
 | "Il dottore più piccolo / più grande / a sinistra / più in alto" | `npm run imposta <reel> grandezza=80 lato=sinistra alza=60` (grandezza da 40 a 160) |
 | "Usa l'altro personaggio", "usa questa immagine come narratore" | Capitolo 8 |
 | "Fallo in 3D", "fallo in 2D" | `npm run imposta <reel> stile=3d` e poi capitolo 9 |
+| "Cambia il fondo", "non lo voglio uguale agli altri" | `npm run imposta <reel> atmosfera=alba` (nomi: classica, serra, abisso, alba, notte; `auto` = la sceglie il regista di serie dal nome del reel e la scrive in `piano.json`) |
 | "Cambia colori / font / posizione dei sottotitoli" | `stile/stile.ts`: vale per tutti i reel dal prossimo render |
 | "Fammelo vedere prima" | `npm run provini <reel>` e mostra l'immagine, oppure `npm run render <reel> bozza` |
 | "Fammene una serie" | Scrivi prima l'elenco dei titoli con l'aggancio di ognuno, fattelo confermare, poi uno alla volta |

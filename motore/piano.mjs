@@ -28,6 +28,7 @@
 //     ]
 //   }
 // Una parola del testo si indica scrivendola ("placebo"); se compare più volte nella scena: {"su": "placebo", "volta": 2}.
+import {NOMI_ATMOSFERE, valoriAtmosfera} from './comune/atmosfere.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import {ErroreFmlab, RADICE, cartellaReel, leggiJson, rel} from './percorsi.mjs';
@@ -127,7 +128,7 @@ export const SOGGETTI = {
 };
 
 const CAMPI_SCENA = ['nome', 'da', 'blocco', 'dati', 'segni', 'enfasi', 'suoni', 'luogo', 'entra', 'campo', 'camera', 'tinta', 'protagonista', 'narratore', 'perche', 'nota'];
-const CAMPI_PIANO = ['versione', 'titolo', 'protagonista', 'scene', 'nota', 'regista'];
+const CAMPI_PIANO = ['versione', 'titolo', 'protagonista', 'atmosfera', 'scene', 'nota', 'regista'];
 const CAMPI_STATO = ['x', 'y', 'grandezza', 'acceso', 'carica', 'colore', 'onda', 'presenza', 'segno'];
 
 // ───────────────────────── il testo, parola per parola ─────────────────────────
@@ -369,6 +370,7 @@ export function controllaPiano(piano, testo, {cartella = null, fonti = null, tem
   for (const k of Object.keys(piano)) if (!CAMPI_PIANO.includes(k)) errori.push(`Piano: il campo "${k}" non esiste. Campi: ${CAMPI_PIANO.join(', ')}.`);
   if (!Array.isArray(piano.scene) || !piano.scene.length) return {...esitoVuoto, errori: [...errori, 'Piano: manca "scene", l\'elenco delle scene.']};
   if (piano.titolo !== undefined && typeof piano.titolo !== 'string') errori.push('Piano: "titolo" è una scritta.');
+  if (piano.atmosfera !== undefined && !NOMI_ATMOSFERE.includes(piano.atmosfera)) errori.push(`Piano: l'atmosfera "${piano.atmosfera}" non esiste. Puoi scegliere: ${NOMI_ATMOSFERE.join(', ')}.`);
   if (piano.protagonista !== undefined && piano.protagonista !== false) {
     const p = piano.protagonista;
     if (!p || !PROTAGONISTI.includes(p.tipo)) errori.push(`Piano · protagonista: "tipo" può essere ${PROTAGONISTI.join(', ')} (oppure "protagonista": false per non averlo).`);
@@ -698,6 +700,7 @@ export function scriviScene(piano, esito) {
     '',
     'export default definisciReel({',
     ...(piano.titolo ? [`  titolo: ${scrivi(piano.titolo)},`] : []),
+    ...(piano.atmosfera && valoriAtmosfera(piano.atmosfera) ? [`  // atmosfera "${piano.atmosfera}" (motore/comune/atmosfere.mjs)`, `  atmosfera: ${codice(valoriAtmosfera(piano.atmosfera), 1)},`] : []),
     ...(piano.protagonista ? [`  protagonista: ${codice(piano.protagonista, 1)},`] : []),
     '  scene: {',
     ...voci,

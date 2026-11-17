@@ -1,5 +1,14 @@
 # Novità
 
+## 2.3 · un'atmosfera per reel
+
+- **Cinque atmosfere** per il fondo: `classica` (quella di sempre), `serra`, `abisso`, `alba`, `notte`. Sono
+  combinazioni di colore della foschia, densità e raggi: niente di nuovo da disegnare (`motore/comune/atmosfere.mjs`).
+- **`atmosfera` nelle impostazioni del reel**, `auto` di serie: il regista di serie la sceglie dal nome del reel
+  (stesso nome, stessa atmosfera) evitando quella del reel che lo precede nella cartella, e la scrive nel piano.
+  A mano: `npm run imposta <reel> atmosfera=<nome>`.
+- I reel esistenti non cambiano: un fotogramma per ognuno dei quattro, prima e dopo, è identico.
+
 ## 2.2 · più sicuro con i servizi esterni
 
 - **Nessuna chiamata resta appesa**: voce e immagini hanno 90 secondi per rispondere (`FMLAB_ATTESA_FORNITORE`), poi
