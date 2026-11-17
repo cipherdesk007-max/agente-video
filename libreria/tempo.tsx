@@ -1,7 +1,7 @@
 // FMLAB Reel Kit — il tempo del reel: fotogramma corrente, parole, segni e scene.
 // Tutto ciò che si vede è una funzione pura del tempo: niente animazioni CSS, niente Date.now().
 import {createContext, useContext} from 'react';
-import {IMPOSTAZIONI_BASE} from './impostazioni';
+import {IMPOSTAZIONI_BASE, formatoDi} from './impostazioni';
 import type {Impostazioni, Ingombro} from './impostazioni';
 
 export type Parola = {
@@ -98,7 +98,7 @@ export function creaTempo(
   slug: string,
   frame: number,
   extra: {impostazioni?: Impostazioni; narratore?: Ingombro | null} = {},
-  formato = {larghezza: 1080, altezza: 1920}
+  formato: {larghezza: number; altezza: number} = formatoDi(extra.impostazioni)
 ): Tempo {
   const fps = dati.fps;
   const ora = frame / fps;

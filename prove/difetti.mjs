@@ -770,6 +770,27 @@ await prova('soggetti: grandi, vivi, con uno stato che cambia su una parola; il 
   assert.match(controllaPiano(piano, TESTO_RETA).errori.join('\n'), /"ginocchio" non ha "febbre"\. Il suo stato: dolore/);
 });
 
+await prova('formati: verticale, quadrato e orizzontale si scelgono per reel; la tela resta 1080×1920 e se ne vede una finestra', async () => {
+  const {sistema} = await carica('motore/impostazioni.mjs');
+  const {formatoDi, FORMATI} = await carica('motore/percorsi.mjs');
+  assert.equal(sistema({}, {}).formato, '9:16');
+  assert.equal(sistema({formato: '1:1'}, {}).formato, '1:1');
+  assert.deepEqual(formatoDi({}), {larghezza: 1080, altezza: 1920});
+  assert.deepEqual(formatoDi({formato: '1:1'}), {larghezza: 1080, altezza: 1080});
+  assert.deepEqual(formatoDi({formato: '16:9'}), {larghezza: 1920, altezza: 1080});
+  assert.throws(() => sistema({formato: '4:3'}, {}), /"formato" può essere 9:16 \(verticale\), 1:1 \(quadrato\) o 16:9/);
+  // la pagina usa le stesse misure del motore, e in ogni formato la finestra contiene sottotitoli e palco
+  const web = await ts('prove/sostegno/formati.tsx');
+  const {stile} = web;
+  for (const [nome, f] of Object.entries(web.FORMATI)) {
+    assert.deepEqual({larghezza: f.larghezza, altezza: f.altezza}, FORMATI[nome], nome);
+    const alto = -f.tela.y;
+    const basso = alto + f.altezza;
+    assert.ok(alto <= stile.sottotitoli.y - 60 && basso >= stile.palco.basso, `${nome}: nella finestra devono entrare i sottotitoli (y ${stile.sottotitoli.y}) e il palco (fino a ${stile.palco.basso})`);
+    assert.ok(f.tela.x >= 0 && f.tela.x + 1080 <= f.larghezza, `${nome}: la tela deve stare dentro il video in larghezza`);
+  }
+});
+
 await prova('B19 · una parola più larga della riga dei sottotitoli si rimpicciolisce finché entra; le parole normali restano a 60', async () => {
   const {corpoSottotitoli} = await ts('prove/sostegno/sottotitoli.tsx');
   assert.equal(corpoSottotitoli([{testo: 'Il'}, {testo: 'placebo,'}], 60, 920), 60);

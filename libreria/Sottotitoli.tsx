@@ -1,6 +1,7 @@
 // FMLAB Reel Kit — sottotitoli in alto, una frase breve per volta.
 // Le parole compaiono quando vengono pronunciate: quella in corso è bianca e in grassetto, quelle già
 // dette si spengono, la parola chiave (scritta tra *asterischi* nel copione) resta dentro un riquadro.
+import {TELA} from './impostazioni';
 import {useMemo} from 'react';
 import {useTempo} from './tempo';
 import {mix, molla, rampa} from './anim';
@@ -56,7 +57,7 @@ export function Sottotitoli() {
       data-fmlab-zona="sottotitoli"
       style={{
         position: 'absolute',
-        left: (tempo.larghezza - cfg.larghezzaMax) / 2,
+        left: (TELA.larghezza - cfg.larghezzaMax) / 2, // i sottotitoli stanno nella tela (1080), qualunque sia il formato
         width: cfg.larghezzaMax,
         top: cfg.y,
         transform: 'translateY(-50%)',

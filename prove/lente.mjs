@@ -303,6 +303,21 @@ for (const argomento of ['salute', 'tecnologia', 'economia']) {
   });
 }
 
+for (const [formato, larga, alta] of [['1:1', 540, 540], ['16:9', 960, 540]]) {
+  await prova(`formato ${formato}: dal testo al video con lo stesso comando, il video ha la misura giusta`, async () => {
+    const slug = `zz-lente-formato-${formato.replace(':', 'x')}-${process.pid}`;
+    daCancellare.add(slug);
+    const file = path.join(K, 'prove', 'sostegno', 'testi', 'salute.txt');
+    const r = kit(['fai', slug, `testo=${file}`, 'Prova formato', `formato=${formato}`, 'narratore=dottore', 'voce=stima', 'bozza'], {attesa: 1500000});
+    assert.equal(r.codice, 0, r.testo.split('\n').slice(-12).join('\n'));
+    assert.match(r.testo, /Fatto: tutte le 8 tappe riuscite/);
+    const {infoMedia, trovaFfmpeg} = await import(`${K}/motore/ffmpeg.mjs`);
+    const video = infoMedia(await trovaFfmpeg(), path.join(REELS, slug, `${slug}.bozza.mp4`)).video;
+    assert.deepEqual([video.larghezza, video.altezza], [larga, alta], 'la bozza è a metà della misura del formato');
+    assert.match(fs.readFileSync(path.join(REELS, slug, 'verifica.md'), 'utf8'), new RegExp(`Formato ${formato}: zone sicure e narratore non controllati`));
+  });
+}
+
 cancella();
 const falliti = esiti.filter((e) => !e.ok);
 console.log(`\n${esiti.length - falliti.length} prove lente superate${falliti.length ? `, ${falliti.length} FALLITE` : ''}`);

@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
-import {ErroreFmlab, leggiJson, rel, sec} from './percorsi.mjs';
+import {ErroreFmlab, formatoDi, leggiJson, rel, sec} from './percorsi.mjs';
 import {estraiVariante} from './reel.mjs';
 import {confrontaTesto, leggiCopione, testoDaDire} from './copione.mjs';
 import {giudicaDurata} from './durata.mjs';
@@ -206,19 +206,27 @@ export async function comandoVerifica(slug, argomenti = []) {
     }
     if (erroreScena) R.errore(`Errore nella scena${erroreScena.scena ? ` "${erroreScena.scena}"` : ''} a ${sec(erroreScena.n / fps)}`, erroreScena.errore);
     else R.ok(`Nessun errore in ${campioni.size} fotogrammi controllati lungo tutto il reel`);
+    // le zone sicure (sotto i sottotitoli, sopra il narratore, lontano dalle icone dell'app) sono quelle del verticale:
+    // negli altri formati la tela è spostata e il narratore sta altrove, quindi qui non si giudicano
+    const verticale = (info.impostazioni?.formato ?? '9:16') === '9:16';
+    if (!verticale) {
+      fuori.clear();
+      coperte.clear();
+      R.avviso(`Formato ${info.impostazioni.formato}: zone sicure e narratore non controllati`, `Il controllo delle zone vale per il verticale. Guarda i provini: npm run provini ${slug}`);
+    }
     if (fuori.size) {
       for (const {t, r, problemi} of [...fuori.values()].slice(0, 8)) {
         R.avviso(`Scritta fuori dalle zone sicure a ${sec(t, 1)}: "${r.testo}"`, `${problemi.join(', ')}${r.scena ? ` · scena ${r.scena}` : ''}. Controlla con: npm run foto ${slug} ${t.toFixed(1)} guide`);
       }
       if (fuori.size > 8) R.avviso(`…e altre ${fuori.size - 8} scritte fuori zona`);
-    } else if (!erroreScena) {
+    } else if (!erroreScena && verticale) {
       R.ok('Sottotitoli e scritte restano dentro le zone sicure');
     }
     if (coperte.size) {
       for (const {t, r} of [...coperte.values()].slice(0, 6)) {
         R.avviso(`Scritta coperta dal narratore a ${sec(t, 1)}: "${r.testo}"`, `Spostala, oppure rimpicciolisci il narratore: npm run imposta ${slug} grandezza=…${r.scena ? ` · scena ${r.scena}` : ''}`);
       }
-    } else if (corpo && !erroreScena) {
+    } else if (corpo && !erroreScena && verticale) {
       R.ok(`Il narratore (${info.impostazioni.narratore.chi}, ${info.impostazioni.narratore.grandezza}%) non copre nessuna scritta`);
     } else if (!corpo) {
       R.ok('Reel senza narratore');
@@ -270,10 +278,17 @@ export async function comandoVerifica(slug, argomenti = []) {
       const ff = await trovaFfmpeg();
       const media = infoMedia(ff, reel.video);
       const v = media.video;
+      let impostazioniReel = null;
+      try {
+        impostazioniReel = leggiImpostazioni(slug);
+      } catch {
+        // impostazioni non leggibili: vale il verticale
+      }
       if (!v) R.errore('Il file non contiene una traccia video');
       else {
-        if (v.larghezza === 1080 && v.altezza === 1920) R.ok('Formato 1080x1920 (verticale 9:16)');
-        else R.errore(`Formato ${v.larghezza}x${v.altezza} invece di 1080x1920`);
+        const atteso = formatoDi(impostazioniReel);
+        if (v.larghezza === atteso.larghezza && v.altezza === atteso.altezza) R.ok(`Formato ${v.larghezza}x${v.altezza} (${impostazioniReel?.formato ?? '9:16'})`);
+        else R.errore(`Formato ${v.larghezza}x${v.altezza} invece di ${atteso.larghezza}x${atteso.altezza} (${impostazioniReel?.formato ?? '9:16'}): rifai il video`);
         if (v.codec === 'h264' && /yuv420p/.test(v.pixel ?? '')) R.ok(`Codifica H.264 ${v.pixel}, ${v.fps} fotogrammi al secondo`);
         else R.avviso(`Codifica insolita: ${v.codec} ${v.pixel}`);
         const traccia = misuraTraccia(ff, reel.video, 'v');
@@ -292,7 +307,7 @@ export async function comandoVerifica(slug, argomenti = []) {
       if (piuNuovi.length) R.avviso('Il video è più vecchio delle ultime modifiche', `Cambiati dopo il render: ${piuNuovi.map(rel).join(', ')}`);
 
       // il video mostra davvero ciò che le scene disegnano in quegli istanti?
-      if (v && v.larghezza === 1080 && !erroreScena) {
+      if (v && v.larghezza === formatoDi(impostazioniReel).larghezza && !erroreScena) {
         const prove = [...new Set([0, Math.floor(totale / 4), Math.floor(totale / 2) - 1, Math.floor(totale / 2), Math.floor((totale * 3) / 4), totale - 1, ...Object.values(dati.segni).slice(0, 4).map((t) => Math.min(totale - 1, Math.round((t + 0.4) * fps)))])];
         let peggiore = {diff: 0, n: 0};
         let saltate = 0;

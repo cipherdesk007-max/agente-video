@@ -2,7 +2,7 @@
 // Regola del kit: prima di ogni render completo si guardano i fotogrammi chiave a piena risoluzione.
 import fs from 'node:fs';
 import path from 'node:path';
-import {CACHE, ErroreFmlab, RADICE, leggiJson, rel} from './percorsi.mjs';
+import {CACHE, ErroreFmlab, RADICE, formatoDi, leggiJson, rel} from './percorsi.mjs';
 import {estraiVariante} from './reel.mjs';
 import {costruisci, impacchetta, paginaBase} from './impacchetta.mjs';
 import {leggiPersonaggi} from './personaggio.mjs';
@@ -17,7 +17,7 @@ export async function apriReelNelBrowser(slug, variante, {scala = 1} = {}) {
   let browser;
   try {
     browser = await avviaBrowser();
-    const pagina = await apriPagina(browser, `${server.url}${pacchetto.percorsoWeb}?modo=render`, {scala});
+    const pagina = await apriPagina(browser, `${server.url}${pacchetto.percorsoWeb}?modo=render`, {scala, formato: formatoDi(pacchetto.impostazioni)});
     return {
       reel: pacchetto.reel,
       pagina,

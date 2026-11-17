@@ -5,7 +5,7 @@ import {createRoot} from 'react-dom/client';
 import {flushSync} from 'react-dom';
 import type {DatiReel} from '../../libreria/tempo';
 import type {Reel} from '../../libreria/reel';
-import {IMPOSTAZIONI_BASE, ingombroNarratore} from '../../libreria/impostazioni';
+import {IMPOSTAZIONI_BASE, formatoDi, ingombroNarratore} from '../../libreria/impostazioni';
 import type {ConfigPersonaggio, Impostazioni} from '../../libreria/impostazioni';
 import {Palco} from './Palco';
 import {Player} from './Player';
@@ -58,7 +58,7 @@ function opacitaEffettiva(el: Element): number {
 function misura(): Rettangolo[] {
   const radice = document.getElementById('radice');
   if (!radice) return [];
-  const scalaX = radice.getBoundingClientRect().width / 1080 || 1;
+  const scalaX = radice.getBoundingClientRect().width / (Number.parseFloat(radice.style.width) || 1080) || 1;
   const origine = radice.getBoundingClientRect();
   return Array.from(document.querySelectorAll('[data-fmlab-zona]'))
     .filter((el) => opacitaEffettiva(el) > 0.25)
@@ -152,8 +152,8 @@ export function avvia({modulo, dati, slug, impostazioni = IMPOSTAZIONI_BASE, per
   const radice = createRoot(contenitore);
 
   if (modo === 'render') {
-    contenitore.style.width = '1080px';
-    contenitore.style.height = '1920px';
+    contenitore.style.width = `${formatoDi(impostazioni).larghezza}px`;
+    contenitore.style.height = `${formatoDi(impostazioni).altezza}px`;
     contenitore.style.overflow = 'hidden';
     const disegna = (fotogramma: number, guide: boolean) =>
       flushSync(() => radice.render(<Palco reel={reel} dati={dati} slug={slug} frame={fotogramma} guide={guide} impostazioni={impostazioni} personaggi={personaggi} />));

@@ -14,7 +14,7 @@ FMLAB Reel Kit — comandi
   npm run nuovo <reel> "Titolo" testo=<file.txt> [scelte]   crea un reel da un testo già scritto (non si tocca)
   npm run fai <reel> [testo=file "Titolo"]  DAL TESTO AL VIDEO, a tappe: regia, monta, tempi, provini | voce, render, verifica,
                                            confronta. Riparte dalla tappa fallita; si ferma prima di spendere (voce=si per dire sì).
-                                           Con testo=<file.txt> crea il reel; scelte: durata=60 narratore=nessuno regalo=mappa · bozza
+                                           Con testo=<file.txt> crea il reel; scelte: durata=60 narratore=nessuno regalo=mappa formato=1:1 · bozza
   npm run affianca <reel> [rif1|rif2|rif3]  IL GIUDICE: 12 fotogrammi del reel accanto a 12 del riferimento, stessi momenti
   npm run prova-cieca [seme=N] [reel=a,b]  una pagina con 10 spezzoni di 5 s (5 riferimenti, 5 kit resi adesso), mescolati,
                                            solo il palco: tre persone dicono "riferimento" o "kit". Passata fino a 6 su 10
@@ -28,6 +28,7 @@ FMLAB Reel Kit — comandi
                                            voce=auto|elevenlabs|mac|comando|stima
                                            durata=15…180|libera (secondi chiesti: scarto massimo 5, la voce si velocizza)
                                            regalo=auto|nessuno|<nome> (cosa si regala in chiusura: npm run regalo)
+                                           formato=9:16|1:1|16:9 (verticale, quadrato, orizzontale: stesse scene)
   npm run voce <reel> [lingua] [motore]    voce + tempi parola per parola (motore: elevenlabs | mac | comando | stima)
                                            se il testo non è cambiato riusa la voce già fatta: zero crediti ("nuova" per rifarla)
   npm run foto <reel> [lingua] <dove>…     fotogrammi a piena risoluzione (dove: secondi, segno, scena, "fine")

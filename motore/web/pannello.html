@@ -484,9 +484,11 @@ function cartaReel(r) {
     const ed = creaEditor(zona, r.impostazioni, {musica: r.musica});
     const durata = h('input', {type: 'number', inputMode: 'numeric', min: stato.limiti.durata.min, max: stato.limiti.durata.max, step: 1, value: r.impostazioni.durata ?? '', placeholder: 'libera'});
     zona.append(h('label', {class: 'campo'}, 'Durata chiesta'), h('div', {class: 'riga-durata', style: {marginTop: 0}}, durata, h('span', {}, 'secondi (vuoto = quanto dura la voce). Dopo averla cambiata: "Genera la voce".')));
+    const formato = h('select', {'aria-label': 'Formato del video'}, [['9:16', 'verticale 9:16 (reel)'], ['1:1', 'quadrato 1:1'], ['16:9', 'orizzontale 16:9']].map(([v, t]) => h('option', {value: v, selected: (r.impostazioni.formato ?? '9:16') === v}, t)));
+    zona.append(h('label', {class: 'campo'}, 'Formato'), h('div', {class: 'riga-durata', style: {marginTop: 0}}, formato, h('span', {}, 'stesse scene; nel quadrato il narratore è piccolo in basso a destra, nell\'orizzontale sta a destra del palco. Dopo averlo cambiato: nuovo video.')));
     const salva = h('button', {class: 'secondario', type: 'button', onclick: async () => {
       try {
-        await chiama('/api/impostazioni', {slug: r.slug, ...ed.valori(), durata: durata.value === '' ? null : Number(durata.value)});
+        await chiama('/api/impostazioni', {slug: r.slug, ...ed.valori(), formato: formato.value, durata: durata.value === '' ? null : Number(durata.value)});
         messaggi[r.slug] = 'Salvate. L\'anteprima aperta si aggiorna da sola; per il video serve un nuovo render.';
         await aggiorna(true);
       } catch (e) { esito.textContent = e.message; }

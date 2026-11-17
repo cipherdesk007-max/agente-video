@@ -18,7 +18,8 @@ npm run fai <reel>            # riparte da dove serve: monta, tempi, provini | v
   rende si scrive in `mano.tsx` e nel piano si chiama con `{"blocco": "mano", "dati": {"componente": "Nome"}}`.
 - **Le scelte della persona** (`npm run imposta <reel> …`, o in coda a `fai`/`nuovo`): `durata=` · `narratore=dottore|nessuno`
   · `regalo=auto|nessuno|<nome>` (cosa si regala in chiusura: `npm run regalo` li elenca e ne aggiunge da un'immagine o
-  da un PDF) · `musica=` · `voce=`. Se la persona non dice niente valgono quelle del kit.
+  da un PDF) · `formato=9:16|1:1|16:9` (verticale, quadrato, orizzontale: le scene sono le stesse, cambia la finestra
+  e dove sta il narratore) · `musica=` · `voce=`. Se la persona non dice niente valgono quelle del kit.
 - **Due tempi.** Prima si fissa la composizione senza spendere (piano, provini a bassa risoluzione: guardali), poi si
   paga il dettaglio (voce, video). `fai` si ferma prima della voce a pagamento e dice quanti crediti costa: si
   riparte con `voce=si` solo dopo il sì della persona. Se una tappa fallisce si corregge e si rilancia `fai`:

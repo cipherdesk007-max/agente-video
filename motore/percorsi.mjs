@@ -9,6 +9,12 @@ export const CACHE = path.join(RADICE, '.fmlab');
 
 /** Formato di uscita: verticale 9:16 per Reels / TikTok / Shorts. */
 export const FORMATO = {larghezza: 1080, altezza: 1920, fps: 30};
+/** I formati del video. Il verticale è quello di serie; gli altri due riusano lo stesso palco (vedi motore/web/Palco.tsx). */
+export const FORMATI = {'9:16': {larghezza: 1080, altezza: 1920}, '1:1': {larghezza: 1080, altezza: 1080}, '16:9': {larghezza: 1920, altezza: 1080}};
+/** Larghezza e altezza del video per le impostazioni di un reel. */
+export function formatoDi(impostazioni) {
+  return FORMATI[impostazioni?.formato] ?? FORMATI['9:16'];
+}
 
 /** Errore "previsto": il messaggio basta, niente stack. */
 export class ErroreFmlab extends Error {}

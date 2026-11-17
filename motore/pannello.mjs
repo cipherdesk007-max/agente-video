@@ -508,7 +508,7 @@ export async function comandoPannello(argomenti = []) {
         return true;
       }
       if (url.pathname === '/api/impostazioni') {
-        const salvate = scriviImpostazioni(slug, {narratore: corpo.narratore, stile: corpo.stile, musica: corpo.musica, voce: corpo.voce, ...(corpo.durata !== undefined ? {durata: corpo.durata} : {})}, personaggi);
+        const salvate = scriviImpostazioni(slug, {narratore: corpo.narratore, stile: corpo.stile, musica: corpo.musica, voce: corpo.voce, ...(corpo.durata !== undefined ? {durata: corpo.durata} : {}), ...(corpo.formato !== undefined ? {formato: corpo.formato} : {})}, personaggi);
         json(res, 200, {impostazioni: salvate});
         return true;
       }

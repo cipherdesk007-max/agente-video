@@ -99,15 +99,16 @@ export async function avviaBrowser() {
 
 /**
  * Apre la pagina di un reel in modalità render e aspetta che font e scene siano pronti.
- * `scala` 1 = 1080x1920, 0.5 = bozza 540x960 (stessa impaginazione, metà pixel).
+ * `scala` 1 = misura piena, 0.5 = bozza a metà pixel (stessa impaginazione). `formato` = larghezza e altezza del
+ * video (di serie 1080x1920; quadrato e orizzontale: vedi FORMATI in percorsi.mjs).
  */
-export async function apriPagina(browser, url, {scala = 1} = {}) {
+export async function apriPagina(browser, url, {scala = 1, formato = FORMATO} = {}) {
   const contesto = await browser.newContext({
-    viewport: {width: FORMATO.larghezza, height: FORMATO.altezza},
+    viewport: {width: formato.larghezza, height: formato.altezza},
     deviceScaleFactor: 1,
   });
   // la pagina è sempre impaginata a 1080x1920; per le bozze è la "fotografia" a essere rimpicciolita
-  const ritaglio = scala === 1 ? {} : {clip: {x: 0, y: 0, width: FORMATO.larghezza, height: FORMATO.altezza, scale: scala}};
+  const ritaglio = scala === 1 ? {} : {clip: {x: 0, y: 0, width: formato.larghezza, height: formato.altezza, scale: scala}};
   const pagina = await contesto.newPage();
   const errori = [];
   pagina.on('pageerror', (e) => errori.push(e.message));

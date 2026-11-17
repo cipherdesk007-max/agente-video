@@ -4,6 +4,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import type {DatiReel} from '../../libreria/tempo';
 import type {Reel} from '../../libreria/reel';
 import type {ConfigPersonaggio, Impostazioni} from '../../libreria/impostazioni';
+import {formatoDi} from '../../libreria/impostazioni';
 import {Palco} from './Palco';
 
 const BARRA = 132;
@@ -16,6 +17,7 @@ function istanteIniziale(fps: number, totale: number) {
 type PropsPlayer = {reel: Reel; dati: DatiReel; slug: string; totale: number; impostazioni?: Impostazioni; personaggi?: Record<string, ConfigPersonaggio>};
 
 export function Player({reel, dati, slug, totale, impostazioni, personaggi}: PropsPlayer) {
+  const F = formatoDi(impostazioni);
   const fps = dati.fps || 30;
   const [frame, setFrame] = useState(() => istanteIniziale(fps, totale));
   const [suona, setSuona] = useState(false);
@@ -28,7 +30,7 @@ export function Player({reel, dati, slug, totale, impostazioni, personaggi}: Pro
   frameRef.current = frame;
 
   useEffect(() => {
-    const misura = () => setScala(Math.min(window.innerWidth / 1080, (window.innerHeight - BARRA) / 1920));
+    const misura = () => setScala(Math.min(window.innerWidth / F.larghezza, (window.innerHeight - BARRA) / F.altezza));
     misura();
     window.addEventListener('resize', misura);
     return () => window.removeEventListener('resize', misura);
@@ -130,8 +132,8 @@ export function Player({reel, dati, slug, totale, impostazioni, personaggi}: Pro
 
   return (
     <div style={{position: 'fixed', inset: 0, background: '#07090d', color: '#fff', font: '500 14px system-ui, sans-serif'}}>
-      <div style={{position: 'absolute', left: '50%', top: 0, width: 1080 * scala, height: 1920 * scala, marginLeft: (-1080 * scala) / 2, overflow: 'hidden'}}>
-        <div style={{width: 1080, height: 1920, transform: `scale(${scala})`, transformOrigin: '0 0'}}>
+      <div style={{position: 'absolute', left: '50%', top: 0, width: F.larghezza * scala, height: F.altezza * scala, marginLeft: (-F.larghezza * scala) / 2, overflow: 'hidden'}}>
+        <div style={{width: F.larghezza, height: F.altezza, transform: `scale(${scala})`, transformOrigin: '0 0'}}>
           <Palco reel={reel} dati={dati} slug={slug} frame={frame} guide={guide} impostazioni={impostazioni} personaggi={personaggi} />
         </div>
       </div>

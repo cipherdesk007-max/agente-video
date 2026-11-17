@@ -16,7 +16,7 @@ export const MOTORI_VOCE = ['auto', 'elevenlabs', 'mac', 'comando', 'stima'];
 export const GRANDEZZA = {min: 40, max: 160};
 /** La seconda mano del narratore: cambia da sola a ogni posa, oppure resta sempre in uno stato. */
 export const MANO2 = ['auto', 'aperta', 'alza', 'giu'];
-const DI_FABBRICA = {narratore: {chi: 'nessuno', grandezza: 100, lato: 'destra', alza: 0, specchia: false, mano2: 'auto'}, stile: 'auto', musica: 30, durata: null, regalo: 'auto', voce: {motore: 'auto', elevenlabs: {}, mac: {}, comando: {}}};
+const DI_FABBRICA = {narratore: {chi: 'nessuno', grandezza: 100, lato: 'destra', alza: 0, specchia: false, mano2: 'auto'}, stile: 'auto', musica: 30, durata: null, regalo: 'auto', formato: '9:16', voce: {motore: 'auto', elevenlabs: {}, mac: {}, comando: {}}};
 
 /** Le voci scelte, per motore e per lingua: {motore, elevenlabs: {it: 'id'}, mac: {it: 'Alice'}, comando: {it: 'nome'}}. */
 function sistemaVoce(grezza, dove) {
@@ -77,7 +77,10 @@ export function sistema(grezze, personaggi = leggiPersonaggi(), dove = 'impostaz
   // il regalo della chiusura ("Commenta MAPPA"): 'auto' = quello della parola detta nel testo, 'nessuno' = solo il cartello
   const regalo = String(grezze?.regalo ?? DI_FABBRICA.regalo).toLowerCase();
   if (!/^[a-z0-9][a-z0-9_-]*$/.test(regalo)) throw new ErroreFmlab(`${dove}: "regalo" è auto, nessuno, oppure il nome di un regalo (npm run regalo li elenca). Trovato: ${grezze?.regalo}`);
-  return {regalo, narratore: {chi, grandezza: Math.round(grandezza), lato, alza: Math.round(alza), specchia: n.specchia === true || n.specchia === 'si' || n.specchia === 'true', mano2}, stile, musica: Math.round(musica), durata: durata === null ? null : Math.round(durata), voce: sistemaVoce(grezze?.voce, dove)};
+  // il formato del video: verticale (di serie), quadrato, orizzontale
+  const formato = String(grezze?.formato ?? DI_FABBRICA.formato);
+  if (!['9:16', '1:1', '16:9'].includes(formato)) throw new ErroreFmlab(`${dove}: "formato" può essere 9:16 (verticale), 1:1 (quadrato) o 16:9 (orizzontale). Trovato: ${grezze?.formato}`);
+  return {regalo, formato, narratore: {chi, grandezza: Math.round(grandezza), lato, alza: Math.round(alza), specchia: n.specchia === true || n.specchia === 'si' || n.specchia === 'true', mano2}, stile, musica: Math.round(musica), durata: durata === null ? null : Math.round(durata), voce: sistemaVoce(grezze?.voce, dove)};
 }
 
 /** Cose che funzionano ma di solito sono una svista (B15): le mostrano `imposta` e `verifica`. */
@@ -110,7 +113,7 @@ export function leggiImpostazioni(slug, personaggi = leggiPersonaggi()) {
     comando: {...(kit.voce?.comando ?? {}), ...(sue.voce?.comando ?? {})},
   };
   // la durata è una scelta del singolo reel: non si eredita da quelle del kit
-  return sistema({narratore: {...(kit.narratore ?? {}), ...(sue.narratore ?? {})}, stile: sue.stile ?? kit.stile, musica: sue.musica ?? kit.musica, durata: sue.durata, regalo: sue.regalo ?? kit.regalo, voce}, personaggi, rel(file));
+  return sistema({narratore: {...(kit.narratore ?? {}), ...(sue.narratore ?? {})}, stile: sue.stile ?? kit.stile, musica: sue.musica ?? kit.musica, durata: sue.durata, regalo: sue.regalo ?? kit.regalo, formato: sue.formato ?? kit.formato, voce}, personaggi, rel(file));
 }
 
 /** Salva le impostazioni di un reel (complete, già controllate). */
@@ -118,7 +121,7 @@ export function scriviImpostazioni(slug, impostazioni, personaggi = leggiPersona
   const file = fileDelReel(slug);
   const altro = leggiSeCe(file);
   // chi salva solo una parte (per esempio il pannello: solo narratore e stile) non cancella il resto
-  const complete = {narratore: impostazioni.narratore ? {...(altro.narratore ?? {}), ...impostazioni.narratore} : altro.narratore, stile: impostazioni.stile ?? altro.stile, regalo: impostazioni.regalo ?? altro.regalo, musica: impostazioni.musica ?? altro.musica, durata: impostazioni.durata !== undefined ? impostazioni.durata : altro.durata, voce: impostazioni.voce ?? altro.voce};
+  const complete = {narratore: impostazioni.narratore ? {...(altro.narratore ?? {}), ...impostazioni.narratore} : altro.narratore, stile: impostazioni.stile ?? altro.stile, regalo: impostazioni.regalo ?? altro.regalo, formato: impostazioni.formato ?? altro.formato, musica: impostazioni.musica ?? altro.musica, durata: impostazioni.durata !== undefined ? impostazioni.durata : altro.durata, voce: impostazioni.voce ?? altro.voce};
   const pulite = sistema(complete, personaggi, rel(file));
   scriviJson(file, {...altro, ...pulite});
   return pulite;
@@ -130,7 +133,7 @@ const CHIAVI = {narratore: 'chi', chi: 'chi', personaggio: 'chi', grandezza: 'gr
 export async function comandoImposta(slug, argomenti = []) {
   const personaggi = leggiPersonaggi();
   const attuali = leggiImpostazioni(slug, personaggi);
-  const nuove = {narratore: {...attuali.narratore}, stile: attuali.stile, musica: attuali.musica, durata: attuali.durata, regalo: attuali.regalo, voce: attuali.voce};
+  const nuove = {narratore: {...attuali.narratore}, stile: attuali.stile, musica: attuali.musica, durata: attuali.durata, regalo: attuali.regalo, formato: attuali.formato, voce: attuali.voce};
   for (const a of argomenti) {
     const m = /^([a-zà]+)=(.*)$/i.exec(a);
     if (!m) throw new ErroreFmlab(`Non capisco "${a}". Scrivi coppie chiave=valore, per esempio: narratore=nessuno grandezza=80 lato=sinistra stile=3d`);
@@ -140,9 +143,10 @@ export async function comandoImposta(slug, argomenti = []) {
     else if (chiave === 'voce' || chiave === 'motore') nuove.voce = {...nuove.voce, motore: valore.toLowerCase()};
     else if (chiave === 'durata') nuove.durata = valore.replace(/\s*s(ec(ondi)?)?$/i, '');
     else if (chiave === 'regalo') nuove.regalo = valore.toLowerCase();
+    else if (chiave === 'formato') nuove.formato = {verticale: '9:16', quadrato: '1:1', orizzontale: '16:9'}[valore.toLowerCase()] ?? valore;
     else if (chiave === 'musica') nuove.musica = /^(no|niente|spenta)$/i.test(valore) ? 0 : Number(valore.replace(',', '.'));
     else if (CHIAVI[chiave]) nuove.narratore[CHIAVI[chiave]] = ['chi', 'lato', 'mano2'].includes(CHIAVI[chiave]) ? valore.toLowerCase() : CHIAVI[chiave] === 'specchia' ? /^(si|sì|true|1)$/i.test(valore) : Number(valore.replace(',', '.'));
-    else throw new ErroreFmlab(`"${chiave}" non è un'impostazione. Puoi cambiare: narratore, grandezza, lato, alza, specchia, mano, stile, musica, durata, regalo, voce.`);
+    else throw new ErroreFmlab(`"${chiave}" non è un'impostazione. Puoi cambiare: narratore, grandezza, lato, alza, specchia, mano, stile, musica, durata, regalo, formato, voce.`);
   }
   const esito = argomenti.length ? scriviImpostazioni(slug, nuove, personaggi) : attuali;
   const n = esito.narratore;
@@ -151,6 +155,7 @@ export async function comandoImposta(slug, argomenti = []) {
   console.log(`  stile       ${esito.stile}`);
   console.log(`  durata      ${esito.durata ? `${esito.durata} secondi chiesti (scarto massimo 5: se serve la voce viene velocizzata)` : 'libera (quanto dura la voce)'}`);
   console.log(`  regalo      ${esito.regalo === 'auto' ? 'auto (quello della parola detta nel testo: "Commenta MAPPA" → mappa)' : esito.regalo === 'nessuno' ? 'nessuno (in chiusura solo il cartello con la parola)' : esito.regalo}`);
+  console.log(`  formato     ${esito.formato}${esito.formato === '9:16' ? ' (verticale)' : esito.formato === '1:1' ? ' (quadrato: sottotitoli e palco, narratore piccolo in basso a destra)' : ' (orizzontale: palco a sinistra, narratore a destra)'}`);
   for (const avviso of avvisiNarratore(n)) console.log(`  ⚠ ${avviso}`);
   console.log(`  musica      ${esito.musica ? `volume ${esito.musica} su 100 (solo se nella cartella del reel c'è musica.mp3)` : 'spenta'}`);
   const scelte = ['elevenlabs', 'mac', 'comando'].flatMap((m) => Object.entries(esito.voce[m]).map(([l, n]) => `${m}/${l}: ${n}`));

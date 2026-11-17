@@ -49,6 +49,8 @@ export type Impostazioni = {
   stile: StileVideo;
   /** Volume della musica di sottofondo, da 0 (niente) a 100. Vale solo se nella cartella del reel c'è un file musica.mp3. */
   musica?: number;
+  /** Il formato del video: verticale (di serie), quadrato, orizzontale. */
+  formato?: '9:16' | '1:1' | '16:9';
   /** La voce scelta per il reel (la usa `npm run voce`; non cambia come si disegnano le scene). */
   voce?: {motore: string; elevenlabs: Record<string, string>; mac: Record<string, string>; comando: Record<string, string>};
 };
@@ -73,4 +75,19 @@ export function ingombroNarratore(config: ConfigPersonaggio | null | undefined, 
   const x = n.lato === 'sinistra' ? -config.video.rientro : larghezzaVideo - larghezza + config.video.rientro;
   const y = altezzaVideo - Math.round(altezza * (1 - config.video.sborda)) - n.alza;
   return {x, y, larghezza, altezza};
+}
+
+/** La tela è sempre 1080×1920: ci si disegna come nel verticale. Il formato dice quale finestra della tela si vede. */
+export const TELA = {larghezza: 1080, altezza: 1920};
+/**
+ * I formati: misura del video; di quanto si sposta la tela (negli altri formati si vede il riquadro con sottotitoli
+ * e palco, da 240 a 1320 pixel); dove va e quanto è grande il narratore, ancorato all'angolo in basso a destra.
+ */
+export const FORMATI: Record<string, {larghezza: number; altezza: number; tela: {x: number; y: number}; narratore: number}> = {
+  '9:16': {larghezza: 1080, altezza: 1920, tela: {x: 0, y: 0}, narratore: 1},
+  '1:1': {larghezza: 1080, altezza: 1080, tela: {x: 0, y: -240}, narratore: 0.54},
+  '16:9': {larghezza: 1920, altezza: 1080, tela: {x: 230, y: -240}, narratore: 1},
+};
+export function formatoDi(impostazioni?: Impostazioni | null) {
+  return FORMATI[impostazioni?.formato ?? '9:16'] ?? FORMATI['9:16'];
 }

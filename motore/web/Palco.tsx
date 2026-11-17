@@ -15,7 +15,7 @@ import {Personaggio, scalettaPose} from '../../libreria/Personaggio';
 import type {Regia} from '../../libreria/Personaggio';
 import {scalettaAssetti, scalettaGesti} from '../../libreria/gesti';
 import {poseDi, secondeDi} from '../../libreria/Pupazzo';
-import {IMPOSTAZIONI_BASE, ingombroNarratore} from '../../libreria/impostazioni';
+import {IMPOSTAZIONI_BASE, TELA, formatoDi, ingombroNarratore} from '../../libreria/impostazioni';
 import type {ConfigPersonaggio, Impostazioni} from '../../libreria/impostazioni';
 import {curve, mix, rampa} from '../../libreria/anim';
 import {miscela} from '../../libreria/colore';
@@ -240,6 +240,7 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
     stato = {visibile: mix(s0.visibile, stato.visibile, p), sorriso: mix(s0.sorriso, stato.sorriso, p), sopracciglia: mix(s0.sopracciglia, stato.sopracciglia, p)};
   }
 
+  const formato = formatoDi(impostazioni);
   return (
     <div
       style={{
@@ -259,6 +260,8 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
         ) : (
           <Mondo tinta={aria.tinta} densita={aria.densita} raggi={aria.raggi} camera={camera} luogo={aria.luogo} avanzamento={corrente.avanzamento} luogoPrima={luogoPrima} passaggio={p} verso={verso} fumo={tramaFumo()} />
         )}
+        {/* la tela: 1080×1920, ci si disegna sempre come nel verticale. Negli altri formati se ne vede una finestra */}
+        <div style={{position: 'absolute', left: formato.tela.x, top: formato.tela.y, width: TELA.larghezza, height: TELA.altezza}}>
         {strati.map(({scena, opacita, scala: scalaPassaggio, sposta: spostaPassaggio, sfoca}) => {
           const Comp = parti(reel.scene[scena.nome]).componente;
           const q = inquadra(scena);
@@ -290,9 +293,13 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
         })}
         {reel.protagonista && statoProt ? <Protagonista def={reel.protagonista} stato={statoProt} /> : null}
         {reel.firma === false || !stile.firma.mostra ? null : <Firma />}
-        <Personaggio config={config} narratore={narratore} cambi={cambi} assetti={assetti} eventi={eventi} visibile={stato.visibile} sorriso={stato.sorriso} sopracciglia={stato.sopracciglia} personaggi={personaggi} />
         {reel.sottotitoli === false ? null : <Sottotitoli />}
         {guide ? <Guide /> : null}
+        </div>
+        {/* il narratore si mette da solo nell'angolo del video (conosce larghezza e altezza); nel quadrato è più piccolo */}
+        <div style={{position: 'absolute', left: 0, top: 0, width: tempo.larghezza, height: tempo.altezza, transform: formato.narratore === 1 ? undefined : `scale(${formato.narratore})`, transformOrigin: '100% 100%', pointerEvents: 'none'}}>
+          <Personaggio config={config} narratore={narratore} cambi={cambi} assetti={assetti} eventi={eventi} visibile={stato.visibile} sorriso={stato.sorriso} sopracciglia={stato.sopracciglia} personaggi={personaggi} />
+        </div>
       </TempoCtx.Provider>
     </div>
   );

@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {CACHE, ErroreFmlab, FORMATO, RADICE, leggiJson, rel, sec} from './percorsi.mjs';
+import {CACHE, ErroreFmlab, FORMATO, RADICE, formatoDi, leggiJson, rel, sec} from './percorsi.mjs';
 import {estraiVariante} from './reel.mjs';
 import {impacchetta} from './impacchetta.mjs';
 import {avviaServer} from './server.mjs';
@@ -102,7 +102,7 @@ export async function rendi(slug, variante = null, opzioni = {}) {
     const url = `${server.url}${pacchetto.percorsoWeb}?modo=render`;
     await Promise.all(
       pezzi.map(async (pezzo) => {
-        const pagina = await apriPagina(browser, url, {scala});
+        const pagina = await apriPagina(browser, url, {scala, formato: formatoDi(pacchetto.impostazioni)});
         const codifica = apriCodifica(ff, [
           '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'mjpeg', '-i', '-',
           '-vf', FILTRO_COLORE,
