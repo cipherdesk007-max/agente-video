@@ -140,11 +140,16 @@ export function paroleDelTesto(testo) {
   const parole = [];
   let capoverso = 0;
   let k = 0;
+  let daAprire = '';
   for (const blocco of pulito.split(/\n\s*\n/)) {
     for (const p of blocco.split(/\s+/).filter(Boolean)) {
       // la punteggiatura isolata (un trattino tra due spazi) fa parte della parola prima, come nel copione
-      if (!/[\p{L}\p{N}]/u.test(p) && parole.length) parole[parole.length - 1].testo += ' ' + p;
-      else parole.push({testo: p, chiave: soloLettere(p), capoverso, enfasi: enfasi.has(k)});
+      if (!/[\p{L}\p{N}]/u.test(p) && /^[(\[«“‘¿¡]+$/u.test(p)) daAprire += p; // un segno che apre, da solo: va con la parola dopo
+      else if (!/[\p{L}\p{N}]/u.test(p) && parole.length) parole[parole.length - 1].testo += ' ' + p;
+      else {
+        parole.push({testo: daAprire + p, chiave: soloLettere(p), capoverso, enfasi: enfasi.has(k)});
+        daAprire = '';
+      }
       k++;
     }
     capoverso++;

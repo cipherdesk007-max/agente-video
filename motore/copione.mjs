@@ -18,6 +18,9 @@ const COMANDI = '[]*#><\\';
 const DA_PARTE = (c) => String.fromCharCode(0xe000 + COMANDI.indexOf(c));
 const RIMETTI = (t) => t.replace(/[\ue000-\ue006]/g, (c) => COMANDI[c.charCodeAt(0) - 0xe000]);
 
+/** I segni che aprono: scritti da soli tra due spazi vanno con la parola dopo, non con quella prima. */
+const APRE = /^[(\[«“‘¿¡]+$/u;
+
 export function leggiCopione(testo) {
   let pulito = String(testo)
     .replace(/[\ue000-\ue006]/g, '')
@@ -29,6 +32,7 @@ export function leggiCopione(testo) {
     .join('\n');
 
   const parole = [];
+  let daAprire = '';
   const segni = {};
   const scene = [];
   const suoni = [];
@@ -77,11 +81,17 @@ export function leggiCopione(testo) {
             else segni[a.nome] = parole.length - 1;
           }
         }
+      } else if (!/[\p{L}\p{N}]/u.test(testoPezzo) && APRE.test(testoPezzo)) {
+        // un segno che apre, da solo («, parentesi, virgolette): appartiene alla parola che viene dopo
+        daAprire += testoPezzo;
       } else if (!/[\p{L}\p{N}]/u.test(testoPezzo) && parole.length) {
-        // punteggiatura isolata (es. un trattino): si attacca alla parola prima
+        // punteggiatura isolata che non apre (un trattino, una virgoletta che chiude): non è una parola da dire, si
+        // attacca alla parola prima. Senza spazio in mezzo: una parola con uno spazio dentro non si allinea più
+        // ai tempi della voce, che contano le parole dagli spazi.
         parole[parole.length - 1].testo += testoPezzo;
       } else {
-        parole.push({testo: testoPezzo, enfasi});
+        parole.push({testo: daAprire + testoPezzo, enfasi});
+        daAprire = '';
         const indice = parole.length - 1;
         for (const a of inAttesa.splice(0)) {
           if (a.tipo === 'scena') scene.push({nome: a.nome, indice});

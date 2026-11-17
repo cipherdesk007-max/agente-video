@@ -746,6 +746,20 @@ await prova('soggetti: grandi, vivi, con uno stato che cambia su una parola; il 
   assert.match(controllaPiano(piano, TESTO_RETA).errori.join('\n'), /"ginocchio" non ha "febbre"\. Il suo stato: dolore/);
 });
 
+await prova('B20 · un segno che apre, scritto da solo, va con la parola dopo; quello che chiude e il trattino con la parola prima', async () => {
+  const {leggiCopione, confrontaTesto} = await carica('motore/copione.mjs');
+  const {paroleDelTesto} = await carica('motore/piano.mjs');
+  const testo = 'Il caffè — quello vero — costa. Disse « bene » e ( forse ) basta.';
+  const attese = ['Il', 'caffè—', 'quello', 'vero—', 'costa.', 'Disse', '«bene»', 'e', '(forse)', 'basta.'];
+  const c = leggiCopione(`[scena:a]\n${testo}`);
+  assert.deepEqual(c.parole.map((p) => p.testo), attese);
+  assert.equal(confrontaTesto(testo, c.testoParlato), null);
+  // nessuna parola ha uno spazio dentro: i tempi della voce contano le parole dagli spazi
+  assert.ok(c.parole.every((p) => !/\s/.test(p.testo)));
+  // il piano divide il testo dato nello stesso numero di parole
+  assert.equal(paroleDelTesto(testo).length, attese.length);
+});
+
 // ───────────────────────── il giudice è l'occhio: il foglio affiancato ─────────────────────────
 
 await prova('affianca: stessi momenti = stessa frazione della durata; senza il video di riferimento lo dice e dice dove metterlo', async () => {

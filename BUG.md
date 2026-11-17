@@ -180,10 +180,12 @@ il difetto com'era; in fondo a ognuna, come è stato chiuso.
 - Una parola di 50 lettere a 60 px esce dai 920 px. La verifica lo segnala come scritta fuori zona. In italiano non
   capita; in tedesco sì.
 
-## B20 · Punteggiatura isolata attaccata alla parola prima (bassa) — aperto
+## B20 · Punteggiatura isolata attaccata alla parola prima (bassa) — chiuso il 17/11
 
-- `Il caffè — quello vero —` diventa `caffè—` `vero—` nei sottotitoli. È una scelta del kit (un trattino da solo non
-  è una parola da pronunciare); resta brutto con i segni che aprono, come `(` o `«` staccati.
+- Era: `Disse « bene »` diventava `Disse«` `bene»`. Ora un segno che apre, scritto da solo (`«`, `(`, `“`, `¿`), va
+  con la parola dopo: `«bene»`, `(forse)`. Il trattino e i segni che chiudono restano con la parola prima
+  (`caffè—`): un trattino da solo non è una parola da dire, e una parola con uno spazio dentro non si allineerebbe
+  più ai tempi della voce, che contano le parole dagli spazi. Prova: `B20` in `prove/difetti.mjs`.
 
 ## Cosa non è un difetto ma è lontano dal traguardo
 
