@@ -405,6 +405,117 @@ await prova('mondo: tutti i luoghi pronti si disegnano, e ci sono quelli chiesti
   }
 });
 
+// ───────────────────────── immagini generate (fase 2) ─────────────────────────
+
+await prova('immagini: stessa richiesta, stessa impronta; senza fornitore non si genera niente e lo si dice', async () => {
+  const im = await carica('motore/immagini.mjs');
+  for (const f of ['nessuno', 'higgsfield', 'stability', 'comando']) assert.ok(im.FORNITORI.includes(f), `manca il fornitore ${f}`);
+  const a = im.improntaImmagine({soggetto: 'Un ginocchio in sezione', stile: 'morbido', formato: '1:1'});
+  assert.equal(a, im.improntaImmagine({soggetto: '  un  GINOCCHIO in sezione ', stile: 'Morbido', formato: '1:1'}));
+  assert.notEqual(a, im.improntaImmagine({soggetto: 'Un ginocchio in sezione', stile: 'a matita', formato: '1:1'}));
+  assert.match(im.componiPrompt({soggetto: 'Una fiala', stile: 'morbido'}), /Una fiala\. Stile: morbido\..*sfondo verde pieno/);
+  const cartella = fs.mkdtempSync(path.join(os.tmpdir(), 'fmlab-immagini-'));
+  await assert.rejects(im.immagine({soggetto: 'una fiala di vetro', fornitore: 'nessuno', cartella}), /non genero niente[\s\S]*una fiala di vetro\. Stile:/);
+  await assert.rejects(im.immagine({soggetto: 'una fiala di vetro', fornitore: 'inventato', cartella}), /non esiste/);
+  // senza chiavi i fornitori veri si fermano prima di chiamare chiunque
+  const salvate = {a: process.env.HF_API_KEY_ID, b: process.env.HF_API_KEY, c: process.env.STABILITY_API_KEY};
+  delete process.env.HF_API_KEY_ID;
+  delete process.env.HF_API_KEY;
+  delete process.env.STABILITY_API_KEY;
+  try {
+    await assert.rejects(im.immagine({soggetto: 'una fiala di vetro', fornitore: 'higgsfield', cartella}), /HF_API_KEY_ID/);
+    await assert.rejects(im.immagine({soggetto: 'una fiala di vetro', fornitore: 'stability', cartella}), /STABILITY_API_KEY/);
+  } finally {
+    if (salvate.a) process.env.HF_API_KEY_ID = salvate.a;
+    if (salvate.b) process.env.HF_API_KEY = salvate.b;
+    if (salvate.c) process.env.STABILITY_API_KEY = salvate.c;
+  }
+  fs.rmSync(cartella, {recursive: true, force: true});
+});
+await prova('immagini: generata una volta, la seconda esce dalla biblioteca e non costa; il fondo verde diventa trasparente', async () => {
+  const {trovaFfmpeg} = await carica('motore/ffmpeg.mjs');
+  try {
+    await trovaFfmpeg();
+  } catch {
+    console.log('       (saltata: ffmpeg non trovato su questo computer)');
+    return;
+  }
+  const im = await carica('motore/immagini.mjs');
+  const cartella = fs.mkdtempSync(path.join(os.tmpdir(), 'fmlab-immagini-'));
+  const conta = path.join(cartella, 'chiamate.txt');
+  Object.assign(process.env, {FMLAB_IMMAGINI_COMANDO: `node "${path.join(K, 'prove/sostegno/immagine-finta.mjs')}" {prompt} {uscita}`, FMLAB_IMMAGINI_CONTA: conta});
+  const chiamate = () => (fs.existsSync(conta) ? fs.readFileSync(conta, 'utf8').trim().split('\n').length : 0);
+  const prima = await im.immagine({soggetto: 'Una fiala di vetro', fornitore: 'comando', cartella});
+  assert.equal(prima.daBiblioteca, false);
+  assert.equal(chiamate(), 1);
+  assert.ok(prima.trasparente > 0.7 && prima.trasparente < 0.95, `parte trasparente: ${prima.trasparente}`); // il quadrato è il 14% dell'immagine
+  const scheda = JSON.parse(fs.readFileSync(prima.file.replace(/\.png$/, '.json'), 'utf8'));
+  assert.equal(scheda.impronta, prima.impronta);
+  assert.equal(scheda.soggetto, 'Una fiala di vetro');
+  assert.match(scheda.prompt, /sfondo verde/);
+  // seconda volta, anche scritta in un altro modo e senza fornitore: stessa immagine, nessuna chiamata
+  const seconda = await im.immagine({soggetto: 'una  fiala di VETRO', fornitore: 'nessuno', cartella});
+  assert.equal(seconda.daBiblioteca, true);
+  assert.equal(seconda.file, prima.file);
+  assert.equal(chiamate(), 1);
+  // "nuova" la rifà davvero
+  await im.immagine({soggetto: 'Una fiala di vetro', fornitore: 'comando', cartella, nuova: true});
+  assert.equal(chiamate(), 2);
+  assert.equal(im.elencoBiblioteca(cartella).length, 1);
+  fs.rmSync(cartella, {recursive: true, force: true});
+});
+
+await prova('immagini: Higgsfield (richiesta, stato, scarico) e Stability (una chiamata) contro servizi finti: con quelli veri non è provato', async () => {
+  const {trovaFfmpeg} = await carica('motore/ffmpeg.mjs');
+  try {
+    await trovaFfmpeg();
+  } catch {
+    console.log('       (saltata: ffmpeg non trovato su questo computer)');
+    return;
+  }
+  const http = await import('node:http');
+  const im = await carica('motore/immagini.mjs');
+  const cartella = fs.mkdtempSync(path.join(os.tmpdir(), 'fmlab-immagini-'));
+  const png = path.join(cartella, 'finta.png');
+  spawnSync(process.execPath, [path.join(K, 'prove/sostegno/immagine-finta.mjs'), 'x', png]);
+  const viste = [];
+  let giri = 0;
+  const server = http.createServer((req, res) => {
+    let corpo = '';
+    req.on('data', (d) => (corpo += d));
+    req.on('end', () => {
+      viste.push({metodo: req.method, url: req.url, chi: req.headers.authorization, corpo});
+      const base = `http://127.0.0.1:${server.address().port}`;
+      const json = (dati) => res.writeHead(200, {'Content-Type': 'application/json'}).end(JSON.stringify(dati));
+      if (req.url === '/higgsfield-ai/soul/standard') return json({status: 'queued', request_id: 'abc', status_url: `${base}/requests/abc/status`});
+      if (req.url === '/requests/abc/status') return json(++giri < 2 ? {status: 'in_progress'} : {status: 'completed', images: [{url: `${base}/pronta.png`}]});
+      if (req.url === '/pronta.png' || req.url === '/v2beta/stable-image/generate/core') return res.writeHead(200, {'Content-Type': 'image/png'}).end(fs.readFileSync(png));
+      res.writeHead(404).end();
+    });
+  });
+  await new Promise((r) => server.listen(0, '127.0.0.1', r));
+  const base = `http://127.0.0.1:${server.address().port}`;
+  Object.assign(process.env, {FMLAB_HIGGSFIELD_URL: base, FMLAB_STABILITY_URL: base, HF_API_KEY_ID: 'chiave', HF_API_KEY_SECRET: 'segreto', STABILITY_API_KEY: 'chiave-s', FMLAB_IMMAGINI_ATTESA: '5'});
+  try {
+    const h = await im.immagine({soggetto: 'Un recettore sulla membrana', fornitore: 'higgsfield', cartella});
+    assert.equal(h.daBiblioteca, false);
+    assert.ok(h.trasparente > 0.7);
+    const invio = viste.find((v) => v.metodo === 'POST');
+    assert.equal(invio.chi, 'Key chiave:segreto');
+    assert.match(JSON.parse(invio.corpo).prompt, /Un recettore sulla membrana/);
+    assert.equal(viste.filter((v) => v.url === '/requests/abc/status').length, 2);
+    const st = await im.immagine({soggetto: 'Una bilancia a due piatti', fornitore: 'stability', cartella});
+    assert.equal(st.daBiblioteca, false);
+    assert.equal(viste.at(-1).chi, 'Bearer chiave-s');
+    assert.match(viste.at(-1).corpo, /Una bilancia a due piatti/);
+    assert.equal(im.elencoBiblioteca(cartella).length, 2);
+  } finally {
+    server.close();
+    for (const k of ['FMLAB_HIGGSFIELD_URL', 'FMLAB_STABILITY_URL', 'HF_API_KEY_ID', 'HF_API_KEY_SECRET', 'STABILITY_API_KEY', 'FMLAB_IMMAGINI_ATTESA']) delete process.env[k];
+    fs.rmSync(cartella, {recursive: true, force: true});
+  }
+});
+
 // ───────────────────────── il metro (fase 1) ─────────────────────────
 
 await prova('metro: le soglie si ricavano dai riferimenti con il margine scritto nel file, e stanno nel file', async () => {

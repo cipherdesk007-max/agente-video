@@ -30,6 +30,9 @@ FMLAB Reel Kit — comandi
   npm run clip <reel> <video> [nome]       divide un video (registrazione dello schermo, clip) in fotogrammi per <Filmato>
                                            (larghezza=720  da=0  durata=…  per prenderne solo un pezzo)
   npm run suoni [crea]                     gli effetti sonori (pop, ding, whoosh…): nel copione [suono:pop] davanti a una parola
+  npm run immagine <reel> "soggetto"       un'immagine su fondo trasparente: dalla biblioteca se c'è già (costo zero),
+                                           altrimenti generata dal fornitore scelto in .env (FMLAB_IMMAGINI)
+  npm run immagini                         la biblioteca delle immagini
   npm run confronta <video|reel>           il metro: misura un video (tagli, novità, palco, sottotitoli, narratore, audio)
                                            e lo confronta con le soglie di riferimenti/misure.json
                                            ("riferimenti" al posto del video: rimisura i riferimenti e riscrive le soglie)
@@ -105,6 +108,11 @@ async function principale() {
     case 'suoni': {
       const {comandoSuoni} = await import('./suoni.mjs');
       return comandoSuoni(argomenti);
+    }
+    case 'immagine':
+    case 'immagini': {
+      const {comandoImmagine} = await import('./immagini.mjs');
+      return comandoImmagine(argomenti);
     }
     case 'confronta': {
       const {comandoConfronta} = await import('./confronta.mjs');

@@ -27,6 +27,8 @@
     "clip": "node motore/cli.mjs clip",
     "riuso": "node motore/cli.mjs riuso",
     "confronta": "node motore/cli.mjs confronta",
+    "immagine": "node motore/cli.mjs immagine",
+    "immagini": "node motore/cli.mjs immagini",
     "suoni": "node motore/cli.mjs suoni",
     "aiuto": "node motore/cli.mjs aiuto"
   },

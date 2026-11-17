@@ -116,7 +116,8 @@ export function creaTempo(
     lingua: dati.lingua ?? 'it',
     segno: (nome) => cercaSegno(dati, nome),
     dopo: (nome) => ora - cercaSegno(dati, nome),
-    risorsa: (file) => `/reels/${slug}/${file.replace(/^\/+/, '')}`,
+    // un file della biblioteca delle immagini (libreria/immagini/…) si prende da lì; tutto il resto dalla cartella del reel
+    risorsa: (file) => (/^\/?libreria\/immagini\//.test(file) ? `/${file.replace(/^\/+/, '')}` : `/reels/${slug}/${file.replace(/^\/+/, '')}`),
   };
 }
 
