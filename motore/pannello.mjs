@@ -223,7 +223,7 @@ function testoRichiesta({titolo, richiesta, lingua, durata, impostazioni, person
     `- **Narratore:** ${chi}`,
     `- **Stile:** ${stile}`,
     ...(tipo === 'testo'
-      ? [`- **Scene:** da fare. \`scene.tsx\` ha una sola scena di partenza: dividi il copione in scene e disegnale${modello ? ` (tipo di reel indicato: \`${modello.id}\` — ${modello.descrizione})` : ''}.`]
+      ? [`- **Scene:** si fanno con il piano di regia, senza scrivere codice. \`npm run fai <reel>\` scrive il piano di serie e i provini; poi migliora \`piano.json\` scena per scena (primo capitolo di SCHEDA.md) e rilancia \`npm run fai <reel>\`${modello ? ` (tipo di reel indicato: \`${modello.id}\` — ${modello.descrizione})` : ''}.`]
       : [
           `- **Modello di partenza:** ${modello ? `\`${modello.id}\` — ${modello.descrizione} In \`scene.tsx\` le scene pronte sono già montate: cambia testi, numeri e segni; aggiungi o togli scene se il racconto lo chiede.` : 'spiegazione'}`,
           `- **Invito finale:** ${invito ? `"Commenta ${invito.toUpperCase()}" (o l'equivalente nella lingua del reel)` : 'a tua scelta: una parola sola, legata all\'argomento'}`,

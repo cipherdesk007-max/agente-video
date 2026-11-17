@@ -1,8 +1,61 @@
 # FMLAB Reel Kit — la scheda
 
-Per fare un reel basta questa pagina. `FMLAB_AVVIA.md` si apre solo per il dettaglio di un capitolo.
+Per fare un reel bastano queste pagine. `FMLAB_AVVIA.md` si apre solo per il dettaglio di un capitolo.
 
-## Il giro
+## Dal testo al reel: il regista sei tu, il kit fa il resto
+
+Quando arriva **un testo già scritto** (incollato in chat, dal pannello, in un file) il lavoro è questo, e non altro:
+
+```
+npm run fai <reel> testo=<file.txt> "Titolo" durata=60 narratore=dottore regalo=mappa    # crea, piano di serie, provini
+# → migliora reels/<reel>/piano.json scena per scena, riempi fonti.md
+npm run piano <reel>          # controllo: errori, consigli, rischio cartelli (deve essere "basso")
+npm run fai <reel>            # riparte da dove serve: monta, tempi, provini | voce, render, verifica, confronta
+```
+
+- **Il testo non si tocca** (sta in `testo.txt`). **Non si scrive codice**: si scrive `piano.json`; `copione.md` e
+  `scene.tsx` li scrive `npm run monta` (lo chiama `fai`) e non si modificano a mano. Una scena che nessun blocco
+  rende si scrive in `mano.tsx` e nel piano si chiama con `{"blocco": "mano", "dati": {"componente": "Nome"}}`.
+- **Le scelte della persona** (`npm run imposta <reel> …`, o in coda a `fai`/`nuovo`): `durata=` · `narratore=dottore|nessuno`
+  · `regalo=auto|nessuno|<nome>` (cosa si regala in chiusura: `npm run regalo` li elenca e ne aggiunge da un'immagine o
+  da un PDF) · `musica=` · `voce=`. Se la persona non dice niente valgono quelle del kit.
+- **Due tempi.** Prima si fissa la composizione senza spendere (piano, provini a bassa risoluzione: guardali), poi si
+  paga il dettaglio (voce, video). `fai` si ferma prima della voce a pagamento e dice quanti crediti costa: si
+  riparte con `voce=si` solo dopo il sì della persona. Se una tappa fallisce si corregge e si rilancia `fai`:
+  le tappe riuscite non si rifanno. Il reel è fatto solo se `verifica` passa; al massimo due giri di correzione
+  guardando `confronta`, poi si consegna dicendo cosa resta fuori soglia.
+
+Il piano, una scena (l'esempio intero è `prove/sostegno/piano-reta.json`; `npm run piano` senza reel elenca blocchi e campi):
+
+```json
+{"nome": "risultati", "da": "Con la Reta, il",
+ "perche": "i due numeri uno accanto all'altro: quasi quattro contro circa due",
+ "blocco": "confronto",
+ "dati": {"sinistra": {"titolo": "Reta", "valore": 3.96, "decimali": 2, "segno": "quattro"},
+          "destra": {"titolo": "Placebo", "valore": 2.12, "decimali": 2, "segno": "duepunti"}, "fonte": "NEJM 2026"},
+ "segni": {"quattro": "quattro", "anche": "placebo", "duepunti": "due"},
+ "enfasi": ["quattro", "due"], "suoni": [{"suono": "ding", "su": "quattro"}],
+ "luogo": "bilancia", "entra": "avanti", "campo": "stretto", "camera": "spinta",
+ "protagonista": [{"carica": 1}, {"segno": "anche", "colore": "#5AA8FF", "carica": 0.5}]}
+```
+
+`da` = le prime parole della scena come sono nel testo · `segni` = nome → parola del testo su cui cade (se la parola
+torna nella scena: `{"su": "dieci", "volta": 2}`) · un segno conta solo se fa comparire o cambiare qualcosa.
+
+**Ogni scena è una ripresa, non un cartello** (è il metodo con cui si descrive una ripresa a un generatore di video):
+
+1. **un perché** (`perche`): cosa deve far capire. Se non lo sai dire in una riga, la scena decora e basta;
+2. **un soggetto che si può mostrare**: numero, grafico, oggetto 3D, icone. Le scritte da sole sono l'ultima scelta;
+3. **un'azione**: qualcosa che *cambia* su una parola (un valore che sale, un oggetto che cambia stato con `cambia`,
+   il protagonista che si accende), almeno ogni 3 secondi. Descrivi verbi, non aspetti;
+4. **un'inquadratura** (`campo`: largo → medio → stretto, mai due scene uguali di fila) e **un movimento di camera con
+   un nome** (`camera`: spinta, indietro, destra, sinistra, sale, scende, gira);
+5. **continuità**: lo stesso protagonista, lo stesso colore per lo stesso soggetto in tutto il reel (es. Reta verde,
+   placebo azzurro, dolore rosso), lo stesso suono per lo stesso tipo di cosa, una luce sola per scena (`tinta`).
+
+Mai più di tre scene dello stesso blocco di fila; almeno tre blocchi diversi nel reel; da 4 a 6 suoni.
+
+## Il giro (quando il testo è da scrivere)
 
 | # | Cosa | Comando |
 |---|---|---|
@@ -145,6 +198,8 @@ export default definisciReel({
 ```
 
 - **`luogo`**: `corpo` · `vaso` · `membrana` · `laboratorio` · `stadio` · `palco` · `bilancia` · `studio` · `vuoto`.
+- **`campo`** e **`camera`**: quanto è larga l'inquadratura (`largo` · `medio` · `stretto`) e come si muove la camera
+  mentre la scena dura (`spinta` · `indietro` · `destra` · `sinistra` · `sale` · `scende` · `gira` · `ferma`).
 - **`entra`**: da che parte la camera arriva nella scena. `avanti` (di serie: attraversa la scena prima, che si
   ingrandisce e si sfoca) · `sinistra` · `destra` · `alto` · `basso` (carrellata). Mai un taglio, mai una dissolvenza semplice.
 - **`protagonista`**: un oggetto solo per tutto il reel, che resta mentre le scene cambiano. Ogni scena ne dice lo

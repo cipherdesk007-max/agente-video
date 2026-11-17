@@ -77,3 +77,41 @@ Dal confronto qui sopra, in ordine di distanza. È l'elenco dei lavori delle fas
 
 Già allineati: nessun taglio, posizione e disegno dei sottotitoli, parole a schermo insieme, contrasto, luminosità
 del fondo, numero di tinte, palco occupato, volume della voce.
+
+## Cosa si impara da chi fa video con i modelli (studiato il 17/11/2026)
+
+Due progetti letti per il metodo, su indicazione di Francesco. Nessuno dei due è dentro il kit.
+
+### LTX-2.5 (Lightricks): come si descrive una ripresa
+
+Fonti: `github.com/Lightricks/LTX-2` (pagina del progetto), `docs.ltx.io` (guida ai prompt, generazione in due tempi,
+risoluzione nativa). Il modello non si può usare sul Mac del 2017 (pesi di circa 66 GB, schede NVIDIA); via servizio
+costa a secondi di video. Qui interessa come chiede di descrivere una ripresa, perché è la stessa cosa che deve
+fare il piano di regia.
+
+| Cosa fa LTX | Cosa è diventato nel kit |
+|---|---|
+| Ogni ripresa si apre dichiarando l'inquadratura (scala del campo) | `campo`: largo, medio, stretto, per scena; il controllo avvisa se due scene di fila sono uguali |
+| Il movimento di camera ha un nome (spinge, si allontana, carrella, sale, gira, ferma) | `camera`: spinta, indietro, destra, sinistra, sale, scende, gira, ferma; "ferma" pesa nel rischio cartelli |
+| Si descrivono azioni, con un verbo per frase: l'aspetto da solo non dà movimento | un segno conta solo se fa comparire o cambiare qualcosa; `cambia` negli oggetti 3D; stati del protagonista |
+| Più riprese in fila: 2-4, ognuna con un compito; a ogni taglio si ridice chi c'è e cosa resta uguale | `perche` per scena; protagonista unico; stesso colore per lo stesso soggetto in tutto il reel |
+| Una sola logica di luce per ripresa, pochi soggetti | una `tinta` per scena; i blocchi non accettano più elementi di quanti ne entrano |
+| Due tempi: prima la composizione a bassa risoluzione, poi il dettaglio | `npm run fai`: piano e provini senza spendere, poi voce e video |
+| La durata si adatta all'azione descritta; le pause vanno scritte | la durata di una scena è quella delle sue parole; il controllo segnala oltre 3,5 secondi senza novità |
+| Le scritte dentro i video generati vengono male: brevi, e quelle importanti si aggiungono dopo | qui le scritte le disegna il kit: è il motivo per cui il rendering resta in casa |
+
+### OpenMontage: l'agente fa il regista, il programma controlla
+
+Fonte: `github.com/OpenMontageInc/OpenMontage` (letti `lib/slideshow_risk.py`, `skills/pipelines/explainer/scene-director.md`,
+`skills/meta/reviewer.md`). Licenza AGPL-3.0: vedi `STATO.md`, "Da dove viene cosa".
+
+| Cosa fa OpenMontage | Cosa è diventato nel kit |
+|---|---|
+| Non c'è un programma che orchestra: lo fa l'agente, leggendo le istruzioni di ogni tappa | il regista è l'agente; le istruzioni sono il primo capitolo di `SCHEDA.md`; il piano è un file solo |
+| Tappe fisse con salvataggio: ricerca, proposta, copione, piano delle scene, materiali, montaggio, composizione | `npm run fai`: otto tappe salvate, si riparte dalla prima non riuscita |
+| Prima di comporre misura il "rischio diapositive" su sei voci e sopra una soglia non va avanti | "rischio cartelli" in `npm run piano`: sette voci, da 0 a 100; "alto" ferma il render |
+| Varietà: mai più di tre scene dello stesso tipo di fila, almeno tre tipi diversi | stessi due controlli, come consigli del piano |
+| Ogni scena dichiara soggetto, movimento del soggetto, ambiente, inquadratura, camera | `blocco`+`dati`, segni e `cambia`, `luogo`+`tinta`, `campo`, `camera` |
+| Revisione dopo il render: se fallisce il video non viene presentato | `fai` dice "fatto" solo se `verifica` passa |
+| Preventivo, soglia di spesa per azione, cancello di approvazione | `fai` si ferma prima della voce a pagamento e dice i crediti; riparte con `voce=si` |
+| Voce gratuita senza rete (Piper) e riconoscimento parola per parola (WhisperX) | non ancora nel kit: si possono collegare oggi come voce `comando`; sono la strada per la voce di prova e per il controllo "detto = scritto" |
