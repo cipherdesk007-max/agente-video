@@ -1,0 +1,806 @@
+{
+  "versione": 1,
+  "regista": "agente",
+  "titolo": "MOTS-c: il peptide che nei muscoli anziani aumenta",
+  "scene": [
+    {
+      "nome": "aggancio",
+      "da": "La coscia che hai",
+      "perche": "due cosce una accanto all'altra: a 30 anni piena, a 70 spenta",
+      "dati": {
+        "soggetti": [
+          {
+            "tipo": "icona",
+            "icona": "GiLeg",
+            "etichetta": "30 anni",
+            "colore": "#5CF2C8",
+            "stato": {
+              "acceso": 0.6
+            },
+            "cambia": [
+              {
+                "segno": "trenta1",
+                "stato": {
+                  "acceso": 1
+                }
+              }
+            ]
+          },
+          {
+            "tipo": "icona",
+            "icona": "GiLeg",
+            "etichetta": "70 anni",
+            "colore": "#C9D4E0",
+            "segno": "diversa1",
+            "stato": {
+              "acceso": 1
+            },
+            "cambia": [
+              {
+                "segno": "settanta1",
+                "stato": {
+                  "acceso": 0.35
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "segni": {
+        "trenta1": "30",
+        "diversa1": "diversa",
+        "settanta1": "70"
+      },
+      "enfasi": [
+        "30",
+        "70"
+      ],
+      "campo": "medio",
+      "camera": "spinta",
+      "blocco": "soggetti",
+      "luogo": "vuoto"
+    },
+    {
+      "nome": "sorpresa",
+      "da": "Ma nei muscoli più",
+      "perche": "la sorpresa: nel muscolo anziano la batteria del MOTS-c sale invece di scendere",
+      "dati": {
+        "soggetti": [
+          {
+            "tipo": "icona",
+            "icona": "GiMuscleUp",
+            "etichetta": "Muscoli anziani",
+            "colore": "#C9D4E0",
+            "stato": {
+              "acceso": 0.55
+            },
+            "cambia": [
+              {
+                "segno": "anziani2",
+                "stato": {
+                  "acceso": 1
+                }
+              }
+            ]
+          },
+          {
+            "tipo": "batteria",
+            "etichetta": "MOTS-c",
+            "colore": "#5CF2C8",
+            "segno": "peptide2",
+            "stato": {
+              "livello": 0.35,
+              "accesa": 0.5
+            },
+            "cambia": [
+              {
+                "segno": "mots2",
+                "stato": {
+                  "accesa": 1
+                }
+              },
+              {
+                "segno": "aumenta2",
+                "stato": {
+                  "livello": 0.95
+                },
+                "durata": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      "segni": {
+        "anziani2": "anziani,",
+        "peptide2": "peptide",
+        "mots2": "MOTS-c",
+        "aumenta2": "aumenta"
+      },
+      "enfasi": [
+        "aumenta"
+      ],
+      "suoni": [
+        {
+          "suono": "sale",
+          "su": "aumenta"
+        }
+      ],
+      "campo": "stretto",
+      "camera": "sale",
+      "blocco": "soggetti",
+      "luogo": "vuoto"
+    },
+    {
+      "nome": "cose",
+      "da": "Il MOTS-c è un",
+      "perche": "cos'è: un pezzetto scritto nel DNA dei mitocondri, le centrali di energia della cellula",
+      "dati": {
+        "soggetti": [
+          {
+            "tipo": "icona",
+            "icona": "FaDna",
+            "etichetta": "Mitocondri",
+            "colore": "#5AA8FF",
+            "stato": {
+              "acceso": 0.4
+            },
+            "cambia": [
+              {
+                "segno": "dna3",
+                "stato": {
+                  "acceso": 0.75
+                }
+              },
+              {
+                "segno": "mitocondri3",
+                "stato": {
+                  "acceso": 1
+                }
+              }
+            ]
+          },
+          {
+            "tipo": "batteria",
+            "etichetta": "Energia",
+            "colore": "#5CF2C8",
+            "segno": "centrali3",
+            "stato": {
+              "livello": 0.2,
+              "accesa": 0.7
+            },
+            "cambia": [
+              {
+                "segno": "energetiche3",
+                "stato": {
+                  "livello": 1
+                },
+                "durata": 1.0
+              },
+              {
+                "segno": "cellula3",
+                "stato": {
+                  "accesa": 1
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "segni": {
+        "dna3": "DNA",
+        "mitocondri3": "mitocondri,",
+        "centrali3": "centrali",
+        "energetiche3": "energetiche",
+        "cellula3": "cellula"
+      },
+      "enfasi": [
+        "mitocondri"
+      ],
+      "campo": "largo",
+      "camera": "destra",
+      "blocco": "soggetti",
+      "luogo": "vuoto"
+    },
+    {
+      "nome": "sangue",
+      "da": "In uno studio del 2020",
+      "perche": "lo studio del 2020: nel sangue degli anziani ce n'è meno che nei ventenni",
+      "dati": {
+        "soggetti": [
+          {
+            "tipo": "foglio",
+            "etichetta": "Studio 2020",
+            "nota": "Nuova Zelanda",
+            "colore": "#5CF2C8",
+            "stato": {
+              "evidenzia": 0
+            },
+            "cambia": [
+              {
+                "segno": "studio4",
+                "stato": {
+                  "evidenzia": 0.4
+                }
+              },
+              {
+                "segno": "zelanda4",
+                "stato": {
+                  "evidenzia": 1
+                }
+              }
+            ]
+          },
+          {
+            "tipo": "icona",
+            "icona": "FaDroplet",
+            "etichetta": "70–81 anni",
+            "colore": "#FF8FA0",
+            "nota": "sangue: meno",
+            "segno": "uomini4",
+            "stato": {
+              "acceso": 1
+            },
+            "cambia": [
+              {
+                "segno": "meno4",
+                "stato": {
+                  "acceso": 0.3
+                }
+              }
+            ]
+          },
+          {
+            "tipo": "icona",
+            "icona": "FaDroplet",
+            "etichetta": "Ventenni",
+            "colore": "#5AA8FF",
+            "nota": "sangue: di più",
+            "segno": "ventenni4"
+          }
+        ],
+        "fonte": "Aging, 2020 · uomini sani"
+      },
+      "segni": {
+        "studio4": "studio",
+        "zelanda4": "Zelanda,",
+        "uomini4": "uomini",
+        "meno4": "meno",
+        "ventenni4": "ventenni."
+      },
+      "enfasi": [
+        "meno"
+      ],
+      "campo": "largo",
+      "camera": "sinistra",
+      "blocco": "soggetti",
+      "luogo": "vuoto"
+    },
+    {
+      "nome": "cosce",
+      "da": "Ma nei muscoli delle",
+      "perche": "il numero che conta: nel muscolo della coscia circa una volta e mezza di più",
+      "dati": {
+        "titolo": "MOTS-c nel muscolo della coscia",
+        "soggetti": [
+          {
+            "tipo": "batteria",
+            "etichetta": "Ventenni",
+            "colore": "#5AA8FF",
+            "stato": {
+              "livello": 0.6,
+              "accesa": 0.6
+            },
+            "cambia": [
+              {
+                "segno": "cosce5",
+                "stato": {
+                  "accesa": 1
+                }
+              }
+            ]
+          },
+          {
+            "tipo": "batteria",
+            "etichetta": "70–81 anni",
+            "nota": "circa 1,5 volte",
+            "colore": "#5CF2C8",
+            "segno": "muscoli5",
+            "stato": {
+              "livello": 0.6,
+              "accesa": 0.8
+            },
+            "cambia": [
+              {
+                "segno": "mezza5",
+                "stato": {
+                  "livello": 0.9
+                },
+                "durata": 1.0
+              },
+              {
+                "segno": "piu5",
+                "stato": {
+                  "accesa": 1
+                }
+              }
+            ]
+          }
+        ],
+        "fonte": "Aging, 2020"
+      },
+      "segni": {
+        "muscoli5": "muscoli",
+        "cosce5": "cosce",
+        "mezza5": "mezza",
+        "piu5": "più."
+      },
+      "enfasi": [
+        "mezza"
+      ],
+      "suoni": [
+        {
+          "suono": "ding",
+          "su": "mezza"
+        }
+      ],
+      "campo": "medio",
+      "camera": "spinta",
+      "blocco": "soggetti",
+      "luogo": "vuoto"
+    },
+    {
+      "nome": "ipotesi",
+      "da": "I ricercatori ipotizzano che,",
+      "perche": "l'ipotesi: il muscolo ne fa di più, ma al resto del corpo ne arriva meno",
+      "dati": {
+        "titolo": "Un'ipotesi dei ricercatori",
+        "soggetti": [
+          {
+            "tipo": "icona",
+            "icona": "GiMuscleUp",
+            "etichetta": "Muscolo: di più",
+            "colore": "#5CF2C8",
+            "stato": {
+              "acceso": 0.4
+            },
+            "cambia": [
+              {
+                "segno": "muscoli6",
+                "stato": {
+                  "acceso": 0.6
+                }
+              },
+              {
+                "segno": "producano6",
+                "stato": {
+                  "acceso": 0.8
+                }
+              },
+              {
+                "segno": "stress6",
+                "stato": {
+                  "acceso": 1
+                }
+              }
+            ]
+          },
+          {
+            "tipo": "icona",
+            "icona": "FaDroplet",
+            "etichetta": "Sangue: di meno",
+            "colore": "#FF8FA0",
+            "segno": "minore6",
+            "stato": {
+              "acceso": 0.9
+            },
+            "cambia": [
+              {
+                "segno": "corpo6",
+                "stato": {
+                  "acceso": 0.3
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "segni": {
+        "muscoli6": "muscoli",
+        "producano6": "producano",
+        "stress6": "stress,",
+        "minore6": "minore",
+        "corpo6": "corpo."
+      },
+      "enfasi": [
+        "stress"
+      ],
+      "campo": "largo",
+      "camera": "indietro",
+      "blocco": "soggetti",
+      "luogo": "vuoto"
+    },
+    {
+      "nome": "topi",
+      "da": "Uno studio del 2021,",
+      "perche": "il secondo studio: è su topi molto anziani, non su persone",
+      "dati": {
+        "soggetti": [
+          {
+            "tipo": "foglio",
+            "etichetta": "Studio 2021",
+            "nota": "Nature Communications",
+            "colore": "#5CF2C8",
+            "stato": {
+              "evidenzia": 0
+            },
+            "cambia": [
+              {
+                "segno": "studio7",
+                "stato": {
+                  "evidenzia": 0.4
+                }
+              },
+              {
+                "segno": "nature7",
+                "stato": {
+                  "evidenzia": 1
+                }
+              }
+            ]
+          },
+          {
+            "tipo": "icona",
+            "icona": "LuRat",
+            "etichetta": "Topi anziani",
+            "colore": "#C9D4E0",
+            "segno": "topi7",
+            "stato": {
+              "acceso": 0.7
+            },
+            "cambia": [
+              {
+                "segno": "anziani7",
+                "stato": {
+                  "acceso": 1
+                }
+              }
+            ]
+          }
+        ],
+        "fonte": "Studio su animali"
+      },
+      "segni": {
+        "studio7": "studio",
+        "nature7": "Nature",
+        "topi7": "topi",
+        "anziani7": "anziani."
+      },
+      "enfasi": [
+        "topi"
+      ],
+      "suoni": [
+        {
+          "suono": "pop",
+          "su": "topi"
+        }
+      ],
+      "campo": "largo",
+      "camera": "destra",
+      "blocco": "soggetti",
+      "luogo": "vuoto"
+    },
+    {
+      "nome": "risultati",
+      "da": "I topi che avevano",
+      "perche": "cosa è cambiato nei topi trattati: corrono più a lungo, stringono più forte",
+      "dati": {
+        "soggetti": [
+          {
+            "tipo": "icona",
+            "icona": "LuRat",
+            "etichetta": "Con MOTS-c",
+            "colore": "#5CF2C8",
+            "stato": {
+              "acceso": 0.5
+            },
+            "cambia": [
+              {
+                "segno": "ricevuto8",
+                "stato": {
+                  "acceso": 1
+                }
+              },
+              {
+                "segno": "quelli8",
+                "stato": {
+                  "acceso": 0.55
+                }
+              }
+            ]
+          },
+          {
+            "tipo": "icona",
+            "icona": "FaPersonRunning",
+            "etichetta": "Più corsa",
+            "colore": "#5AA8FF",
+            "segno": "correre8",
+            "stato": {
+              "acceso": 0.6
+            },
+            "cambia": [
+              {
+                "segno": "lungo8",
+                "stato": {
+                  "acceso": 1
+                }
+              }
+            ]
+          },
+          {
+            "tipo": "icona",
+            "icona": "FaHandFist",
+            "etichetta": "Più presa",
+            "colore": "#5CF2C8",
+            "segno": "presa8",
+            "stato": {
+              "acceso": 0.6
+            },
+            "cambia": [
+              {
+                "segno": "forte8",
+                "stato": {
+                  "acceso": 1
+                }
+              }
+            ]
+          }
+        ],
+        "fonte": "Nature Communications, 2021 · topi"
+      },
+      "segni": {
+        "ricevuto8": "ricevuto",
+        "correre8": "correre",
+        "lungo8": "lungo",
+        "presa8": "presa",
+        "forte8": "forte",
+        "quelli8": "quelli"
+      },
+      "enfasi": [
+        "forte"
+      ],
+      "suoni": [
+        {
+          "suono": "successo",
+          "su": "forte"
+        }
+      ],
+      "campo": "medio",
+      "camera": "gira",
+      "blocco": "soggetti",
+      "luogo": "vuoto"
+    },
+    {
+      "nome": "cyclette",
+      "da": "E negli esseri umani, una",
+      "perche": "nelle persone: dopo una sessione di cyclette sale nel muscolo e nel sangue",
+      "dati": {
+        "soggetti": [
+          {
+            "tipo": "icona",
+            "icona": "FaBicycle",
+            "etichetta": "Cyclette",
+            "colore": "#5AA8FF",
+            "stato": {
+              "acceso": 0.5
+            },
+            "cambia": [
+              {
+                "segno": "umani9",
+                "stato": {
+                  "acceso": 0.75
+                }
+              },
+              {
+                "segno": "cyclette9",
+                "stato": {
+                  "acceso": 1
+                }
+              }
+            ]
+          },
+          {
+            "tipo": "batteria",
+            "etichetta": "Muscoli",
+            "colore": "#5CF2C8",
+            "segno": "aumentare9",
+            "stato": {
+              "livello": 0.25
+            },
+            "cambia": [
+              {
+                "segno": "muscoli9",
+                "stato": {
+                  "livello": 1
+                },
+                "durata": 1.0
+              }
+            ]
+          },
+          {
+            "tipo": "batteria",
+            "etichetta": "Sangue",
+            "colore": "#FF8FA0",
+            "segno": "livelli9",
+            "stato": {
+              "livello": 0.25
+            },
+            "cambia": [
+              {
+                "segno": "sangue9",
+                "stato": {
+                  "livello": 0.6
+                },
+                "durata": 0.8
+              }
+            ]
+          }
+        ],
+        "fonte": "Nature Communications, 2021 · persone"
+      },
+      "segni": {
+        "umani9": "umani,",
+        "cyclette9": "cyclette",
+        "aumentare9": "aumentare",
+        "livelli9": "livelli",
+        "muscoli9": "muscoli",
+        "sangue9": "sangue."
+      },
+      "enfasi": [
+        "aumentare"
+      ],
+      "suoni": [
+        {
+          "suono": "sale",
+          "su": "aumentare"
+        }
+      ],
+      "campo": "largo",
+      "camera": "sale",
+      "blocco": "soggetti",
+      "luogo": "vuoto"
+    },
+    {
+      "nome": "ruolo",
+      "da": "Quindi, nella perdita di",
+      "perche": "il punto: la massa muscolare cala con l'età, e questo peptide c'entra",
+      "dati": {
+        "soggetti": [
+          {
+            "tipo": "icona",
+            "icona": "GiLeg",
+            "etichetta": "Massa muscolare",
+            "colore": "#C9D4E0",
+            "stato": {
+              "acceso": 1
+            },
+            "cambia": [
+              {
+                "segno": "perdita10",
+                "stato": {
+                  "acceso": 0.6
+                }
+              },
+              {
+                "segno": "invecchiamento10",
+                "stato": {
+                  "acceso": 0.3
+                }
+              }
+            ]
+          },
+          {
+            "tipo": "batteria",
+            "etichetta": "MOTS-c",
+            "colore": "#5CF2C8",
+            "segno": "peptide10",
+            "stato": {
+              "livello": 0.5,
+              "accesa": 0.6
+            },
+            "cambia": [
+              {
+                "segno": "ruolo10",
+                "stato": {
+                  "accesa": 1,
+                  "livello": 0.75
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "segni": {
+        "perdita10": "perdita",
+        "invecchiamento10": "all'invecchiamento,",
+        "peptide10": "peptide",
+        "ruolo10": "ruolo."
+      },
+      "enfasi": [
+        "ruolo"
+      ],
+      "campo": "stretto",
+      "camera": "sinistra",
+      "blocco": "soggetti",
+      "luogo": "vuoto"
+    },
+    {
+      "nome": "esercizio",
+      "da": "E l'esercizio fisico è",
+      "perche": "cosa si può fare oggi: muoversi, l'unica cosa che lo fa salire nelle persone",
+      "dati": {
+        "soggetti": [
+          {
+            "tipo": "icona",
+            "icona": "FaDumbbell",
+            "etichetta": "Esercizio fisico",
+            "colore": "#5CF2C8",
+            "stato": {
+              "acceso": 0.5
+            },
+            "cambia": [
+              {
+                "segno": "esercizio11",
+                "stato": {
+                  "acceso": 1
+                }
+              }
+            ]
+          },
+          {
+            "tipo": "batteria",
+            "etichetta": "MOTS-c",
+            "colore": "#5CF2C8",
+            "segno": "unica11",
+            "stato": {
+              "livello": 0.3
+            },
+            "cambia": [
+              {
+                "segno": "dimostrato11",
+                "stato": {
+                  "livello": 0.55
+                }
+              },
+              {
+                "segno": "aumentarne11",
+                "stato": {
+                  "livello": 1
+                },
+                "durata": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      "segni": {
+        "esercizio11": "l'esercizio",
+        "unica11": "l'unica",
+        "dimostrato11": "dimostrato",
+        "aumentarne11": "aumentarne"
+      },
+      "enfasi": [
+        "esercizio"
+      ],
+      "suoni": [
+        {
+          "suono": "sale",
+          "su": "aumentarne"
+        }
+      ],
+      "campo": "medio",
+      "camera": "spinta",
+      "blocco": "soggetti",
+      "luogo": "vuoto"
+    }
+  ]
+}

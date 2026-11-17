@@ -1,0 +1,21 @@
+{
+  "regalo": "nessuno",
+  "formato": "9:16",
+  "narratore": {
+    "chi": "dottore",
+    "grandezza": 100,
+    "lato": "destra",
+    "alza": 0,
+    "specchia": false,
+    "mano2": "auto"
+  },
+  "stile": "auto",
+  "musica": 30,
+  "durata": null,
+  "voce": {
+    "motore": "auto",
+    "elevenlabs": {},
+    "mac": {},
+    "comando": {}
+  }
+}

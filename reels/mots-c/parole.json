@@ -1,0 +1,1451 @@
+{
+  "versione": 1,
+  "lingua": "it",
+  "motore": "stima",
+  "precisione": "stimata",
+  "voce": null,
+  "durataVoce": 82.328,
+  "coda": 1.4,
+  "durata": 83.733,
+  "fps": 30,
+  "impronta": "e3445acb1ba3",
+  "scene": [
+    {
+      "nome": "aggancio",
+      "inizio": 0,
+      "fine": 4.972
+    },
+    {
+      "nome": "sorpresa",
+      "inizio": 4.972,
+      "fine": 10.134
+    },
+    {
+      "nome": "cose",
+      "inizio": 10.134,
+      "fine": 19.128
+    },
+    {
+      "nome": "sangue",
+      "inizio": 19.128,
+      "fine": 29.148
+    },
+    {
+      "nome": "cosce",
+      "inizio": 29.148,
+      "fine": 33.802
+    },
+    {
+      "nome": "ipotesi",
+      "inizio": 33.802,
+      "fine": 43.949
+    },
+    {
+      "nome": "topi",
+      "inizio": 43.949,
+      "fine": 50.824
+    },
+    {
+      "nome": "risultati",
+      "inizio": 50.824,
+      "fine": 60.231
+    },
+    {
+      "nome": "cyclette",
+      "inizio": 60.231,
+      "fine": 68.478
+    },
+    {
+      "nome": "ruolo",
+      "inizio": 68.478,
+      "fine": 75.3
+    },
+    {
+      "nome": "esercizio",
+      "inizio": 75.3,
+      "fine": 83.733
+    }
+  ],
+  "segni": {
+    "trenta1": 1.366,
+    "diversa1": 2.714,
+    "settanta1": 4.309,
+    "anziani2": 6.215,
+    "peptide2": 7.024,
+    "mots2": 7.981,
+    "aumenta2": 8.176,
+    "dna3": 13.009,
+    "mitocondri3": 13.399,
+    "centrali3": 14.97,
+    "energetiche3": 15.449,
+    "cellula3": 17.843,
+    "studio4": 19.839,
+    "zelanda4": 22.286,
+    "uomini4": 23.095,
+    "meno4": 26.268,
+    "ventenni4": 28.484,
+    "muscoli5": 29.717,
+    "cosce5": 30.533,
+    "mezza5": 32.891,
+    "piu5": 33.423,
+    "muscoli6": 36.893,
+    "producano6": 37.567,
+    "stress6": 39.588,
+    "minore6": 41.07,
+    "corpo6": 43.428,
+    "studio7": 44.466,
+    "nature7": 46.853,
+    "topi7": 49.487,
+    "anziani7": 50.161,
+    "ricevuto8": 52.352,
+    "correre8": 53.983,
+    "lungo8": 54.852,
+    "presa8": 56.341,
+    "forte8": 56.873,
+    "quelli8": 57.883,
+    "umani9": 61.422,
+    "cyclette9": 64.003,
+    "aumentare9": 65.014,
+    "livelli9": 65.83,
+    "muscoli9": 67.088,
+    "sangue9": 67.956,
+    "perdita10": 69.466,
+    "invecchiamento10": 71.576,
+    "peptide10": 73.289,
+    "ruolo10": 74.779,
+    "esercizio11": 75.675,
+    "unica11": 76.97,
+    "dimostrato11": 78.923,
+    "aumentarne11": 79.738
+  },
+  "suoni": [
+    {
+      "nome": "sale",
+      "t": 8.176
+    },
+    {
+      "nome": "ding",
+      "t": 32.891
+    },
+    {
+      "nome": "pop",
+      "t": 49.487
+    },
+    {
+      "nome": "successo",
+      "t": 56.873
+    },
+    {
+      "nome": "sale",
+      "t": 65.014
+    },
+    {
+      "nome": "sale",
+      "t": 79.738
+    }
+  ],
+  "parole": [
+    {
+      "testo": "La",
+      "inizio": 0.25,
+      "fine": 0.445,
+      "frase": 0
+    },
+    {
+      "testo": "coscia",
+      "inizio": 0.445,
+      "fine": 0.782,
+      "frase": 0
+    },
+    {
+      "testo": "che",
+      "inizio": 0.782,
+      "fine": 0.976,
+      "frase": 0
+    },
+    {
+      "testo": "hai",
+      "inizio": 0.976,
+      "fine": 1.171,
+      "frase": 0
+    },
+    {
+      "testo": "a",
+      "inizio": 1.171,
+      "fine": 1.366,
+      "frase": 0
+    },
+    {
+      "testo": "30",
+      "inizio": 1.366,
+      "fine": 1.845,
+      "frase": 0,
+      "enfasi": true
+    },
+    {
+      "testo": "anni",
+      "inizio": 1.845,
+      "fine": 2.182,
+      "frase": 0
+    },
+    {
+      "testo": "è",
+      "inizio": 2.182,
+      "fine": 2.377,
+      "frase": 0
+    },
+    {
+      "testo": "molto",
+      "inizio": 2.377,
+      "fine": 2.714,
+      "frase": 0
+    },
+    {
+      "testo": "diversa",
+      "inizio": 2.714,
+      "fine": 3.192,
+      "frase": 0
+    },
+    {
+      "testo": "da",
+      "inizio": 3.192,
+      "fine": 3.387,
+      "frase": 0
+    },
+    {
+      "testo": "quella",
+      "inizio": 3.387,
+      "fine": 3.724,
+      "frase": 0
+    },
+    {
+      "testo": "che",
+      "inizio": 3.724,
+      "fine": 3.919,
+      "frase": 0
+    },
+    {
+      "testo": "hai",
+      "inizio": 3.919,
+      "fine": 4.114,
+      "frase": 0
+    },
+    {
+      "testo": "a",
+      "inizio": 4.114,
+      "fine": 4.309,
+      "frase": 0
+    },
+    {
+      "testo": "70.",
+      "inizio": 4.309,
+      "fine": 4.787,
+      "frase": 0,
+      "enfasi": true
+    },
+    {
+      "testo": "Ma",
+      "inizio": 5.152,
+      "fine": 5.347,
+      "frase": 1
+    },
+    {
+      "testo": "nei",
+      "inizio": 5.347,
+      "fine": 5.542,
+      "frase": 1
+    },
+    {
+      "testo": "muscoli",
+      "inizio": 5.542,
+      "fine": 6.021,
+      "frase": 1
+    },
+    {
+      "testo": "più",
+      "inizio": 6.021,
+      "fine": 6.215,
+      "frase": 1
+    },
+    {
+      "testo": "anziani,",
+      "inizio": 6.215,
+      "fine": 6.694,
+      "frase": 1
+    },
+    {
+      "testo": "un",
+      "inizio": 6.829,
+      "fine": 7.024,
+      "frase": 1
+    },
+    {
+      "testo": "peptide",
+      "inizio": 7.024,
+      "fine": 7.502,
+      "frase": 1
+    },
+    {
+      "testo": "chiamato",
+      "inizio": 7.502,
+      "fine": 7.981,
+      "frase": 1
+    },
+    {
+      "testo": "MOTS-c",
+      "inizio": 7.981,
+      "fine": 8.176,
+      "frase": 1
+    },
+    {
+      "testo": "aumenta",
+      "inizio": 8.176,
+      "fine": 8.655,
+      "frase": 1,
+      "enfasi": true
+    },
+    {
+      "testo": "invece",
+      "inizio": 8.655,
+      "fine": 9.134,
+      "frase": 1
+    },
+    {
+      "testo": "di",
+      "inizio": 9.134,
+      "fine": 9.329,
+      "frase": 1
+    },
+    {
+      "testo": "diminuire.",
+      "inizio": 9.329,
+      "fine": 9.95,
+      "frase": 1
+    },
+    {
+      "testo": "Il",
+      "inizio": 10.314,
+      "fine": 10.509,
+      "frase": 2
+    },
+    {
+      "testo": "MOTS-c",
+      "inizio": 10.509,
+      "fine": 10.704,
+      "frase": 2
+    },
+    {
+      "testo": "è",
+      "inizio": 10.704,
+      "fine": 10.899,
+      "frase": 2
+    },
+    {
+      "testo": "un",
+      "inizio": 10.899,
+      "fine": 11.094,
+      "frase": 2
+    },
+    {
+      "testo": "piccolo",
+      "inizio": 11.094,
+      "fine": 11.572,
+      "frase": 2
+    },
+    {
+      "testo": "peptide",
+      "inizio": 11.572,
+      "fine": 12.051,
+      "frase": 2
+    },
+    {
+      "testo": "codificato",
+      "inizio": 12.051,
+      "fine": 12.814,
+      "frase": 2
+    },
+    {
+      "testo": "nel",
+      "inizio": 12.814,
+      "fine": 13.009,
+      "frase": 2
+    },
+    {
+      "testo": "DNA",
+      "inizio": 13.009,
+      "fine": 13.204,
+      "frase": 2
+    },
+    {
+      "testo": "dei",
+      "inizio": 13.204,
+      "fine": 13.399,
+      "frase": 2
+    },
+    {
+      "testo": "mitocondri,",
+      "inizio": 13.399,
+      "fine": 14.02,
+      "frase": 2,
+      "enfasi": true
+    },
+    {
+      "testo": "le",
+      "inizio": 14.154,
+      "fine": 14.349,
+      "frase": 2
+    },
+    {
+      "testo": "minuscole",
+      "inizio": 14.349,
+      "fine": 14.97,
+      "frase": 2
+    },
+    {
+      "testo": "centrali",
+      "inizio": 14.97,
+      "fine": 15.449,
+      "frase": 2
+    },
+    {
+      "testo": "energetiche",
+      "inizio": 15.449,
+      "fine": 16.212,
+      "frase": 2
+    },
+    {
+      "testo": "presenti",
+      "inizio": 16.212,
+      "fine": 16.69,
+      "frase": 2
+    },
+    {
+      "testo": "all'interno",
+      "inizio": 16.69,
+      "fine": 17.311,
+      "frase": 2
+    },
+    {
+      "testo": "di",
+      "inizio": 17.311,
+      "fine": 17.506,
+      "frase": 2
+    },
+    {
+      "testo": "ogni",
+      "inizio": 17.506,
+      "fine": 17.843,
+      "frase": 2
+    },
+    {
+      "testo": "cellula",
+      "inizio": 17.843,
+      "fine": 18.322,
+      "frase": 2
+    },
+    {
+      "testo": "muscolare.",
+      "inizio": 18.322,
+      "fine": 18.943,
+      "frase": 2
+    },
+    {
+      "testo": "In",
+      "inizio": 19.308,
+      "fine": 19.502,
+      "frase": 3
+    },
+    {
+      "testo": "uno",
+      "inizio": 19.502,
+      "fine": 19.839,
+      "frase": 3
+    },
+    {
+      "testo": "studio",
+      "inizio": 19.839,
+      "fine": 20.176,
+      "frase": 3
+    },
+    {
+      "testo": "del",
+      "inizio": 20.176,
+      "fine": 20.371,
+      "frase": 3
+    },
+    {
+      "testo": "2020",
+      "inizio": 20.371,
+      "fine": 21.276,
+      "frase": 3
+    },
+    {
+      "testo": "condotto",
+      "inizio": 21.276,
+      "fine": 21.755,
+      "frase": 3
+    },
+    {
+      "testo": "in",
+      "inizio": 21.755,
+      "fine": 21.95,
+      "frase": 3
+    },
+    {
+      "testo": "Nuova",
+      "inizio": 21.95,
+      "fine": 22.286,
+      "frase": 3
+    },
+    {
+      "testo": "Zelanda,",
+      "inizio": 22.286,
+      "fine": 22.765,
+      "frase": 3
+    },
+    {
+      "testo": "gli",
+      "inizio": 22.9,
+      "fine": 23.095,
+      "frase": 3
+    },
+    {
+      "testo": "uomini",
+      "inizio": 23.095,
+      "fine": 23.573,
+      "frase": 3
+    },
+    {
+      "testo": "tra",
+      "inizio": 23.573,
+      "fine": 23.768,
+      "frase": 3
+    },
+    {
+      "testo": "i",
+      "inizio": 23.768,
+      "fine": 23.963,
+      "frase": 3
+    },
+    {
+      "testo": "70",
+      "inizio": 23.963,
+      "fine": 24.442,
+      "frase": 3
+    },
+    {
+      "testo": "e",
+      "inizio": 24.442,
+      "fine": 24.637,
+      "frase": 3
+    },
+    {
+      "testo": "gli",
+      "inizio": 24.637,
+      "fine": 24.832,
+      "frase": 3
+    },
+    {
+      "testo": "81",
+      "inizio": 24.832,
+      "fine": 25.31,
+      "frase": 3
+    },
+    {
+      "testo": "anni",
+      "inizio": 25.31,
+      "fine": 25.647,
+      "frase": 3
+    },
+    {
+      "testo": "avevano",
+      "inizio": 25.647,
+      "fine": 26.268,
+      "frase": 3
+    },
+    {
+      "testo": "meno",
+      "inizio": 26.268,
+      "fine": 26.605,
+      "frase": 3,
+      "enfasi": true
+    },
+    {
+      "testo": "MOTS-c",
+      "inizio": 26.605,
+      "fine": 26.8,
+      "frase": 3
+    },
+    {
+      "testo": "nel",
+      "inizio": 26.8,
+      "fine": 26.995,
+      "frase": 3
+    },
+    {
+      "testo": "sangue",
+      "inizio": 26.995,
+      "fine": 27.332,
+      "frase": 3
+    },
+    {
+      "testo": "rispetto",
+      "inizio": 27.332,
+      "fine": 27.81,
+      "frase": 3
+    },
+    {
+      "testo": "ai",
+      "inizio": 27.81,
+      "fine": 28.005,
+      "frase": 3
+    },
+    {
+      "testo": "ragazzi",
+      "inizio": 28.005,
+      "fine": 28.484,
+      "frase": 3
+    },
+    {
+      "testo": "ventenni.",
+      "inizio": 28.484,
+      "fine": 28.963,
+      "frase": 3
+    },
+    {
+      "testo": "Ma",
+      "inizio": 29.328,
+      "fine": 29.523,
+      "frase": 4
+    },
+    {
+      "testo": "nei",
+      "inizio": 29.523,
+      "fine": 29.717,
+      "frase": 4
+    },
+    {
+      "testo": "muscoli",
+      "inizio": 29.717,
+      "fine": 30.196,
+      "frase": 4
+    },
+    {
+      "testo": "delle",
+      "inizio": 30.196,
+      "fine": 30.533,
+      "frase": 4
+    },
+    {
+      "testo": "cosce",
+      "inizio": 30.533,
+      "fine": 30.87,
+      "frase": 4
+    },
+    {
+      "testo": "ne",
+      "inizio": 30.87,
+      "fine": 31.065,
+      "frase": 4
+    },
+    {
+      "testo": "avevano",
+      "inizio": 31.065,
+      "fine": 31.686,
+      "frase": 4
+    },
+    {
+      "testo": "circa",
+      "inizio": 31.686,
+      "fine": 32.023,
+      "frase": 4
+    },
+    {
+      "testo": "una",
+      "inizio": 32.023,
+      "fine": 32.359,
+      "frase": 4
+    },
+    {
+      "testo": "volta",
+      "inizio": 32.359,
+      "fine": 32.696,
+      "frase": 4
+    },
+    {
+      "testo": "e",
+      "inizio": 32.696,
+      "fine": 32.891,
+      "frase": 4
+    },
+    {
+      "testo": "mezza",
+      "inizio": 32.891,
+      "fine": 33.228,
+      "frase": 4,
+      "enfasi": true
+    },
+    {
+      "testo": "di",
+      "inizio": 33.228,
+      "fine": 33.423,
+      "frase": 4
+    },
+    {
+      "testo": "più.",
+      "inizio": 33.423,
+      "fine": 33.618,
+      "frase": 4
+    },
+    {
+      "testo": "I",
+      "inizio": 33.982,
+      "fine": 34.177,
+      "frase": 5
+    },
+    {
+      "testo": "ricercatori",
+      "inizio": 34.177,
+      "fine": 34.94,
+      "frase": 5
+    },
+    {
+      "testo": "ipotizzano",
+      "inizio": 34.94,
+      "fine": 35.703,
+      "frase": 5
+    },
+    {
+      "testo": "che,",
+      "inizio": 35.703,
+      "fine": 35.898,
+      "frase": 5
+    },
+    {
+      "testo": "con",
+      "inizio": 36.032,
+      "fine": 36.227,
+      "frase": 5
+    },
+    {
+      "testo": "l'età,",
+      "inizio": 36.227,
+      "fine": 36.564,
+      "frase": 5
+    },
+    {
+      "testo": "i",
+      "inizio": 36.698,
+      "fine": 36.893,
+      "frase": 5
+    },
+    {
+      "testo": "muscoli",
+      "inizio": 36.893,
+      "fine": 37.372,
+      "frase": 5
+    },
+    {
+      "testo": "ne",
+      "inizio": 37.372,
+      "fine": 37.567,
+      "frase": 5
+    },
+    {
+      "testo": "producano",
+      "inizio": 37.567,
+      "fine": 38.188,
+      "frase": 5
+    },
+    {
+      "testo": "di",
+      "inizio": 38.188,
+      "fine": 38.382,
+      "frase": 5
+    },
+    {
+      "testo": "più",
+      "inizio": 38.382,
+      "fine": 38.577,
+      "frase": 5
+    },
+    {
+      "testo": "in",
+      "inizio": 38.577,
+      "fine": 38.772,
+      "frase": 5
+    },
+    {
+      "testo": "risposta",
+      "inizio": 38.772,
+      "fine": 39.251,
+      "frase": 5
+    },
+    {
+      "testo": "allo",
+      "inizio": 39.251,
+      "fine": 39.588,
+      "frase": 5
+    },
+    {
+      "testo": "stress,",
+      "inizio": 39.588,
+      "fine": 39.783,
+      "frase": 5,
+      "enfasi": true
+    },
+    {
+      "testo": "mentre",
+      "inizio": 39.917,
+      "fine": 40.254,
+      "frase": 5
+    },
+    {
+      "testo": "una",
+      "inizio": 40.254,
+      "fine": 40.591,
+      "frase": 5
+    },
+    {
+      "testo": "quantità",
+      "inizio": 40.591,
+      "fine": 41.07,
+      "frase": 5
+    },
+    {
+      "testo": "minore",
+      "inizio": 41.07,
+      "fine": 41.548,
+      "frase": 5
+    },
+    {
+      "testo": "riesce",
+      "inizio": 41.548,
+      "fine": 41.885,
+      "frase": 5
+    },
+    {
+      "testo": "a",
+      "inizio": 41.885,
+      "fine": 42.08,
+      "frase": 5
+    },
+    {
+      "testo": "raggiungere",
+      "inizio": 42.08,
+      "fine": 42.701,
+      "frase": 5
+    },
+    {
+      "testo": "il",
+      "inizio": 42.701,
+      "fine": 42.896,
+      "frase": 5
+    },
+    {
+      "testo": "resto",
+      "inizio": 42.896,
+      "fine": 43.233,
+      "frase": 5
+    },
+    {
+      "testo": "del",
+      "inizio": 43.233,
+      "fine": 43.428,
+      "frase": 5
+    },
+    {
+      "testo": "corpo.",
+      "inizio": 43.428,
+      "fine": 43.764,
+      "frase": 5
+    },
+    {
+      "testo": "Uno",
+      "inizio": 44.129,
+      "fine": 44.466,
+      "frase": 6
+    },
+    {
+      "testo": "studio",
+      "inizio": 44.466,
+      "fine": 44.803,
+      "frase": 6
+    },
+    {
+      "testo": "del",
+      "inizio": 44.803,
+      "fine": 44.998,
+      "frase": 6
+    },
+    {
+      "testo": "2021,",
+      "inizio": 44.998,
+      "fine": 45.903,
+      "frase": 6
+    },
+    {
+      "testo": "pubblicato",
+      "inizio": 46.037,
+      "fine": 46.658,
+      "frase": 6
+    },
+    {
+      "testo": "su",
+      "inizio": 46.658,
+      "fine": 46.853,
+      "frase": 6
+    },
+    {
+      "testo": "Nature",
+      "inizio": 46.853,
+      "fine": 47.332,
+      "frase": 6
+    },
+    {
+      "testo": "Communications,",
+      "inizio": 47.332,
+      "fine": 48.095,
+      "frase": 6
+    },
+    {
+      "testo": "ha",
+      "inizio": 48.229,
+      "fine": 48.424,
+      "frase": 6
+    },
+    {
+      "testo": "testato",
+      "inizio": 48.424,
+      "fine": 48.903,
+      "frase": 6
+    },
+    {
+      "testo": "il",
+      "inizio": 48.903,
+      "fine": 49.097,
+      "frase": 6
+    },
+    {
+      "testo": "MOTS-c",
+      "inizio": 49.097,
+      "fine": 49.292,
+      "frase": 6
+    },
+    {
+      "testo": "su",
+      "inizio": 49.292,
+      "fine": 49.487,
+      "frase": 6
+    },
+    {
+      "testo": "topi",
+      "inizio": 49.487,
+      "fine": 49.824,
+      "frase": 6,
+      "enfasi": true
+    },
+    {
+      "testo": "molto",
+      "inizio": 49.824,
+      "fine": 50.161,
+      "frase": 6
+    },
+    {
+      "testo": "anziani.",
+      "inizio": 50.161,
+      "fine": 50.64,
+      "frase": 6
+    },
+    {
+      "testo": "I",
+      "inizio": 51.004,
+      "fine": 51.199,
+      "frase": 7
+    },
+    {
+      "testo": "topi",
+      "inizio": 51.199,
+      "fine": 51.536,
+      "frase": 7
+    },
+    {
+      "testo": "che",
+      "inizio": 51.536,
+      "fine": 51.731,
+      "frase": 7
+    },
+    {
+      "testo": "avevano",
+      "inizio": 51.731,
+      "fine": 52.352,
+      "frase": 7
+    },
+    {
+      "testo": "ricevuto",
+      "inizio": 52.352,
+      "fine": 52.973,
+      "frase": 7
+    },
+    {
+      "testo": "MOTS-c",
+      "inizio": 52.973,
+      "fine": 53.167,
+      "frase": 7
+    },
+    {
+      "testo": "riuscivano",
+      "inizio": 53.167,
+      "fine": 53.788,
+      "frase": 7
+    },
+    {
+      "testo": "a",
+      "inizio": 53.788,
+      "fine": 53.983,
+      "frase": 7
+    },
+    {
+      "testo": "correre",
+      "inizio": 53.983,
+      "fine": 54.462,
+      "frase": 7
+    },
+    {
+      "testo": "più",
+      "inizio": 54.462,
+      "fine": 54.657,
+      "frase": 7
+    },
+    {
+      "testo": "a",
+      "inizio": 54.657,
+      "fine": 54.852,
+      "frase": 7
+    },
+    {
+      "testo": "lungo",
+      "inizio": 54.852,
+      "fine": 55.189,
+      "frase": 7
+    },
+    {
+      "testo": "e",
+      "inizio": 55.189,
+      "fine": 55.383,
+      "frase": 7
+    },
+    {
+      "testo": "avevano",
+      "inizio": 55.383,
+      "fine": 56.004,
+      "frase": 7
+    },
+    {
+      "testo": "una",
+      "inizio": 56.004,
+      "fine": 56.341,
+      "frase": 7
+    },
+    {
+      "testo": "presa",
+      "inizio": 56.341,
+      "fine": 56.678,
+      "frase": 7
+    },
+    {
+      "testo": "più",
+      "inizio": 56.678,
+      "fine": 56.873,
+      "frase": 7
+    },
+    {
+      "testo": "forte",
+      "inizio": 56.873,
+      "fine": 57.21,
+      "frase": 7,
+      "enfasi": true
+    },
+    {
+      "testo": "rispetto",
+      "inizio": 57.21,
+      "fine": 57.689,
+      "frase": 7
+    },
+    {
+      "testo": "a",
+      "inizio": 57.689,
+      "fine": 57.883,
+      "frase": 7
+    },
+    {
+      "testo": "quelli",
+      "inizio": 57.883,
+      "fine": 58.22,
+      "frase": 7
+    },
+    {
+      "testo": "che",
+      "inizio": 58.22,
+      "fine": 58.415,
+      "frase": 7
+    },
+    {
+      "testo": "non",
+      "inizio": 58.415,
+      "fine": 58.61,
+      "frase": 7
+    },
+    {
+      "testo": "lo",
+      "inizio": 58.61,
+      "fine": 58.805,
+      "frase": 7
+    },
+    {
+      "testo": "avevano",
+      "inizio": 58.805,
+      "fine": 59.426,
+      "frase": 7
+    },
+    {
+      "testo": "ricevuto.",
+      "inizio": 59.426,
+      "fine": 60.047,
+      "frase": 7
+    },
+    {
+      "testo": "E",
+      "inizio": 60.411,
+      "fine": 60.606,
+      "frase": 8
+    },
+    {
+      "testo": "negli",
+      "inizio": 60.606,
+      "fine": 60.943,
+      "frase": 8
+    },
+    {
+      "testo": "esseri",
+      "inizio": 60.943,
+      "fine": 61.422,
+      "frase": 8
+    },
+    {
+      "testo": "umani,",
+      "inizio": 61.422,
+      "fine": 61.901,
+      "frase": 8
+    },
+    {
+      "testo": "una",
+      "inizio": 62.035,
+      "fine": 62.372,
+      "frase": 8
+    },
+    {
+      "testo": "singola",
+      "inizio": 62.372,
+      "fine": 62.851,
+      "frase": 8
+    },
+    {
+      "testo": "sessione",
+      "inizio": 62.851,
+      "fine": 63.33,
+      "frase": 8
+    },
+    {
+      "testo": "intensa",
+      "inizio": 63.33,
+      "fine": 63.809,
+      "frase": 8
+    },
+    {
+      "testo": "di",
+      "inizio": 63.809,
+      "fine": 64.003,
+      "frase": 8
+    },
+    {
+      "testo": "cyclette",
+      "inizio": 64.003,
+      "fine": 64.482,
+      "frase": 8
+    },
+    {
+      "testo": "ha",
+      "inizio": 64.482,
+      "fine": 64.677,
+      "frase": 8
+    },
+    {
+      "testo": "fatto",
+      "inizio": 64.677,
+      "fine": 65.014,
+      "frase": 8
+    },
+    {
+      "testo": "aumentare",
+      "inizio": 65.014,
+      "fine": 65.635,
+      "frase": 8,
+      "enfasi": true
+    },
+    {
+      "testo": "i",
+      "inizio": 65.635,
+      "fine": 65.83,
+      "frase": 8
+    },
+    {
+      "testo": "livelli",
+      "inizio": 65.83,
+      "fine": 66.309,
+      "frase": 8
+    },
+    {
+      "testo": "di",
+      "inizio": 66.309,
+      "fine": 66.503,
+      "frase": 8
+    },
+    {
+      "testo": "MOTS-c",
+      "inizio": 66.503,
+      "fine": 66.698,
+      "frase": 8
+    },
+    {
+      "testo": "sia",
+      "inizio": 66.698,
+      "fine": 66.893,
+      "frase": 8
+    },
+    {
+      "testo": "nei",
+      "inizio": 66.893,
+      "fine": 67.088,
+      "frase": 8
+    },
+    {
+      "testo": "muscoli",
+      "inizio": 67.088,
+      "fine": 67.567,
+      "frase": 8
+    },
+    {
+      "testo": "che",
+      "inizio": 67.567,
+      "fine": 67.762,
+      "frase": 8
+    },
+    {
+      "testo": "nel",
+      "inizio": 67.762,
+      "fine": 67.956,
+      "frase": 8
+    },
+    {
+      "testo": "sangue.",
+      "inizio": 67.956,
+      "fine": 68.293,
+      "frase": 8
+    },
+    {
+      "testo": "Quindi,",
+      "inizio": 68.658,
+      "fine": 68.995,
+      "frase": 9
+    },
+    {
+      "testo": "nella",
+      "inizio": 69.129,
+      "fine": 69.466,
+      "frase": 9
+    },
+    {
+      "testo": "perdita",
+      "inizio": 69.466,
+      "fine": 69.945,
+      "frase": 9
+    },
+    {
+      "testo": "di",
+      "inizio": 69.945,
+      "fine": 70.14,
+      "frase": 9
+    },
+    {
+      "testo": "massa",
+      "inizio": 70.14,
+      "fine": 70.476,
+      "frase": 9
+    },
+    {
+      "testo": "muscolare",
+      "inizio": 70.476,
+      "fine": 71.097,
+      "frase": 9
+    },
+    {
+      "testo": "legata",
+      "inizio": 71.097,
+      "fine": 71.576,
+      "frase": 9
+    },
+    {
+      "testo": "all'invecchiamento,",
+      "inizio": 71.576,
+      "fine": 72.481,
+      "frase": 9
+    },
+    {
+      "testo": "anche",
+      "inizio": 72.616,
+      "fine": 72.952,
+      "frase": 9
+    },
+    {
+      "testo": "questo",
+      "inizio": 72.952,
+      "fine": 73.289,
+      "frase": 9
+    },
+    {
+      "testo": "peptide",
+      "inizio": 73.289,
+      "fine": 73.768,
+      "frase": 9
+    },
+    {
+      "testo": "sembra",
+      "inizio": 73.768,
+      "fine": 74.105,
+      "frase": 9
+    },
+    {
+      "testo": "avere",
+      "inizio": 74.105,
+      "fine": 74.584,
+      "frase": 9
+    },
+    {
+      "testo": "un",
+      "inizio": 74.584,
+      "fine": 74.779,
+      "frase": 9
+    },
+    {
+      "testo": "ruolo.",
+      "inizio": 74.779,
+      "fine": 75.116,
+      "frase": 9,
+      "enfasi": true
+    },
+    {
+      "testo": "E",
+      "inizio": 75.48,
+      "fine": 75.675,
+      "frase": 10
+    },
+    {
+      "testo": "l'esercizio",
+      "inizio": 75.675,
+      "fine": 76.296,
+      "frase": 10,
+      "enfasi": true
+    },
+    {
+      "testo": "fisico",
+      "inizio": 76.296,
+      "fine": 76.775,
+      "frase": 10
+    },
+    {
+      "testo": "è",
+      "inizio": 76.775,
+      "fine": 76.97,
+      "frase": 10
+    },
+    {
+      "testo": "l'unica",
+      "inizio": 76.97,
+      "fine": 77.449,
+      "frase": 10
+    },
+    {
+      "testo": "cosa",
+      "inizio": 77.449,
+      "fine": 77.786,
+      "frase": 10
+    },
+    {
+      "testo": "che,",
+      "inizio": 77.786,
+      "fine": 77.98,
+      "frase": 10
+    },
+    {
+      "testo": "finora,",
+      "inizio": 78.115,
+      "fine": 78.594,
+      "frase": 10
+    },
+    {
+      "testo": "ha",
+      "inizio": 78.728,
+      "fine": 78.923,
+      "frase": 10
+    },
+    {
+      "testo": "dimostrato",
+      "inizio": 78.923,
+      "fine": 79.544,
+      "frase": 10
+    },
+    {
+      "testo": "di",
+      "inizio": 79.544,
+      "fine": 79.738,
+      "frase": 10
+    },
+    {
+      "testo": "aumentarne",
+      "inizio": 79.738,
+      "fine": 80.359,
+      "frase": 10
+    },
+    {
+      "testo": "i",
+      "inizio": 80.359,
+      "fine": 80.554,
+      "frase": 10
+    },
+    {
+      "testo": "livelli",
+      "inizio": 80.554,
+      "fine": 81.033,
+      "frase": 10
+    },
+    {
+      "testo": "negli",
+      "inizio": 81.033,
+      "fine": 81.37,
+      "frase": 10
+    },
+    {
+      "testo": "esseri",
+      "inizio": 81.37,
+      "fine": 81.849,
+      "frase": 10
+    },
+    {
+      "testo": "umani.",
+      "inizio": 81.849,
+      "fine": 82.328,
+      "frase": 10
+    }
+  ]
+}
