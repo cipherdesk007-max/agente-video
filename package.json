@@ -1,6 +1,6 @@
 {
   "name": "fmlab-reel-kit",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "private": true,
   "description": "FMLAB Reel Kit: reel explainer verticali da un argomento. Copione, voce, scene sincronizzate alle parole, mp4.",
   "type": "module",

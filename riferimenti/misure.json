@@ -223,7 +223,8 @@
         "cambi": 37,
         "cambiAlMinuto": 41.1,
         "stessaPosaMediana": 1.4,
-        "stessaPosaMassimo": 2.9
+        "stessaPosaMassimo": 2.9,
+        "stessaPosaDove": 6.8
       },
       "audio": {
         "presente": true,
@@ -348,7 +349,8 @@
         "cambi": 47,
         "cambiAlMinuto": 54.3,
         "stessaPosaMediana": 1,
-        "stessaPosaMassimo": 2.6
+        "stessaPosaMassimo": 2.6,
+        "stessaPosaDove": 16
       },
       "audio": {
         "presente": true,
@@ -488,7 +490,8 @@
         "cambi": 44,
         "cambiAlMinuto": 47.7,
         "stessaPosaMediana": 1.1,
-        "stessaPosaMassimo": 2.8
+        "stessaPosaMassimo": 2.8,
+        "stessaPosaDove": 30
       },
       "audio": {
         "presente": true,
