@@ -9,7 +9,7 @@ import {stile} from '../stile/stile';
 let fumoInCache: string | null = null;
 
 /** Trama di fumo generata una volta sola (sempre identica): bianco con trasparenza variabile. */
-function tramaFumo(): string {
+export function tramaFumo(): string {
   if (fumoInCache) return fumoInCache;
   const L = 135;
   const A = 240;

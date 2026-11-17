@@ -18,6 +18,8 @@ export * from './Schizzo';
 export * from './Media';
 export * from './Marchio';
 export {Atmosfera} from './Atmosfera';
+export {LUOGHI, Mondo, cameraMondo} from './Mondo';
+export type {CameraMondo, NomeLuogo, Verso} from './Mondo';
 export type {Posa, Regia} from './Personaggio';
 export type {Gesto} from './gesti';
 export type {Impostazioni, Ingombro, StileVideo} from './impostazioni';

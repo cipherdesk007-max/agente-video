@@ -5,7 +5,9 @@ import type {ReactNode} from 'react';
 import {ScenaCtx, TempoCtx, creaScena, creaTempo} from '../../libreria/tempo';
 import type {DatiReel, Scena, Tempo} from '../../libreria/tempo';
 import type {AtmosferaScena, DefinizioneScena, Reel} from '../../libreria/reel';
-import {Atmosfera} from '../../libreria/Atmosfera';
+import {Atmosfera, tramaFumo} from '../../libreria/Atmosfera';
+import {Mondo, cameraMondo} from '../../libreria/Mondo';
+import type {NomeLuogo, Verso} from '../../libreria/Mondo';
 import {Firma, Guide} from '../../libreria/Firma';
 import {Sottotitoli} from '../../libreria/Sottotitoli';
 import {Personaggio, scalettaPose} from '../../libreria/Personaggio';
@@ -79,7 +81,7 @@ function parti(def: DefinizioneScena | undefined) {
 
 function atmosferaDi(reel: Reel, nome: string) {
   const a = {...(reel.atmosfera ?? {}), ...(parti(reel.scene[nome]).atmosfera ?? {})};
-  return {tinta: a.tinta ?? stile.colori.foschia, densita: a.densita ?? 1, raggi: a.raggi ?? 0};
+  return {tinta: a.tinta ?? stile.colori.foschia, densita: a.densita ?? 1, raggi: a.raggi ?? 0, luogo: (a.luogo ?? 'vuoto') as NomeLuogo};
 }
 
 function regiaDi(reel: Reel, nome: string): Regia {
@@ -142,28 +144,53 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
   // la camera non sta mai ferma: durante ogni scena si avvicina di un niente (non abbastanza da spostare le scritte)
   const respiro = (scena: Scena) => (reel.respiro === false ? 1 : 1 + RESPIRO * scena.avanzamento);
 
-  // 'viaggio': la scena vecchia viene attraversata (si ingrandisce e svanisce), la nuova arriva da lontano
-  const strati: {scena: Scena; opacita: number; scala: number}[] = [];
+  // da che parte si entra nella scena di adesso: 'avanti' attraversa quella prima, gli altri sono carrellate
+  const versoDi = (nome: string): Verso => {
+    const def = reel.scene[nome];
+    return (def && typeof def === 'object' && 'componente' in def ? def.entra : undefined) ?? 'avanti';
+  };
+  const verso = versoDi(corrente.nome);
+  const lato: Record<Verso, [number, number]> = {avanti: [0, 0], sinistra: [-1, 0], destra: [1, 0], alto: [0, -1], basso: [0, 1]};
+  const [lx, ly] = lato[verso];
+  const corsa = (k: number) => (tipo === 'viaggio' && verso !== 'avanti' ? {x: lx * k * tempo.larghezza * 0.9, y: ly * k * tempo.altezza * 0.5} : {x: 0, y: 0});
+
+  // 'viaggio': la scena vecchia viene attraversata (si ingrandisce, si sfoca e svanisce), la nuova arriva da lontano
+  // e si mette a fuoco. Con una carrellata la vecchia esce da un lato e la nuova entra dall'altro.
+  const strati: {scena: Scena; opacita: number; scala: number; sposta: {x: number; y: number}; sfoca: number}[] = [];
   if (precedente) {
+    const k = curve.entra(p);
     strati.push({
       scena: precedente,
       opacita: 1 - rampa(corrente.t, durata * 0.8, curve.entra),
-      scala: (tipo === 'viaggio' ? mix(1, 1.7, curve.entra(p)) : 1) * respiro(precedente),
+      scala: (tipo === 'viaggio' && verso === 'avanti' ? mix(1, 2.3, k) : 1) * respiro(precedente),
+      sposta: corsa(-k),
+      sfoca: tipo === 'viaggio' ? 14 * k : 0,
     });
   }
   strati.push({
     scena: corrente,
     opacita: indice > 0 && durata > 0 ? rampa(corrente.t - durata * 0.15, durata * 0.85, curve.esce) : 1,
-    scala: (tipo === 'viaggio' ? mix(0.62, 1, p) : 1) * respiro(corrente),
+    scala: (tipo === 'viaggio' && verso === 'avanti' ? mix(0.55, 1, p) : 1) * respiro(corrente),
+    sposta: corsa(1 - p),
+    sfoca: tipo === 'viaggio' && p < 1 ? 10 * (1 - p) : 0,
   });
+
+  // la camera del mondo: viaggia sempre, scatta a ogni cambio di scena, dà una spinta a ogni segno
+  const {inizi, segni} = useMemo(
+    () => ({inizi: elenco.map((s) => ({t: s.inizio, verso: versoDi(s.nome)})), segni: [...new Set(Object.values(dati.segni))].sort((a, b) => a - b)}),
+    [dati, reel]
+  );
+  const camera = cameraMondo(tempo.ora, inizi, segni, durata || PASSAGGIO);
 
   // atmosfera, umore e presenza del narratore si mescolano durante il passaggio
   let aria = atmosferaDi(reel, corrente.nome);
+  let luogoPrima: NomeLuogo | undefined;
   let stato = umore(regiaDi(reel, corrente.nome));
   if (precedente) {
     const a0 = atmosferaDi(reel, precedente.nome);
     const s0 = umore(regiaDi(reel, precedente.nome));
-    aria = {tinta: miscela(a0.tinta, aria.tinta, p), densita: mix(a0.densita, aria.densita, p), raggi: mix(a0.raggi, aria.raggi, p)};
+    luogoPrima = a0.luogo;
+    aria = {tinta: miscela(a0.tinta, aria.tinta, p), densita: mix(a0.densita, aria.densita, p), raggi: mix(a0.raggi, aria.raggi, p), luogo: aria.luogo};
     stato = {visibile: mix(s0.visibile, stato.visibile, p), sorriso: mix(s0.sorriso, stato.sorriso, p), sopracciglia: mix(s0.sopracciglia, stato.sopracciglia, p)};
   }
 
@@ -181,8 +208,12 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
       }}
     >
       <TempoCtx.Provider value={tempo}>
-        <Atmosfera tinta={aria.tinta} densita={aria.densita} raggi={aria.raggi} />
-        {strati.map(({scena, opacita, scala}) => {
+        {reel.mondo === false ? (
+          <Atmosfera tinta={aria.tinta} densita={aria.densita} raggi={aria.raggi} />
+        ) : (
+          <Mondo tinta={aria.tinta} densita={aria.densita} raggi={aria.raggi} camera={camera} luogo={aria.luogo} avanzamento={corrente.avanzamento} luogoPrima={luogoPrima} passaggio={p} verso={verso} fumo={tramaFumo()} />
+        )}
+        {strati.map(({scena, opacita, scala, sposta, sfoca}) => {
           const Comp = parti(reel.scene[scena.nome]).componente;
           return (
             <ScenaCtx.Provider key={scena.nome} value={scena}>
@@ -192,7 +223,8 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
                   position: 'absolute',
                   inset: 0,
                   opacity: opacita,
-                  transform: scala === 1 ? undefined : `scale(${scala.toFixed(4)})`,
+                  transform: scala === 1 && !sposta.x && !sposta.y ? undefined : `translate(${sposta.x.toFixed(1)}px, ${sposta.y.toFixed(1)}px) scale(${scala.toFixed(4)})`,
+                  filter: sfoca > 0.3 ? `blur(${sfoca.toFixed(1)}px)` : undefined,
                   transformOrigin: `${stile.palco.centroX}px ${stile.palco.centroY}px`,
                 }}
               >
