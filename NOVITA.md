@@ -1,5 +1,13 @@
 # Novità
 
+## 2.4 · la banca musicale del kit
+
+- **Quattro trame ambientali generate dal kit** (`quiete`, `marea`, `brina`, `orbita`): una formula di ffmpeg, nessun
+  file di altri, nessun diritto da pagare (`motore/musiche.mjs`, `npm run musiche`).
+- **Musica per reel**: `auto` di serie (il regista di serie la sceglie dal nome del reel e la scrive nel piano),
+  `npm run imposta <reel> musica=<nome>`, oppure `musica=no`. Il file `musica.mp3` del reel vince su tutto.
+- Volume e sfumature non sono cambiati. I reel esistenti restano senza musica.
+
 ## 2.3 · un'atmosfera per reel
 
 - **Cinque atmosfere** per il fondo: `classica` (quella di sempre), `serra`, `abisso`, `alba`, `notte`. Sono

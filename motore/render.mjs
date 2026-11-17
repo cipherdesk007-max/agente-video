@@ -2,6 +2,7 @@
 // Il video viene diviso in pezzi fatti in parallelo; i pezzi si uniscono senza ricodificare.
 import fs from 'node:fs';
 import {adesso} from './registro.mjs';
+import {assicuraTrama, cartellaTrame, qualeMusica} from './musiche.mjs';
 import os from 'node:os';
 import path from 'node:path';
 import {CACHE, ErroreFmlab, FORMATO, RADICE, formatoDi, leggiJson, rel, sec} from './percorsi.mjs';
@@ -31,13 +32,23 @@ export function cartellaLavoro(nome) {
 
 /** La musica di sottofondo di un reel: musica.mp3 (o .m4a, .wav, .aac) nella sua cartella, altrimenti quella in stile/. */
 export function trovaMusica(cartellaReel) {
-  for (const cartella of [cartellaReel, path.join(RADICE, 'stile')]) {
-    for (const est of ['mp3', 'm4a', 'wav', 'aac']) {
-      const file = path.join(cartella, `musica.${est}`);
-      if (fs.existsSync(file)) return file;
-    }
+  const inCartella = (cartella) => ['mp3', 'm4a', 'wav', 'aac'].map((est) => path.join(cartella, `musica.${est}`)).find((f) => fs.existsSync(f)) ?? null;
+  // la scelta del reel (impostazioni) e quella del regista di serie (piano): se non si leggono, vale la musica di sempre
+  let scelte = {};
+  let delPiano = null;
+  try {
+    scelte = leggiImpostazioni(path.basename(cartellaReel));
+  } catch {
+    scelte = {};
   }
-  return null;
+  try {
+    delPiano = JSON.parse(fs.readFileSync(path.join(cartellaReel, 'piano.json'), 'utf8')).musica ?? null;
+  } catch {
+    delPiano = null;
+  }
+  const nelReel = inCartella(cartellaReel);
+  // il volume 0 spegne le trame del kit; un file messo a mano nel reel si comporta come sempre (lo spegne il mixer)
+  return qualeMusica({nelReel, volume: nelReel ? 30 : (scelte.musica ?? 30), scelta: scelte.trama ?? 'auto', delPiano, delKit: inCartella(path.join(RADICE, 'stile'))})?.file ?? null;
 }
 
 function minuti(s) {
@@ -149,6 +160,8 @@ export async function rendi(slug, variante = null, opzioni = {}) {
       // impostazioni non leggibili: l'errore lo segnalano gli altri comandi
     }
     const fileMusica = intero ? trovaMusica(reel.dir) : null;
+    // una trama del kit si genera la prima volta che serve
+    if (fileMusica && !fs.existsSync(fileMusica) && path.dirname(fileMusica) === cartellaTrame()) await assicuraTrama(path.basename(fileMusica, '.wav'), ff);
     // effetti sonori: i [suono:nome] del copione, ognuno sulla sua parola
     let effetti = null;
     const eventi = intero ? suoniDelReel(dati, reel.dir) : [];

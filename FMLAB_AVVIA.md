@@ -584,11 +584,12 @@ in `reels/<reel>/suoni/` (solo per quello), con un nome semplice e minuscolo: `[
 elenca. Il volume di tutti è `FMLAB_VOLUME_SUONI=60` nel file `.env` (0 li spegne). Non scaricare suoni tu: usa
 quelli di serie o quelli messi dalla persona. Se il file di un suono chiesto manca, il render si ferma e lo dice.
 
-**Musica di sottofondo.** Se nella cartella del reel c'è un file `musica.mp3` (o `.m4a`, `.wav`, `.aac`; in
-`stile/` vale per tutti i reel), il render lo mette sotto la voce: ripetuto fino alla fine, tenuto basso, abbassato
-ancora mentre la voce parla, con entrata e uscita sfumate. Il volume va da 0 a 100 (`npm run imposta <reel>
-musica=30`, o dal pannello); 0 la spegne. Il kit non contiene musica: il file lo mette la persona, e deve averne i
-diritti. Non scaricarne tu da internet.
+**Musica di sottofondo.** Se nella cartella del reel c'è un file `musica.mp3` (o `.m4a`, `.wav`, `.aac`) è quello,
+sempre: lo mette la persona, e deve averne i diritti. Altrimenti il kit usa una delle sue quattro trame ambientali
+(`quiete`, `marea`, `brina`, `orbita`), che genera da solo e non hanno diritti: con `musica=auto` è quella che il
+regista di serie ha scritto in `piano.json` dal nome del reel, con `npm run imposta <reel> musica=<nome>` quella
+scelta a mano, con `musica=no` nessuna. Il volume è `npm run imposta <reel> musica=30` (da 0 a 100), o dal pannello.
+La musica sta sotto la voce e si abbassa ancora mentre la voce parla, come sempre.
 
 Per ElevenLabs copia `.env.esempio` in `.env` e riempi `ELEVENLABS_API_KEY` ed `ELEVENLABS_VOICE_ID`.
 Non scrivere mai la chiave in altri file e non mostrarla.

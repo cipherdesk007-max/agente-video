@@ -21,6 +21,7 @@
     "piano": "node motore/cli.mjs piano",
     "monta": "node motore/cli.mjs monta",
     "regalo": "node motore/cli.mjs regalo",
+    "musiche": "node motore/cli.mjs musiche",
     "richieste": "node motore/cli.mjs richieste",
     "frasi": "node motore/cli.mjs frasi",
     "imposta": "node motore/cli.mjs imposta",

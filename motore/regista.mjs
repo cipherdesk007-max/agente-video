@@ -14,6 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {ErroreFmlab, cartellaReel, elencoReel, rel} from './percorsi.mjs';
 import {atmosferaDalNome} from './comune/atmosfere.mjs';
+import {musicaDalNome} from './musiche.mjs';
 import {CAMERE, CAMPI, LUOGHI, controllaPiano, leggiRegali, paroleDelTesto} from './piano.mjs';
 import {leggiImpostazioni} from './impostazioni.mjs';
 import {stimaTempi} from './copione.mjs';
@@ -425,6 +426,14 @@ export async function comandoRegia(slug, argomenti = []) {
     scelta = 'auto';
   }
   if (scelta === 'auto') piano.atmosfera = atmosferaPerReel(slug);
+  // la musica di sottofondo: una trama del kit, anche questa dal nome del reel (a mano: npm run imposta <reel> musica=<nome>)
+  let trama = 'auto';
+  try {
+    trama = leggiImpostazioni(slug).trama ?? 'auto';
+  } catch {
+    trama = 'auto';
+  }
+  if (trama === 'auto') piano.musica = musicaDalNome(slug);
   const esito = controllaPiano(piano, testo, {cartella: dir});
   if (esito.errori.length) throw new ErroreFmlab(`Il regista di serie ha scritto un piano che non passa il controllo (è un difetto del kit, segnalalo):\n${esito.errori.map((e) => '  ✗ ' + e).join('\n')}`);
   fs.writeFileSync(file, JSON.stringify(piano, null, 2) + '\n');

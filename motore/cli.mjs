@@ -24,6 +24,7 @@ FMLAB Reel Kit — comandi
   npm run piano [reel]                     controlla il piano e il suo "rischio cartelli" (senza reel: blocchi, luoghi, camere)
   npm run monta <reel>                     piano.json → copione.md + scene.tsx (il testo resta parola per parola)
   npm run regalo [nome file "Titolo" [PAROLA]]  i regali della chiusura (ebook, mappe, PDF): elenco, o ne aggiunge uno
+  npm run musiche                             le trame ambientali del kit (musica di sottofondo generata dal kit)
   npm run frasi [audio testo.txt]             la banca delle frasi già dette dalla voce: elenco, o taglia un audio e le aggiunge (in un reel non costano)
   npm run imposta <reel> [chiave=valore…]  le scelte del reel: narratore=dottore|fmlab|nessuno  grandezza=40…160
                                            lato=destra|sinistra  specchia=si|no  alza=0…600  stile=auto|2d|3d
@@ -206,6 +207,10 @@ async function principale() {
     case 'richieste': {
       const {comandoRichieste} = await import('./registro.mjs');
       return comandoRichieste(argomenti);
+    }
+    case 'musiche': {
+      const {comandoMusiche} = await import('./musiche.mjs');
+      return comandoMusiche();
     }
     case 'regalo': {
       const {comandoRegalo} = await import('./regali.mjs');

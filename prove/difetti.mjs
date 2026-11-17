@@ -1107,6 +1107,63 @@ await prova('B29 · atmosfera scritta male nelle impostazioni: l\'errore dice i 
   fs.rmSync(path.join(os.tmpdir(), `fmlab-b29-${process.pid}`), {recursive: true, force: true});
 });
 
+// ───────────────────────── B30 · la banca musicale del kit ─────────────────────────
+
+await prova('B30 · musica: le trame le genera il kit da una formula; dal nome del reel esce sempre la stessa; musica=no la spegne; il file del reel vince', async () => {
+  const m = await carica('motore/musiche.mjs');
+  const {sistema} = await carica('motore/impostazioni.mjs');
+  assert.ok(m.NOMI_TRAME.length >= 3 && m.NOMI_TRAME.length <= 4);
+  // generate dal kit: una formula di ffmpeg, nessun file da leggere
+  for (const [nome, [cosa, note, filtro]] of Object.entries(m.TRAME)) {
+    assert.ok(cosa && note.length >= 2 && filtro, nome);
+    for (const n of note) {
+      assert.match(n, /^[\d.]+\*sin\(2\*PI\*[\d.]+\*t\)/, `${nome}: solo note sintetizzate`);
+      const hz = Number(/2\*PI\*([\d.]+)\*t/.exec(n)[1]);
+      assert.ok(Math.abs(hz * m.DURATA_TRAMA - Math.round(hz * m.DURATA_TRAMA)) < 1e-6, `${nome}: ${hz} Hz non chiude il giro in ${m.DURATA_TRAMA} secondi (si sentirebbe lo scalino)`);
+    }
+  }
+  // dal nome: stabile, e su molti nomi escono tutte
+  const nomi = Array.from({length: 120}, (_, i) => `reel-${i}`);
+  for (const n of nomi) assert.equal(m.musicaDalNome(n), m.musicaDalNome(n));
+  assert.deepEqual([...new Set(nomi.map((n) => m.musicaDalNome(n)))].sort(), [...m.NOMI_TRAME].sort());
+  // l'ordine di chi decide
+  const trama = m.NOMI_TRAME[0];
+  assert.deepEqual(m.qualeMusica({nelReel: '/x/musica.mp3', volume: 0, scelta: trama, delPiano: trama}), {tipo: 'file', file: '/x/musica.mp3'}, 'il file del reel vince su tutto');
+  assert.equal(m.qualeMusica({volume: 0, scelta: trama, delPiano: trama, delKit: '/k/musica.mp3'}), null, 'musica=no: nessuna musica');
+  assert.equal(m.qualeMusica({scelta: m.NOMI_TRAME[1], delPiano: trama}).nome, m.NOMI_TRAME[1], 'la scelta a mano vince su quella del piano');
+  assert.equal(m.qualeMusica({scelta: 'auto', delPiano: trama}).nome, trama, 'auto: quella scritta nel piano dal regista di serie');
+  assert.equal(m.qualeMusica({scelta: 'auto', delPiano: null}), null, 'un reel senza scelta resta senza musica, come prima');
+  assert.deepEqual(m.qualeMusica({scelta: 'auto', delKit: '/k/musica.mp3'}), {tipo: 'file', file: '/k/musica.mp3'}, 'la musica del kit in stile/ vale come prima');
+  // le impostazioni: auto di serie, un nome sbagliato dà l'elenco
+  assert.equal(sistema({}, {}).trama, 'auto');
+  assert.throws(() => sistema({trama: 'valzer'}, {}, 'x'), new RegExp(`la musica "valzer" non esiste\\. Puoi scegliere: auto, ${m.NOMI_TRAME.join(', ')}`));
+  // dalla riga di comando: un numero è il volume, "no" spegne, un nome sceglie la trama (su una copia: gps non si tocca)
+  const {comandoImposta, leggiImpostazioni} = await carica('motore/impostazioni.mjs');
+  const slug = `zz-difetti-musica-${process.pid}`;
+  daCancellare.add(slug);
+  const creato = spawnSync(process.execPath, [path.join(K, 'motore/cli.mjs'), 'nuovo', slug, 'Prova musica', 'spiegazione'], {cwd: K, encoding: 'utf8', env: {...process.env, FMLAB_REGISTRO: path.join(os.tmpdir(), `fmlab-b30-${process.pid}`), FMLAB_DASHBOARD: 'no'}});
+  assert.equal(creato.status, 0, creato.stderr);
+  fs.rmSync(path.join(os.tmpdir(), `fmlab-b30-${process.pid}`), {recursive: true, force: true});
+  const zitto = console.log;
+  console.log = () => {};
+  try {
+    await comandoImposta(slug, ['musica=45']);
+    assert.deepEqual([leggiImpostazioni(slug).musica, leggiImpostazioni(slug).trama], [45, 'auto']);
+    await comandoImposta(slug, ['musica=no']);
+    assert.equal(leggiImpostazioni(slug).musica, 0);
+    await comandoImposta(slug, [`musica=${trama}`]);
+    assert.deepEqual([leggiImpostazioni(slug).musica > 0, leggiImpostazioni(slug).trama], [true, trama]);
+  } finally {
+    console.log = zitto;
+  }
+  // il regista di serie scrive la trama nel piano, e il piano la controlla
+  const {controllaPiano} = await carica('motore/piano.mjs');
+  const {regia} = await carica('motore/regista.mjs');
+  const {piano} = regia(TESTO_RETA);
+  piano.musica = 'valzer';
+  assert.match(controllaPiano(piano, TESTO_RETA).errori.join('\n'), /la musica "valzer" non esiste/);
+});
+
 if (pannello) await pannello.server.chiudi();
 cancella();
 const falliti = esiti.filter((e) => !e.ok);

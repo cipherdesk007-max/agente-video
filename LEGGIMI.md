@@ -157,6 +157,7 @@ video: le scene si riallineano da sole alle parole.
 | `npm run catalogo` | ridisegna `catalogo.jpg` con tutto quello che è pronto |
 | `npm run icone cuore` | cerca un'icona tra 35.000, anche in italiano |
 | `npm run clip gps registrazione.mp4 demo` | prepara un video (una registrazione dello schermo) per metterlo in una scena |
+| `npm run musiche` | le trame ambientali del kit: elenco, e le genera per ascoltarle |
 | `npm run suoni` | l'elenco degli effetti sonori (cartella `suoni/`: ci metti anche i tuoi) |
 | `npm run riuso gps` | a fine reel: cosa è scritto a mano e può entrare in libreria |
 | `npm test` | prove veloci del kit (pochi secondi, senza browser) |
@@ -185,9 +186,17 @@ voce del Mac (gratuita) la sincronia è esatta sulle frasi e sulle pause.
   Una banca non fa dire parole nuove: per quelle serve la voce.
 - Qualsiasi altro servizio di voce si collega con un piccolo programma: `voci/COME-FARE.md`.
 
-**Musica di sottofondo.** Metti un file `musica.mp3` nella cartella del reel (un brano tuo, o di cui hai i
-diritti): al prossimo video finisce sotto la voce, basso, e si abbassa ancora mentre la voce parla. Il volume si
-regola dal pannello o con `npm run imposta <reel> musica=30`; con 0 non c'è. Il kit non contiene musica.
+**Musica di sottofondo.** Il kit ha la sua banca: quattro trame ambientali (`quiete`, `marea`, `brina`, `orbita`)
+che genera lui stesso da una formula, come gli effetti di `suoni/`. Non c'è nessun file di altri e nessun diritto da
+pagare. `npm run musiche` le elenca e le genera (in `.fmlab/musiche/`) per ascoltarle; durano 24 secondi e si
+ripetono sotto il reel.
+
+- Di serie è `auto`: quando il regista di serie scrive il piano sceglie la trama dal nome del reel (stesso nome,
+  stessa trama) e la scrive in `piano.json` (`"musica": "marea"`).
+- A mano: `npm run imposta <reel> musica=brina`. Per non averla: `musica=no`. Per il volume: `musica=30` (da 0 a 100).
+- Un file `musica.mp3` nella cartella del reel (un brano tuo, o di cui hai i diritti) vince su tutto, come prima.
+- Volume e sfumature sono quelli di sempre: la musica sta sotto la voce e si abbassa ancora mentre la voce parla.
+- I reel che c'erano già non hanno una trama scritta e restano senza musica, come prima.
 
 ## Il narratore
 

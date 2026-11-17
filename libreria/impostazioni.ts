@@ -51,6 +51,8 @@ export type Impostazioni = {
   musica?: number;
   /** L'atmosfera del fondo: "auto" (quella del piano, o il fondo di sempre) o un nome di motore/comune/atmosfere.mjs. */
   atmosfera?: string;
+  /** La trama musicale scelta: "auto" o un nome di motore/musiche.mjs. */
+  trama?: string;
   /** Il formato del video: verticale (di serie), quadrato, orizzontale. */
   formato?: '9:16' | '1:1' | '16:9';
   /** La voce scelta per il reel (la usa `npm run voce`; non cambia come si disegnano le scene). */
