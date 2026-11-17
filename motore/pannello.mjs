@@ -438,6 +438,117 @@ export async function comandoPannello(argomenti = []) {
         json(res, 200, {lavoro: vistaLavoro(lavoro, Number(url.searchParams.get('da') ?? 0))});
         return true;
       }
+      // ───────── la dashboard in diretta: registro, coda, riferimenti, chiavi, pezzi, diario ─────────
+      if (url.pathname === '/api/adesso' && req.method === 'GET') {
+        const {leggiAdesso, leggiRegistro, leggiCoda, creditiSpesi} = await import('./registro.mjs');
+        const {preventivoElevenLabs} = await import('./voce.mjs');
+        const {leggiCopione} = await import('./copione.mjs');
+        // quanto costerebbe adesso la voce di ogni reel: solo le frasi che non sono né in banca né già pagate
+        const daSpendere = {};
+        for (const slug of elencoReel()) {
+          try {
+            const copione = leggiCopione(fs.readFileSync(path.join(CARTELLA_REELS, slug, 'copione.md'), 'utf8'));
+            daSpendere[slug] = preventivoElevenLabs(copione, 'it', leggiImpostazioni(slug).voce);
+          } catch {
+            // un reel senza copione non ha ancora un costo
+          }
+        }
+        const coda = leggiCoda();
+        json(res, 200, {
+          adesso: leggiAdesso(),
+          fatti: leggiRegistro({ultimi: 60}),
+          coda: [...coda.filter((r) => r.stato !== 'fatta'), ...coda.filter((r) => r.stato === 'fatta').slice(-4)],
+          crediti: {spesi: creditiSpesi(), daSpendere},
+          tappe: (await import('./fai.mjs')).TAPPE,
+        });
+        return true;
+      }
+      if (url.pathname === '/api/coda' && req.method === 'POST') {
+        const {aggiungiRichiesta, segnaRichiesta} = await import('./registro.mjs');
+        const corpo = await leggiCorpo(req);
+        if (corpo.fatta) {
+          json(res, 200, {richiesta: segnaRichiesta(String(corpo.fatta), 'fatta')});
+          return true;
+        }
+        const reel = corpo.reel && elencoReel().includes(corpo.reel) ? corpo.reel : null;
+        const permesse = ['narratore', 'formato', 'durata', 'regalo', 'voce', 'stile', 'musica'];
+        const scelte = Object.fromEntries(Object.entries(corpo.scelte ?? {}).filter(([k, v]) => permesse.includes(k) && ['string', 'number'].includes(typeof v) && String(v).length < 40));
+        let richiesta;
+        try {
+          richiesta = aggiungiRichiesta({reel, testo: corpo.testo ?? '', scelte});
+        } catch (e) {
+          throw new ErroreFmlab(e.message);
+        }
+        json(res, 200, {richiesta});
+        return true;
+      }
+      if (url.pathname === '/api/riferimenti' && req.method === 'GET') {
+        const cartella = path.join(RADICE, 'riferimenti');
+        const video = fs.existsSync(cartella) ? fs.readdirSync(cartella).filter((f) => /\.(mp4|mov|m4v)$/i.test(f)).sort() : [];
+        let misure = {};
+        try {
+          misure = leggiJson(path.join(cartella, 'misure.json')).riferimenti ?? {};
+        } catch {
+          misure = {};
+        }
+        json(res, 200, {
+          cartella: rel(cartella),
+          video: video.map((f) => ({nome: f, mega: Math.round((fs.statSync(path.join(cartella, f)).size / 1e6) * 10) / 10, indirizzo: `/riferimenti/${encodeURIComponent(f)}`, durata: misure[f.replace(/\.[^.]+$/, '')]?.durata ?? null})),
+          misurati: Object.keys(misure).length,
+          analisi: fs.existsSync(path.join(cartella, 'ANALISI.md')),
+        });
+        return true;
+      }
+      if (url.pathname === '/api/apri' && req.method === 'POST') {
+        if (!locale(req)) throw new ErroreFmlab('Le cartelle si aprono solo dal computer su cui gira il kit.');
+        const corpo = await leggiCorpo(req);
+        const posti = {kit: RADICE, riferimenti: path.join(RADICE, 'riferimenti'), frasi: path.join(RADICE, 'voci', 'frasi'), pagate: path.join(RADICE, 'voci', 'pagate'), immagini: path.join(RADICE, 'libreria', 'immagini'), suoni: path.join(RADICE, 'suoni'), personaggi: path.join(RADICE, 'personaggi'), libreria: path.join(RADICE, 'libreria')};
+        const cosa = String(corpo.cosa ?? '');
+        const cartella = cosa.startsWith('reel:') && elencoReel().includes(cosa.slice(5)) ? path.join(CARTELLA_REELS, cosa.slice(5)) : posti[cosa];
+        if (!cartella) throw new ErroreFmlab('Cartella sconosciuta.');
+        fs.mkdirSync(cartella, {recursive: true});
+        let aperta = false;
+        if (!process.env.FMLAB_NON_APRIRE) {
+          const comando = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'explorer' : 'xdg-open';
+          try {
+            spawn(comando, [cartella], {stdio: 'ignore', detached: true}).on('error', () => {}).unref();
+            aperta = true;
+          } catch {
+            aperta = false;
+          }
+        }
+        json(res, 200, {aperta, percorso: cartella});
+        return true;
+      }
+      if (url.pathname === '/api/chiavi') {
+        const {statoChiavi, scriviChiave} = await import('./chiavi.mjs');
+        if (req.method === 'POST') {
+          if (!locale(req)) throw new ErroreFmlab('Le chiavi si scrivono solo dal computer su cui gira il kit, non dal telefono.');
+          const corpo = await leggiCorpo(req);
+          scriviChiave(String(corpo.nome ?? ''), corpo.valore);
+        }
+        json(res, 200, {chiavi: statoChiavi(), daQui: locale(req)});
+        return true;
+      }
+      if (url.pathname === '/api/pezzi' && req.method === 'GET') {
+        const {BLOCCHI, OGGETTI, LUOGHI, SOGGETTI} = await import('./piano.mjs');
+        const {leggiBanca} = await import('./frasi.mjs');
+        const banca = leggiBanca();
+        json(res, 200, {
+          blocchi: Object.entries(BLOCCHI).map(([nome, b]) => ({nome, cosa: b.cosa})),
+          soggetti: Object.entries(SOGGETTI).map(([nome, stato]) => ({nome, stato})),
+          oggetti: Object.keys(OGGETTI),
+          luoghi: LUOGHI,
+          frasi: banca.frasi.map((f) => ({testo: f.testo, lingua: f.lingua, secondi: f.secondi, indirizzo: `/${f.file.split(path.sep).join('/')}`})),
+          ritmo: banca.ritmo,
+        });
+        return true;
+      }
+      if (url.pathname === '/api/diario' && req.method === 'GET') {
+        const {leggiDiario} = await import('./registro.mjs');
+        json(res, 200, {voci: leggiDiario()});
+        return true;
+      }
       if (req.method !== 'POST') {
         json(res, 405, {errore: 'Metodo non permesso.'});
         return true;
@@ -559,7 +670,9 @@ export async function comandoPannello(argomenti = []) {
   } catch {
     server = await avviaServer({porta: 0, host, rotte});
   }
-  const indirizzo = `http://localhost:${server.porta}/?chiave=${chiave}`;
+  // accesa da `npm run stato`: si apre sulla diretta, perché chi guarda vuole vedere cosa fa l'agente
+  const vista = /^[a-z]+$/.test(process.env.FMLAB_VISTA ?? '') ? `#${process.env.FMLAB_VISTA}` : '';
+  const indirizzo = `http://localhost:${server.porta}/?chiave=${chiave}${vista}`;
   console.log(`\nPannello FMLAB pronto:  ${indirizzo}`);
   console.log(`Codice d'ingresso:      ${chiave}`);
   if (rete) {

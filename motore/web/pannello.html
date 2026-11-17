@@ -18,8 +18,9 @@
   header { position: sticky; top: 0; z-index: 5; background: rgba(4, 7, 10, 0.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--bordo); padding: 12px 16px 0; }
   .marchio { font: 900 20px/1 "Inter Display", "Inter", system-ui; letter-spacing: 0.02em; }
   .marchio span { color: var(--luce); font-weight: 700; }
-  nav { display: flex; gap: 4px; margin-top: 10px; }
-  nav button { flex: 1; background: none; border: 0; border-bottom: 3px solid transparent; color: var(--tenue); font: 700 15px "Inter", system-ui; padding: 10px 4px; cursor: pointer; }
+  nav { display: flex; gap: 4px; margin-top: 10px; overflow-x: auto; scrollbar-width: none; }
+  nav::-webkit-scrollbar { display: none; }
+  nav button { flex: 1 0 auto; white-space: nowrap; background: none; border: 0; border-bottom: 3px solid transparent; color: var(--tenue); font: 700 15px "Inter", system-ui; padding: 10px 4px; cursor: pointer; }
   nav button[aria-selected="true"] { color: var(--testo); border-bottom-color: var(--luce); }
   main { max-width: 760px; margin: 0 auto; padding: 16px; }
   h2 { font: 800 19px/1.2 "Inter Display", "Inter", system-ui; margin: 26px 0 10px; }
@@ -107,12 +108,53 @@
 <header>
   <div class="marchio">FMLAB <span>Reel Kit</span></div>
   <nav role="tablist">
+    <button role="tab" data-vista="adesso" aria-selected="false">Adesso</button>
     <button role="tab" data-vista="nuovo" aria-selected="true">Nuovo reel</button>
     <button role="tab" data-vista="reel" aria-selected="false">I miei reel</button>
+    <button role="tab" data-vista="riferimenti" aria-selected="false">Riferimenti</button>
+    <button role="tab" data-vista="chiavi" aria-selected="false">Chiavi</button>
     <button role="tab" data-vista="catalogo" aria-selected="false">Catalogo e prompt</button>
+    <button role="tab" data-vista="diario" aria-selected="false">Diario</button>
   </nav>
 </header>
 <main>
+  <section id="vista-adesso" hidden>
+    <div id="adesso"></div>
+    <h2>Chiedi una cosa all'agente</h2>
+    <div class="aiuto">La richiesta va in coda: l'agente la legge al prossimo <b>npm run stato</b>, la fa e la segna come fatta. Non entra nella sua chat: se è fermo ad aspettarti, digli "guarda lo stato".</div>
+    <label class="campo" for="coda-reel">Per quale reel</label>
+    <select id="coda-reel"></select>
+    <div class="scelte" id="coda-scelte" style="margin-top:10px"></div>
+    <label class="campo" for="coda-testo">Con parole tue (facoltativo)</label>
+    <textarea id="coda-testo" rows="3" placeholder="Per esempio: nella terza scena metti due batterie al posto delle icone"></textarea>
+    <div class="azioni"><button class="principale" id="coda-manda" type="button">Metti in coda</button></div>
+    <div class="nota" id="coda-nota"></div>
+    <h2>In coda</h2>
+    <div id="coda"></div>
+    <h2>Cosa è successo</h2>
+    <div id="fatti"></div>
+  </section>
+
+  <section id="vista-riferimenti" hidden>
+    <h2>Video di riferimento</h2>
+    <div class="aiuto">Sono i video a cui i reel devono somigliare. Stanno nella cartella <b>riferimenti/</b> del kit, fuori da Git: mettili lì a mano. <b>npm run affianca</b> e <b>npm run prova-cieca</b> li usano.</div>
+    <div class="azioni"><button class="secondario" type="button" data-apri="riferimenti">Apri la cartella</button></div>
+    <div class="nota" id="rif-nota"></div>
+    <div id="riferimenti"></div>
+  </section>
+
+  <section id="vista-chiavi" hidden>
+    <h2>Chiavi e regolazioni</h2>
+    <div class="aiuto">Stanno solo nel file <b>.env</b> di questo computer. Qui vedi se ci sono; una chiave scritta non viene più mostrata. Si scrivono solo dal computer stesso, non dal telefono.</div>
+    <div id="chiavi"></div>
+  </section>
+
+  <section id="vista-diario" hidden>
+    <h2>Diario del kit</h2>
+    <div class="aiuto">Una voce per ogni reel chiuso, scritta dal kit: cosa è entrato in catalogo e cosa è rimasto da sistemare. È il file <b>diario.md</b>.</div>
+    <div id="diario"></div>
+  </section>
+
   <section id="vista-nuovo">
     <h2>Il testo del reel</h2>
     <div class="scelte" id="tipo" style="margin-bottom: 10px"></div>
@@ -152,6 +194,15 @@
     <div class="nota">Scene, oggetti 3D, grafici, icone: i nomi sono quelli che l'agente scrive nelle scene. Come si usano è in CATALOGO.md.</div>
     <div class="azioni"><button class="secondario" id="rifai-catalogo" type="button">Ridisegna il catalogo</button></div>
     <div id="catalogo"></div>
+    <h2>I pezzi, per nome</h2>
+    <div class="aiuto">Quello che un piano di regia può usare. Le frasi in banca, scritte uguali nel testo, non costano.</div>
+    <div class="azioni">
+      <button class="secondario" type="button" data-apri="libreria">Apri la libreria</button>
+      <button class="secondario" type="button" data-apri="frasi">Apri le frasi</button>
+      <button class="secondario" type="button" data-apri="immagini">Apri le immagini</button>
+      <button class="secondario" type="button" data-apri="suoni">Apri i suoni</button>
+    </div>
+    <div id="pezzi"></div>
   </section>
 
   <section id="vista-reel" hidden>
@@ -633,15 +684,180 @@ $('#rifai-catalogo').addEventListener('click', async () => {
   catch (e) { $('#catalogo').replaceChildren(h('div', {class: 'avviso errore'}, e.message)); }
 });
 
+// ───────── la diretta: cosa sta facendo il kit adesso, chiunque l'abbia lanciato ─────────
+const ora = (iso) => new Date(iso).toLocaleTimeString('it-IT', {hour: '2-digit', minute: '2-digit', second: '2-digit'});
+const sceltaCoda = {};
+function pulsantiCoda() {
+  const gruppi = [
+    ['narratore', [['dottore', 'Con il dottore'], ['nessuno', 'Senza dottore']]],
+    ['formato', [['9:16', 'Verticale'], ['1:1', 'Quadrato'], ['16:9', 'Orizzontale']]],
+    ['durata', [['45', '45 s'], ['60', '60 s'], ['75', '75 s'], ['90', '90 s']]],
+    ['regalo', [['mappa', 'Regalo: mappa'], ['nessuno', 'Senza regalo']]],
+    ['voce', [['elevenlabs', 'Voce ElevenLabs'], ['mac', 'Voce del Mac'], ['stima', 'Solo tempi stimati']]],
+  ];
+  $('#coda-scelte').replaceChildren(...gruppi.flatMap(([chiave, voci]) => voci.map(([valore, testo]) => h('button', {class: 'scelta', type: 'button', 'aria-pressed': String(sceltaCoda[chiave] === valore), 'data-scelta': `${chiave}=${valore}`, onclick: () => {
+    if (sceltaCoda[chiave] === valore) delete sceltaCoda[chiave]; else sceltaCoda[chiave] = valore;
+    pulsantiCoda();
+  }}, testo))));
+}
+async function disegnaAdesso() {
+  const d = await chiama('/api/adesso');
+  const a = d.adesso;
+  const fatti = d.fatti;
+  const ultimoConReel = [...fatti].reverse().find((f) => f.reel);
+  const slug = a?.reel ?? ultimoConReel?.reel ?? null;
+  const r = slug ? stato?.reel.find((x) => x.slug === slug) : null;
+  const versione = r?.versioni?.[0] ?? null;
+  // le tappe dell'ultimo `fai` di questo reel
+  const daDove = fatti.map((f, i) => (f.tipo === 'inizio' && f.comando === 'fai' && f.reel === slug ? i : -1)).filter((i) => i >= 0).pop();
+  const tappe = {};
+  if (daDove !== undefined) for (const f of fatti.slice(daDove)) if (f.tipo === 'tappa' && f.reel === slug) tappe[f.tappa] = f;
+  const chips = Object.keys(tappe).length ? h('div', {class: 'etichette', id: 'adesso-tappe'}, d.tappe.map((t) => {
+    const f = tappe[t];
+    const classe = !f ? 'etichetta' : f.stato === 'fatta' ? 'etichetta si' : f.stato === 'ferma' ? 'etichetta male' : 'etichetta no';
+    return h('span', {class: classe, title: f?.motivo ?? f?.nota ?? ''}, `${!f ? '·' : f.stato === 'fatta' ? '✓' : f.stato === 'ferma' ? '✖' : '▶'} ${t}`);
+  })) : null;
+  const ferma = Object.values(tappe).find((f) => f.stato === 'ferma');
+  const spesi = d.crediti.spesi;
+  const costo = slug ? d.crediti.daSpendere[slug] : null;
+  $('#adesso').replaceChildren(...[
+    h('div', {class: 'reel', id: 'adesso-corso'},
+      h('h3', {}, a ? `In corso: ${a.comando}${a.reel ? ` · ${a.reel}` : ''}${a.tappa ? ` · ${a.tappa} (${a.n} di ${a.di})` : ''}` : 'Niente in corso'),
+      a && a.percento !== null && a.percento !== undefined ? h('div', {class: 'barra', style: {height: '8px', background: 'var(--bordo)', borderRadius: '6px', overflow: 'hidden', margin: '8px 0'}}, h('i', {style: {display: 'block', height: '100%', width: `${a.percento}%`, background: 'var(--luce)'}})) : null,
+      a && a.percento !== null && a.percento !== undefined ? h('div', {class: 'nota'}, `${a.percento}%${a.mancano ? ` · mancano circa ${Math.ceil(a.mancano / 60)} min` : ''}`) : null,
+      !a ? h('div', {class: 'nota'}, slug ? `Ultimo lavoro: ${slug}. Quando l'agente lancia un comando del kit lo vedi qui, mentre succede.` : 'Quando l\'agente lancia un comando del kit lo vedi qui, mentre succede.') : null,
+      chips,
+      ferma ? h('div', {class: 'avviso errore', id: 'adesso-errore'}, `Ferma alla tappa "${ferma.tappa}": ${ferma.motivo ?? ''}`) : null,
+    ),
+    h('div', {class: 'reel', id: 'adesso-crediti'},
+      h('h3', {}, 'Crediti'),
+      h('div', {class: 'nota'}, h('b', {}, String(spesi.totale)), ` spesi finora per la voce${Object.keys(spesi.perReel).length ? ` (${Object.entries(spesi.perReel).map(([k, v]) => `${k}: ${v}`).join(' · ')})` : ''}.`),
+      costo ? h('div', {class: 'nota'}, costo.caratteri ? [h('b', {}, String(costo.caratteri)), ` da spendere per la voce di ${slug}${costo.pronte ? ` (${costo.pronte} frasi sono già pronte e non si pagano)` : ''}. Non parte niente senza il tuo sì.`] : `La voce di ${slug} non costa: tutte le frasi sono già pronte.`) : null,
+    ),
+    versione ? h('div', {class: 'reel', id: 'adesso-vedi'},
+      h('h3', {}, `Guarda ${slug}`),
+      h('div', {class: 'collegamenti'},
+        h('a', {class: 'secondario forte', href: versione.anteprima, target: '_blank'}, versione.conAudio ? 'Anteprima con audio' : 'Anteprima (senza voce)'),
+        versione.video ? h('a', {class: 'secondario', href: versione.video.indirizzo, target: '_blank'}, `Video (${quando(versione.video.quando)})`) : null,
+        h('button', {class: 'secondario', type: 'button', onclick: () => apri(`reel:${slug}`)}, 'Apri la cartella'),
+      ),
+      versione.provini ? h('a', {href: versione.provini.indirizzo, target: '_blank'}, h('img', {id: 'adesso-provini', src: `${versione.provini.indirizzo}?t=${Math.round(versione.provini.quando)}`, alt: 'Provini', style: {width: '100%', borderRadius: '12px', marginTop: '10px', maxHeight: '420px', objectFit: 'cover', objectPosition: 'top'}})) : h('div', {class: 'nota'}, 'I provini non ci sono ancora.'),
+    ) : null,
+  ].filter(Boolean));
+  // la coda
+  const scelta = $('#coda-reel');
+  const prima = scelta.value;
+  scelta.replaceChildren(h('option', {value: ''}, 'Nessuno in particolare'), ...(stato?.reel ?? []).map((x) => h('option', {value: x.slug}, x.slug)));
+  scelta.value = prima || slug || '';
+  $('#coda').replaceChildren(...(d.coda.length ? d.coda.map((q) => h('div', {class: 'frase', 'data-richiesta': q.id},
+    h('span', {class: q.stato === 'fatta' ? 'etichetta si' : q.stato === 'vista' ? 'etichetta no' : 'etichetta'}, q.stato === 'fatta' ? 'fatta' : q.stato === 'vista' ? 'l\'agente l\'ha vista' : 'in attesa'),
+    ` ${q.reel ? `${q.reel}: ` : ''}${q.testo}${q.comando ? ` → ${q.comando}` : ''} `,
+    q.stato !== 'fatta' ? h('button', {class: 'secondario', type: 'button', onclick: async () => { await chiama('/api/coda', {fatta: q.id}); disegnaAdesso(); }}, 'Togli') : null,
+  )) : [h('div', {class: 'nota'}, 'Nessuna richiesta in coda.')]));
+  $('#fatti').replaceChildren(...[...fatti].reverse().filter((f) => f.tipo !== 'inizio' || f.comando !== 'fai').slice(0, 30).map((f) => h('div', {class: 'nota', style: {margin: '4px 0'}},
+    `${ora(f.t)}  `,
+    f.tipo === 'tappa' ? `${f.reel} · ${f.tappa}: ${f.stato === 'parte' ? 'parte' : f.stato === 'fatta' ? `fatta in ${f.secondi} s` : `FERMA — ${f.motivo ?? ''}`}`
+      : f.tipo === 'fine' ? `${f.comando}${f.reel ? ` ${f.reel}` : ''}: ${f.ok ? `finito in ${f.secondi} s` : `ERRORE — ${f.errore ?? ''}`}`
+      : f.tipo === 'inizio' ? `${f.comando} ${f.argomenti ?? ''}`
+      : f.tipo === 'spesa' ? `SPESA: ${f.caratteri} crediti per la voce di ${f.reel}`
+      : f.tipo === 'preventivo' ? `la voce di ${f.reel} costerebbe ${f.caratteri} crediti`
+      : f.tipo === 'richiesta' ? `richiesta ${f.id}${f.stato ? `: ${f.stato}` : ` in coda${f.testo ? ` — ${f.testo}` : ''}`}`
+      : `${f.tipo}`,
+  )));
+}
+$('#coda-manda').addEventListener('click', async () => {
+  const nota = $('#coda-nota');
+  try {
+    await chiama('/api/coda', {reel: $('#coda-reel').value || null, testo: $('#coda-testo').value, scelte: sceltaCoda});
+    $('#coda-testo').value = '';
+    for (const k of Object.keys(sceltaCoda)) delete sceltaCoda[k];
+    pulsantiCoda();
+    nota.textContent = 'In coda. L\'agente la legge al prossimo "npm run stato".';
+    disegnaAdesso();
+  } catch (e) { nota.textContent = e.message; }
+});
+async function apri(cosa) {
+  try {
+    const r = await chiama('/api/apri', {cosa});
+    return r;
+  } catch (e) { alertNota(e.message); return null; }
+}
+function alertNota(testo) {
+  const el = h('div', {class: 'avviso errore'}, testo);
+  $('main').prepend(el);
+  setTimeout(() => el.remove(), 6000);
+}
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-apri]'); if (b) apri(b.dataset.apri).then((r) => { if (r && !r.aperta) alertNota(`La cartella è ${r.percorso}`); }); });
+
+async function disegnaRiferimenti() {
+  const d = await chiama('/api/riferimenti');
+  $('#rif-nota').textContent = d.video.length ? `${d.video.length} video in ${d.cartella}/${d.misurati ? ` · ${d.misurati} misurati (npm run confronta riferimenti)` : ''}` : `Nessun video in ${d.cartella}/: aprila e mettici i tuoi.`;
+  $('#riferimenti').replaceChildren(...d.video.map((v) => h('div', {class: 'reel', 'data-riferimento': v.nome},
+    h('h3', {}, v.nome), h('div', {class: 'nota'}, `${v.mega} MB${v.durata ? ` · ${Math.round(v.durata)} s` : ''}`),
+    h('video', {src: v.indirizzo, controls: true, preload: 'metadata', playsInline: true, style: {maxHeight: '420px'}}),
+  )));
+}
+
+async function disegnaChiavi(risposta = null) {
+  const d = risposta ?? await chiama('/api/chiavi');
+  const gruppi = [...new Set(d.chiavi.map((c) => c.gruppo))];
+  $('#chiavi').replaceChildren(...[
+    d.daQui ? null : h('div', {class: 'avviso'}, 'Stai guardando da un altro dispositivo: qui vedi cosa c\'è, ma le chiavi si scrivono solo dal computer del kit.'),
+    ...gruppi.map((g) => h('div', {class: 'reel'}, h('h3', {}, g), ...d.chiavi.filter((c) => c.gruppo === g).map((c) => {
+      const campo = h('input', {type: c.segreto ? 'password' : 'text', autocomplete: 'off', placeholder: c.segreto ? (c.presente ? 'c\'è già: scrivi qui solo per cambiarla' : 'incolla qui') : (c.esempio ?? ''), value: c.segreto ? '' : (c.valore ?? ''), disabled: !d.daQui, 'data-chiave': c.nome, style: {flex: '1', minWidth: '0', background: 'var(--carta)', color: 'var(--testo)', border: '1px solid var(--bordo)', borderRadius: '12px', padding: '10px 12px', font: 'inherit'}});
+      const salva = async (valore) => {
+        try { disegnaChiavi(await chiama('/api/chiavi', {nome: c.nome, valore})); } catch (e) { alertNota(e.message); }
+      };
+      return h('div', {style: {margin: '12px 0'}, 'data-riga-chiave': c.nome},
+        h('div', {}, h('span', {class: c.presente ? 'etichetta si' : 'etichetta male'}, c.presente ? 'c\'è' : 'manca'), ' ', h('b', {}, c.nome)),
+        h('div', {class: 'nota', style: {marginTop: '2px'}}, c.cosa),
+        h('div', {style: {display: 'flex', gap: '8px', marginTop: '6px'}}, campo,
+          h('button', {class: 'secondario', type: 'button', disabled: !d.daQui, onclick: () => { if (campo.value.trim() || !c.segreto) salva(campo.value); }}, 'Salva'),
+          c.presente ? h('button', {class: 'secondario', type: 'button', disabled: !d.daQui, onclick: () => salva('')}, 'Togli') : null),
+      );
+    }))),
+  ].filter(Boolean));
+}
+
+async function disegnaPezzi() {
+  const d = await chiama('/api/pezzi');
+  const elenco = (titolo, voci) => h('details', {class: 'prompt'}, h('summary', {}, `${titolo} (${voci.length})`), h('div', {style: {padding: '6px 2px'}}, ...voci));
+  const riga = (nome, cosa) => h('div', {class: 'nota', style: {margin: '6px 0'}}, h('b', {}, nome), cosa ? ` — ${cosa}` : '');
+  $('#pezzi').replaceChildren(
+    elenco('Scene pronte', d.blocchi.map((b) => riga(b.nome, b.cosa))),
+    elenco('Soggetti grandi', d.soggetti.map((x) => riga(x.nome, `cambia: ${x.stato.join(', ')}`))),
+    elenco('Oggetti 3D', d.oggetti.map((o) => riga(o))),
+    elenco('Luoghi', d.luoghi.map((l) => riga(l))),
+    elenco('Frasi in banca', d.frasi.map((f) => h('div', {class: 'nota', style: {margin: '8px 0'}, 'data-frase': f.testo}, h('b', {}, f.testo), ` · ${f.secondi} s`, h('audio', {src: f.indirizzo, controls: true, preload: 'none', style: {display: 'block', width: '100%', marginTop: '4px'}})))),
+  );
+}
+
+async function disegnaDiario() {
+  const d = await chiama('/api/diario');
+  $('#diario').replaceChildren(...(d.voci.length ? d.voci.map((v) => h('div', {class: 'reel', 'data-voce-diario': v.titolo}, h('h3', {}, v.titolo), ...v.righe.map((r) => h('div', {class: 'nota', style: {margin: '6px 0'}}, r)))) : [h('div', {class: 'nota'}, 'Ancora nessuna voce: la prima la scrive il kit quando un reel arriva in fondo a "npm run fai".')]));
+}
+
 // ───────── schede e avvio ─────────
+const VISTE = ['adesso', 'nuovo', 'reel', 'riferimenti', 'chiavi', 'catalogo', 'diario'];
+let diretta = null;
 function mostra(vista) {
   for (const b of document.querySelectorAll('nav button')) b.setAttribute('aria-selected', String(b.dataset.vista === vista));
-  $('#vista-nuovo').hidden = vista !== 'nuovo';
-  $('#vista-reel').hidden = vista !== 'reel';
-  $('#vista-catalogo').hidden = vista !== 'catalogo';
+  for (const v of VISTE) $(`#vista-${v}`).hidden = v !== vista;
+  clearInterval(diretta);
+  diretta = null;
+  const errore = (e) => alertNota(e.message);
   if (vista === 'reel') aggiorna(true);
-  if (vista === 'catalogo') disegnaCatalogo();
-  history.replaceState(null, '', vista === 'reel' ? '#reel' : vista === 'catalogo' ? '#catalogo' : '#');
+  if (vista === 'catalogo') { disegnaCatalogo(); disegnaPezzi().catch(errore); }
+  if (vista === 'riferimenti') disegnaRiferimenti().catch(errore);
+  if (vista === 'chiavi') disegnaChiavi().catch(errore);
+  if (vista === 'diario') disegnaDiario().catch(errore);
+  if (vista === 'adesso') {
+    pulsantiCoda();
+    const giro = () => aggiorna(true).then(disegnaAdesso).catch(() => {});
+    giro();
+    diretta = setInterval(giro, 2000);
+  }
+  history.replaceState(null, '', vista === 'nuovo' ? '#' : `#${vista}`);
 }
 for (const b of document.querySelectorAll('nav button')) b.addEventListener('click', () => mostra(b.dataset.vista));
 
@@ -654,7 +870,7 @@ async function aggiorna(soloElenco = false) {
   if (stato.lavoro && stato.lavoro.stato === 'in corso' && seguito !== stato.lavoro.id) segui(stato.lavoro);
 }
 
-aggiorna().then(() => { if (location.hash === '#reel') mostra('reel'); else if (location.hash === '#catalogo') mostra('catalogo'); }).catch((e) => { $('main').prepend(h('div', {class: 'avviso errore'}, e.message)); });
+aggiorna().then(() => { const v = location.hash.slice(1); if (VISTE.includes(v) && v !== 'nuovo') mostra(v); }).catch((e) => { $('main').prepend(h('div', {class: 'avviso errore'}, e.message)); });
 </script>
 </body>
 </html>

@@ -51,7 +51,7 @@ export async function assicuraDashboard() {
   try {
     fs.mkdirSync(base(), {recursive: true});
     const registro = fs.openSync(path.join(base(), 'pannello.log'), 'a');
-    const figlio = spawn(process.execPath, [path.join(RADICE, 'motore', 'cli.mjs'), 'pannello'], {cwd: RADICE, detached: true, stdio: ['ignore', registro, registro], env: process.env});
+    const figlio = spawn(process.execPath, [path.join(RADICE, 'motore', 'cli.mjs'), 'pannello'], {cwd: RADICE, detached: true, stdio: ['ignore', registro, registro], env: {...process.env, FMLAB_VISTA: 'adesso'}});
     figlio.unref();
     for (let i = 0; i < 50; i++) {
       await new Promise((ok) => setTimeout(ok, 120));

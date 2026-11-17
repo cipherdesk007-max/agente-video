@@ -403,6 +403,123 @@ await prova('voce a frasi: ElevenLabs (finto) genera frase per frase; la banca e
   }
 });
 
+await prova('dashboard: npm run stato la accende da sola, la ritrova la seconda volta, e si spegne', async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fmlab-dash-'));
+  const porta = 4800 + (process.pid % 400);
+  const env = {FMLAB_REGISTRO: tmp, FMLAB_DASHBOARD: 'si', FMLAB_PORTA_PANNELLO: String(porta)};
+  try {
+    const uno = kit(['stato'], {env});
+    assert.equal(uno.codice, 0, uno.testo);
+    assert.match(uno.testo, new RegExp(`Dashboard: http://localhost:${porta}/\\?chiave=[A-Z0-9]+#adesso +\\(accesa adesso`));
+    const due = kit(['stato'], {env});
+    assert.match(due.testo, new RegExp(`Dashboard: http://localhost:${porta}/`));
+    assert.doesNotMatch(due.testo, /accesa adesso/);
+    assert.equal((await fetch(`http://localhost:${porta}/`)).status, 401, 'la dashboard risponde e chiede il codice');
+    assert.match(kit(['pannello', 'ferma'], {env}).testo, /Dashboard spenta/);
+    await new Promise((r) => setTimeout(r, 400));
+    await assert.rejects(fetch(`http://localhost:${porta}/`));
+    assert.doesNotMatch(kit(['stato'], {env: {...env, FMLAB_DASHBOARD: 'no'}}).testo, /Dashboard:/);
+  } finally {
+    kit(['pannello', 'ferma'], {env});
+    fs.rmSync(tmp, {recursive: true, force: true});
+  }
+});
+
+await prova('dashboard: le pagine Adesso, Riferimenti, Chiavi, Catalogo e Diario nel browser, con la coda letta da npm run stato', async () => {
+  const {chromium} = await import('playwright-core');
+  const {trovaBrowser} = await import(`${K}/motore/browser.mjs`);
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fmlab-dash-'));
+  const porta = 5300 + (process.pid % 400);
+  const fileEnv = path.join(tmp, 'env');
+  const env = {FMLAB_REGISTRO: tmp, FMLAB_ENV: fileEnv, FMLAB_DIARIO: path.join(tmp, 'diario.md'), FMLAB_DASHBOARD: 'no', ELEVENLABS_API_KEY: '', ELEVENLABS_MODEL: ''};
+  // quello che la diretta deve mostrare: un comando riuscito, uno fallito, un `fai` fermo alla voce, una spesa
+  assert.equal(kit(['piano', 'reta-testo'], {env}).codice, 0);
+  kit(['render', 'zz-non-esiste'], {env});
+  const semina = `
+    const r = await import(${JSON.stringify(`${K}/motore/registro.mjs`)});
+    r.annota('inizio', {comando: 'fai', reel: 'reta-testo', argomenti: 'reta-testo'});
+    r.annota('tappa', {reel: 'reta-testo', tappa: 'regia', n: 1, di: 8, stato: 'fatta', secondi: 1});
+    r.annota('tappa', {reel: 'reta-testo', tappa: 'voce', n: 5, di: 8, stato: 'ferma', motivo: 'La voce costa circa 1498 crediti'});
+    r.annota('spesa', {reel: 'reta-testo', caratteri: 123, motore: 'elevenlabs'});
+    r.scriviDiario('reta-testo · prova', ['entrato in catalogo: niente di nuovo', 'da sistemare: una etichetta fuori zona']);`;
+  assert.equal(spawnSync(process.execPath, ['--input-type=module', '-e', semina], {env: {...process.env, ...env}, encoding: 'utf8'}).status, 0);
+  const server = spawn(process.execPath, [CLI, 'pannello'], {cwd: K, stdio: 'ignore', env: {...process.env, ...env, FMLAB_NON_APRIRE: '1', FMLAB_CHIAVE_PANNELLO: 'LENTE567', FMLAB_PORTA_PANNELLO: String(porta), FMLAB_PANNELLO_PROVA: ''}});
+  const browser = await chromium.launch({executablePath: trovaBrowser(), headless: true});
+  const errori = [];
+  try {
+    await new Promise((r) => setTimeout(r, 1500));
+    const pagina = await (await browser.newContext({viewport: {width: 390, height: 844}, isMobile: true, hasTouch: true})).newPage();
+    pagina.on('pageerror', (e) => errori.push(e.message));
+    await pagina.goto(`http://localhost:${porta}/?chiave=LENTE567#adesso`);
+    // Adesso
+    await pagina.waitForSelector('#adesso-corso');
+    assert.match(await pagina.textContent('#adesso-corso'), /Niente in corso/);
+    assert.doesNotMatch(await pagina.textContent('#adesso'), /\bnull\b|undefined/, 'niente "null" scritto nella pagina');
+    assert.match(await pagina.textContent('#adesso-tappe'), /✓ regia/);
+    assert.match(await pagina.textContent('#adesso-tappe'), /✖ voce/);
+    assert.match(await pagina.textContent('#adesso-errore'), /1498 crediti/);
+    assert.match(await pagina.textContent('#adesso-crediti'), /123 spesi/);
+    assert.match(await pagina.textContent('#adesso-crediti'), /da spendere per la voce di reta-testo|non costa/);
+    assert.match(await pagina.textContent('#fatti'), /ERRORE/);
+    assert.ok(await pagina.locator('#adesso-provini').count(), 'i provini del reel si vedono nella diretta');
+    // la coda: un pulsante e due parole, poi l'agente la legge con npm run stato e la chiude
+    await pagina.selectOption('#coda-reel', 'reta-testo');
+    await pagina.click('[data-scelta="narratore=nessuno"]');
+    await pagina.fill('#coda-testo', 'togli il dottore e rifai i provini');
+    await pagina.click('#coda-manda');
+    await pagina.waitForSelector('[data-richiesta]');
+    assert.match(await pagina.textContent('#coda'), /in attesa/);
+    const stato = kit(['stato'], {env});
+    assert.match(stato.testo, /Richieste dalla dashboard \(1\)/);
+    assert.match(stato.testo, /reta-testo: togli il dottore e rifai i provini/);
+    assert.match(stato.testo, /→ npm run imposta reta-testo narratore=nessuno/);
+    await pagina.waitForFunction(() => /l'agente l'ha vista/.test(document.querySelector('#coda').textContent), null, {timeout: 8000});
+    const id = /\[([0-9a-f]{6})\]/.exec(stato.testo)[1];
+    assert.match(kit(['richieste', 'fatta', id], {env}).testo, /segnata come fatta/);
+    await pagina.waitForFunction(() => /fatta/.test(document.querySelector('#coda').textContent), null, {timeout: 8000});
+    assert.doesNotMatch(kit(['stato'], {env}).testo, /Richieste dalla dashboard/);
+    // Riferimenti
+    await pagina.click('nav button[data-vista=riferimenti]');
+    await pagina.waitForFunction(() => document.querySelector('#rif-nota').textContent.length > 5);
+    await pagina.click('#vista-riferimenti [data-apri=riferimenti]');
+    await pagina.waitForSelector('main > .avviso.errore');
+    assert.match(await pagina.textContent('main > .avviso.errore'), /riferimenti/);
+    // Chiavi: si scrivono nel file, non tornano mai indietro
+    await pagina.click('nav button[data-vista=chiavi]');
+    const riga = (nome) => pagina.locator(`[data-riga-chiave=${nome}]`);
+    await riga('ELEVENLABS_API_KEY').waitFor();
+    assert.match(await riga('ELEVENLABS_API_KEY').textContent(), /manca/);
+    assert.doesNotMatch(await pagina.textContent('#chiavi'), /null|undefined/, 'niente "null" scritto nella pagina');
+    await riga('ELEVENLABS_API_KEY').locator('input').fill('sk_prova_0123456789abcdef');
+    await riga('ELEVENLABS_API_KEY').locator('button:has-text("Salva")').click();
+    await pagina.waitForFunction(() => /c'è/.test(document.querySelector('[data-riga-chiave=ELEVENLABS_API_KEY]').textContent));
+    assert.match(fs.readFileSync(fileEnv, 'utf8'), /^ELEVENLABS_API_KEY=sk_prova_0123456789abcdef$/m);
+    assert.ok(!(await pagina.content()).includes('sk_prova_0123456789abcdef'), 'la chiave non deve tornare nella pagina');
+    assert.equal(await riga('ELEVENLABS_API_KEY').locator('input').inputValue(), '');
+    assert.ok(!fs.readFileSync(path.join(tmp, 'registro.jsonl'), 'utf8').includes('sk_prova'), 'la chiave non deve finire nel registro');
+    await riga('ELEVENLABS_MODEL').locator('input').fill('eleven_v4');
+    await riga('ELEVENLABS_MODEL').locator('button:has-text("Salva")').click();
+    await pagina.waitForFunction(() => document.querySelector('[data-riga-chiave=ELEVENLABS_MODEL] input').value === 'eleven_v4' && /c'è/.test(document.querySelector('[data-riga-chiave=ELEVENLABS_MODEL]').textContent));
+    await riga('ELEVENLABS_API_KEY').locator('button:has-text("Togli")').click();
+    await pagina.waitForFunction(() => /manca/.test(document.querySelector('[data-riga-chiave=ELEVENLABS_API_KEY]').textContent));
+    assert.doesNotMatch(fs.readFileSync(fileEnv, 'utf8'), /ELEVENLABS_API_KEY/);
+    // Catalogo: i pezzi per nome e le frasi in banca
+    await pagina.click('nav button[data-vista=catalogo]');
+    await pagina.waitForSelector('#pezzi details');
+    const pezzi = await pagina.textContent('#pezzi');
+    for (const atteso of ['Scene pronte', 'Soggetti grandi', 'ginocchio', 'Oggetti 3D', 'Frasi in banca', 'Vediamo cosa è successo.']) assert.ok(pezzi.includes(atteso), `nel catalogo manca "${atteso}"`);
+    // Diario
+    await pagina.click('nav button[data-vista=diario]');
+    await pagina.waitForSelector('[data-voce-diario]');
+    assert.match(await pagina.textContent('#diario'), /entrato in catalogo: niente di nuovo/);
+    assert.deepEqual(errori, [], 'errori nella pagina');
+  } finally {
+    await browser.close();
+    server.kill();
+    fs.rmSync(tmp, {recursive: true, force: true});
+  }
+});
+
 cancella();
 const falliti = esiti.filter((e) => !e.ok);
 console.log(`\n${esiti.length - falliti.length} prove lente superate${falliti.length ? `, ${falliti.length} FALLITE` : ''}`);
