@@ -1253,6 +1253,42 @@ await prova('B33 · docs/RICETTE.md: da sei a otto ricette, ognuna con quando us
   for (const serve of ['numero', 'confronto', 'passi', 'mito', 'scala', 'barre']) assert.ok(blocchi.includes(serve), `manca la ricetta con il blocco "${serve}"`);
 });
 
+// ───────────────────────── B34 · il piano spiegato (docs/ESEMPIO-PIANO.md) ─────────────────────────
+
+await prova('B34 · docs/ESEMPIO-PIANO.md: tutte le scene di reta-testo, in ordine, ognuna con il pezzo, le parole dei suoi segni e il perché; i numeri sono quelli del piano', async () => {
+  const {controllaPiano} = await carica('motore/piano.mjs');
+  const leggi = (f) => fs.readFileSync(path.join(K, f), 'utf8');
+  const guida = leggi('docs/ESEMPIO-PIANO.md');
+  const piano = JSON.parse(leggi('reels/reta-testo/piano.json'));
+  const esito = controllaPiano(piano, leggi('reels/reta-testo/testo.txt'));
+  assert.deepEqual([esito.errori.length, esito.avvisi.length, esito.rischio.punti], [0, 0, 0], 'il piano d\'esempio è senza errori, senza avvisi e senza rischio');
+  const pezzi = guida.split(/^### /m).slice(1);
+  assert.deepEqual(pezzi.map((p) => p.split('\n')[0]), piano.scene.map((s, i) => `${i + 1} · ${s.nome}`), 'le scene della guida sono quelle del piano, nello stesso ordine');
+  piano.scene.forEach((s, i) => {
+    assert.match(pezzi[i], /\*\*Pezzo:\*\* .{10,}/, s.nome);
+    assert.match(pezzi[i], /\*\*Perché:\*\* .{40,}/, s.nome);
+    for (const su of Object.values(s.segni)) {
+      const parola = typeof su === 'string' ? su : su.su;
+      assert.ok(pezzi[i].includes(`\`${parola}\``), `${s.nome}: la guida non spiega il segno su "${parola}"`);
+    }
+    for (const {suono} of s.suoni ?? []) assert.ok(pezzi[i].includes(`\`${suono}\``), `${s.nome}: la guida non dice del suono "${suono}"`);
+  });
+  // i numeri della tabella vengono dal piano
+  const virgola = (n, d = 1) => n.toFixed(d).replace('.', ',');
+  const segni = piano.scene.reduce((n, s) => n + Object.keys(s.segni).length, 0);
+  const durata = JSON.parse(leggi('reels/reta-testo/parole.json')).durata;
+  for (const riga of [`| Scene | ${piano.scene.length} |`, `| Parole | ${esito.parole.length} |`, `| Segni | ${segni} |`, `${virgola(durata)} secondi: un segno ogni ${virgola(durata / segni)} secondi`, `| Rischio cartelli | ${esito.rischio.punti} su 100 (${esito.rischio.livello}) |`, `| Effetti sonori | ${piano.scene.flatMap((s) => s.suoni ?? []).length}:`]) {
+    assert.ok(guida.includes(riga), `nella guida manca "${riga}"`);
+  }
+  // nessuna inquadratura uguale a quella prima, come dice la guida
+  piano.scene.forEach((s, i) => i && assert.notEqual(`${s.campo}/${s.camera}`, `${piano.scene[i - 1].campo}/${piano.scene[i - 1].camera}`, s.nome));
+  // il confronto con l'altro piano del kit, e il difetto dichiarato
+  const altro = JSON.parse(leggi('reels/mots-c/piano.json'));
+  assert.ok(guida.includes(`contro ${altro.scene.length} e ${altro.scene.reduce((n, s) => n + Object.keys(s.segni ?? {}).length, 0)}`));
+  const prima = leggi('reels/reta-testo/testo.txt').split(/(?<=[.!?])\s/)[0].trim().split(/\s+/).length;
+  assert.ok(guida.includes(`La prima frase ha ${prima} parole`), 'la guida dichiara l\'aggancio lungo');
+});
+
 if (pannello) await pannello.server.chiudi();
 cancella();
 const falliti = esiti.filter((e) => !e.ok);
