@@ -30,6 +30,13 @@ export type DefinizioneScena =
        * 'sinistra', 'destra', 'alto', 'basso' (carrellata: la scena prima esce dalla parte opposta).
        */
       entra?: Verso;
+      /** Quanto è larga l'inquadratura: 'largo' (si vede tutto, più piccolo), 'medio' (di serie), 'stretto' (più vicino). Da una scena all'altra conviene cambiarla. */
+      campo?: 'largo' | 'medio' | 'stretto';
+      /**
+       * Come si muove la camera mentre la scena dura: 'spinta' (si avvicina), 'indietro' (si allontana), 'destra',
+       * 'sinistra' (carrellata), 'sale', 'scende' (gru), 'gira' (ruota di poco), 'ferma' (di serie: solo il respiro).
+       */
+      camera?: 'ferma' | 'spinta' | 'indietro' | 'destra' | 'sinistra' | 'sale' | 'scende' | 'gira';
       /**
        * Lo stato del protagonista in questa scena (dove sta, acceso/spento, pieno/vuoto, colore, calmo/agitato).
        * Più stati: il primo all'ingresso, gli altri ognuno al suo `segno`. false = esce di scena.

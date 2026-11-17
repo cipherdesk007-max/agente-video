@@ -7,6 +7,21 @@
 import {curve, mix, molla, onda, rampa} from './anim';
 import {stile} from '../stile/stile';
 import {useTempo} from './tempo';
+import regali from '../stile/regali.json';
+
+export type Regalo = {file: string; titolo: string; misure: [number, number]; parola?: string};
+
+/** I regali della pagina (ebook, mappe, PDF) con la loro copertina: `stile/regali.json`, li aggiunge `npm run regalo`. */
+export const REGALI = regali as Record<string, Regalo>;
+
+/** Il regalo con quel nome; senza nome, il primo dell'elenco. Un nome che non esiste ferma la scena e dice quali ci sono. */
+export function regaloDi(nome?: string): Regalo {
+  const nomi = Object.keys(REGALI);
+  if (nome === undefined || nome === 'auto') return REGALI[nomi[0]] ?? {file: stile.ebook.file, titolo: stile.ebook.titolo, misure: stile.ebook.misure};
+  const scelto = REGALI[nome.toLowerCase()];
+  if (!scelto) throw new Error(`bloccoEbook: il regalo "${nome}" non esiste. Ci sono: ${nomi.join(', ') || '(nessuno)'}. Per aggiungerne uno: npm run regalo <nome> <copertina.jpg|pdf> "Titolo".`);
+  return scelto;
+}
 
 export function Logo({x, y, larghezza = 420, da, fino, bagliore = 1, spento = 0}: {x: number; y: number; larghezza?: number; /** Secondi da quando compare (di solito s.dopo('segno')). */ da: number; fino?: number; /** 0…1: quanto è forte l'alone attorno. */ bagliore?: number; spento?: number}) {
   const tempo = useTempo();
@@ -42,12 +57,12 @@ export function Logo({x, y, larghezza = 420, da, fino, bagliore = 1, spento = 0}
  *
  * Per la scena intera ("Commenta MAPPA e te lo mando") c'è bloccoEbook. Per cambiare copertina: sostituisci stile/ebook.jpg.
  */
-export function Ebook({x, y, larghezza = 460, da, fino, gira = 22, bagliore = 1, file}: {x: number; y: number; larghezza?: number; da: number; fino?: number; /** Gradi di oscillazione a destra e a sinistra (0 = fermo, di fronte). */ gira?: number; bagliore?: number; /** Un'altra copertina, dalla cartella stile/. */ file?: string}) {
+export function Ebook({x, y, larghezza = 460, da, fino, gira = 22, bagliore = 1, file, misure}: {x: number; y: number; larghezza?: number; da: number; fino?: number; /** Gradi di oscillazione a destra e a sinistra (0 = fermo, di fronte). */ gira?: number; bagliore?: number; /** Un'altra copertina, dalla cartella stile/. */ file?: string; /** Larghezza e altezza della copertina in pixel (di serie quelle di stile.ebook). */ misure?: [number, number]}) {
   const tempo = useTempo();
   if (da <= 0) return null;
   const uscita = fino === undefined ? 0 : rampa(fino, 0.3, curve.entra);
   if (uscita >= 1) return null;
-  const [cl, ca] = stile.ebook.misure;
+  const [cl, ca] = misure ?? stile.ebook.misure;
   const L = larghezza;
   const bordo = L * 0.045;
   const A = ((L - bordo * 2) * ca) / cl + bordo * 2;

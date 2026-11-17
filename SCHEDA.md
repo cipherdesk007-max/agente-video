@@ -82,7 +82,8 @@ della scena, oppure niente (si distribuiscono da soli).
 | `bloccoAvviso` | `titolo`, `sotto?`, `punti?: [{testo, segno?}]` (max 3), `segno?`, `fonte?` |
 | `bloccoCitazione` | `testo`, `autore?`, `segno?` |
 | `bloccoSigla` | `nome?`, `sotto?`, `segno?` · il logo della pagina (`stile/logo.png`) con il nome |
-| `bloccoEbook` | `invito?`, `sotto?`, `segno?` · l'ebook regalo (`stile/ebook.jpg`) su un tablet 3D che gira: per "Commenta MAPPA" |
+| `bloccoEbook` | `regalo?`, `invito?`, `sopra?`, `sotto?`, `segno?`, `segnoSopra?`, `segnoSotto?` · il regalo su un tablet 3D che gira: per "Commenta MAPPA" (`npm run regalo` li elenca) |
+| `bloccoParole` | `parole: [{testo, segno?, colore?}]`, `titolo?` · le parole che contano, una alla volta, ognuna sulla sua parola |
 | `bloccoDomanda` | `domanda`, `sopra?`, `sotto?`, `segno?` · l'aggancio in forma di domanda |
 | `bloccoStudio` | `rivista`, `titolo`, `dati?: [{testo, segno?}]` (max 3), `pagato?`, `fonte?` |
 | `bloccoPersone` | `accese`, `quante?` (fino a 20), `etichetta?`, `titolo?`, `segno?`, `fonte?` · "2 su 10" |

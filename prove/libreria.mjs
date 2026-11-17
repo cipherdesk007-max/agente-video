@@ -323,7 +323,7 @@ await prova('3D: forme chiuse, facce orientate verso l\'esterno, proiezione', ()
 const {sistema} = await import(`${K}/motore/impostazioni.mjs`);
 await prova('impostazioni: valori completati e controllati', () => {
   const pers = {dottore: {id: 'dottore'}, fmlab: {id: 'fmlab'}};
-  assert.deepEqual(sistema({}, pers), {narratore: {chi: 'nessuno', grandezza: 100, lato: 'destra', alza: 0, specchia: false, mano2: 'auto'}, stile: 'auto', musica: 30, durata: null, voce: {motore: 'auto', elevenlabs: {}, mac: {}, comando: {}}});
+  assert.deepEqual(sistema({}, pers), {regalo: 'auto', narratore: {chi: 'nessuno', grandezza: 100, lato: 'destra', alza: 0, specchia: false, mano2: 'auto'}, stile: 'auto', musica: 30, durata: null, voce: {motore: 'auto', elevenlabs: {}, mac: {}, comando: {}}});
   // la seconda mano del narratore e il volume della musica
   assert.equal(sistema({narratore: {chi: 'dottore', mano2: 'Giù'}}, pers).narratore.mano2, 'giu');
   assert.throws(() => sistema({narratore: {chi: 'dottore', mano2: 'tasca'}}, pers), /seconda mano/);

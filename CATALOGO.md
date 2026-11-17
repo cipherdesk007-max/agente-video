@@ -37,7 +37,8 @@ Una scena intera in una riga, dentro `definisciReel({scene: {nome: bloccoâ€¦({â€
 | `bloccoAvviso` | il triangolo d'avviso con una frase | `titolo`, `sotto?`, `punti?: [{testo, segno?}]` (max 3), `segno?`, `fonte?` |
 | `bloccoCitazione` | una frase tra virgolette | `testo`, `autore?`, `segno?` |
 | `bloccoSigla` | il logo della pagina che si accende, con il nome sotto | `nome?`, `sotto?`, `segno?` |
-| `bloccoEbook` | l'ebook regalo su un tablet 3D che entra girando e oscilla, con l'invito sotto | `invito?`, `sotto?`, `sopra?`, `segno?`, `gira?` |
+| `bloccoEbook` | il regalo (ebook, mappa, PDF: `npm run regalo`) su un tablet 3D che entra girando e oscilla, con l'invito sotto | `regalo?`, `invito?`, `sotto?`, `sopra?`, `segno?`, `segnoSopra?`, `segnoSotto?`, `gira?` |
+| `bloccoParole` | le parole che contano, una alla volta: quella nuova grande al centro, le precedenti salgono e rimpiccioliscono | `parole: [{testo, segno?, colore?}]`, `titolo?` |
 | `bloccoDomanda` | una domanda grande con il punto interrogativo dietro: l'aggancio | `domanda`, `sopra?`, `sotto?`, `segno?` |
 | `bloccoStudio` | la scheda di uno studio: rivista, titolo, dati, chi ha pagato | `rivista`, `titolo`, `dati?: [{testo, segno?}]` (max 3), `pagato?`, `segnoPagato?`, `fonte?` |
 | `bloccoPersone` | "2 su 10": gli omini si accendono uno alla volta | `accese`, `quante?` (fino a 20), `etichetta?`, `titolo?`, `segno?`, `fonte?` |

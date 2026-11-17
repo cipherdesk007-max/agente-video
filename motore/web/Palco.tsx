@@ -26,6 +26,22 @@ const PASSAGGIO = 0.5;
 /** Di quanto la camera si avvicina lungo una scena (0.012 = 1,2%). */
 const RESPIRO = 0.012;
 
+/**
+ * I movimenti di camera dentro una scena, dall'inizio alla fine della scena: scala, spostamento (pixel) e giro (gradi).
+ * 'spinta' si avvicina, 'indietro' si allontana, 'destra'/'sinistra' carrellano (la scena scorre dall'altra parte),
+ * 'sale'/'scende' come una gru, 'gira' ruota di poco attorno al centro, 'ferma' lascia solo il respiro.
+ */
+const MOVIMENTI: Record<string, {scala: [number, number]; x: [number, number]; y: [number, number]; giro: [number, number]}> = {
+  ferma: {scala: [1, 1], x: [0, 0], y: [0, 0], giro: [0, 0]},
+  spinta: {scala: [0.95, 1.05], x: [0, 0], y: [0, 0], giro: [0, 0]},
+  indietro: {scala: [1.05, 0.95], x: [0, 0], y: [0, 0], giro: [0, 0]},
+  destra: {scala: [1, 1], x: [44, -44], y: [0, 0], giro: [0, 0]},
+  sinistra: {scala: [1, 1], x: [-44, 44], y: [0, 0], giro: [0, 0]},
+  sale: {scala: [1, 1], x: [0, 0], y: [-30, 30], giro: [0, 0]},
+  scende: {scala: [1, 1], x: [0, 0], y: [30, -30], giro: [0, 0]},
+  gira: {scala: [0.98, 1.02], x: [-18, 18], y: [0, 0], giro: [-1.5, 1.5]},
+};
+
 declare global {
   interface Window {
     __fmlabErrore?: {scena?: string; errore: string} | null;
@@ -145,6 +161,17 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
   // la camera non sta mai ferma: durante ogni scena si avvicina di un niente (non abbastanza da spostare le scritte)
   const respiro = (scena: Scena) => (reel.respiro === false ? 1 : 1 + RESPIRO * scena.avanzamento);
 
+  // l'inquadratura della scena: quanto è larga (campo) e come si muove la camera mentre la scena dura.
+  // Ogni scena è una ripresa con un movimento che ha un nome: mai un palco fermo con le scritte sopra.
+  const inquadra = (scena: Scena): {scala: number; x: number; y: number; giro: number} => {
+    const def = reel.scene[scena.nome];
+    const scelte = def && typeof def === 'object' && 'componente' in def ? def : null;
+    const base = scelte?.campo === 'largo' ? 0.92 : scelte?.campo === 'stretto' ? 1.06 : 1;
+    const a = scena.avanzamento;
+    const m = MOVIMENTI[scelte?.camera ?? 'ferma'] ?? MOVIMENTI.ferma;
+    return {scala: base * mix(m.scala[0], m.scala[1], a), x: mix(m.x[0], m.x[1], a), y: mix(m.y[0], m.y[1], a), giro: mix(m.giro[0], m.giro[1], a)};
+  };
+
   // da che parte si entra nella scena di adesso: 'avanti' attraversa quella prima, gli altri sono carrellate
   const versoDi = (nome: string): Verso => {
     const def = reel.scene[nome];
@@ -157,7 +184,7 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
 
   // 'viaggio': la scena vecchia viene attraversata (si ingrandisce, si sfoca e svanisce), la nuova arriva da lontano
   // e si mette a fuoco. Con una carrellata la vecchia esce da un lato e la nuova entra dall'altro.
-  const strati: {scena: Scena; opacita: number; scala: number; sposta: {x: number; y: number}; sfoca: number}[] = [];
+  const strati: {scena: Scena; opacita: number; scala: number; sposta: {x: number; y: number}; sfoca: number; giro?: number}[] = [];
   if (precedente) {
     const k = curve.entra(p);
     strati.push({
@@ -228,8 +255,11 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
         ) : (
           <Mondo tinta={aria.tinta} densita={aria.densita} raggi={aria.raggi} camera={camera} luogo={aria.luogo} avanzamento={corrente.avanzamento} luogoPrima={luogoPrima} passaggio={p} verso={verso} fumo={tramaFumo()} />
         )}
-        {strati.map(({scena, opacita, scala, sposta, sfoca}) => {
+        {strati.map(({scena, opacita, scala: scalaPassaggio, sposta: spostaPassaggio, sfoca}) => {
           const Comp = parti(reel.scene[scena.nome]).componente;
+          const q = inquadra(scena);
+          const scala = scalaPassaggio * q.scala;
+          const sposta = {x: spostaPassaggio.x + q.x, y: spostaPassaggio.y + q.y};
           return (
             <ScenaCtx.Provider key={scena.nome} value={scena}>
               <div
@@ -238,7 +268,7 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
                   position: 'absolute',
                   inset: 0,
                   opacity: opacita,
-                  transform: scala === 1 && !sposta.x && !sposta.y ? undefined : `translate(${sposta.x.toFixed(1)}px, ${sposta.y.toFixed(1)}px) scale(${scala.toFixed(4)})`,
+                  transform: scala === 1 && !sposta.x && !sposta.y && !q.giro ? undefined : `translate(${sposta.x.toFixed(1)}px, ${sposta.y.toFixed(1)}px) scale(${scala.toFixed(4)})${q.giro ? ` rotate(${q.giro.toFixed(3)}deg)` : ''}`,
                   filter: sfoca > 0.3 ? `blur(${sfoca.toFixed(1)}px)` : undefined,
                   transformOrigin: `${stile.palco.centroX}px ${stile.palco.centroY}px`,
                 }}
