@@ -36,11 +36,13 @@ C'è però un [altro]altro aspetto da considerare.
 Gli [autori]autori hanno riportato che gli [effetti]effetti collaterali [suono:errore]*gravi* erano più [frequenti]frequenti con la Reta, soprattutto quelli [gastro]gastrointestinali.
 
 [scena:conclusione]
-In conclusione, [duestudi]due studi sull'uomo hanno dimostrato che la Reta [riduce]riduce il dolore al ginocchio [suono:successo][piu]*più* del placebo.
-Gli studi sono stati [condotti]condotti con il coinvolgimento dell'[azienda]azienda che produce la Reta, e i [dettagli]*dettagli* sono importanti tanto quanto i risultati.
+In conclusione, [duestudi]due studi sull'uomo hanno [dimostrato]dimostrato che la Reta [riduce]riduce il dolore al ginocchio [suono:successo][piu]*più* del placebo.
+
+[scena:azienda]
+Gli studi sono stati [condotti]condotti con il coinvolgimento dell'[azienda]azienda che produce la Reta, e i [dettagli]*dettagli* sono importanti tanto quanto i [risultati]risultati.
 
 [scena:amico]
-[manda]Manda questo video a quell'[amico]amico a cui [scricchiolano]scricchiolano le ginocchia ogni volta che fa le [scale]scale.
+[manda]Manda questo video a quell'[amico]amico a cui [scricchiolano]scricchiolano le ginocchia ogni [volta]volta che fa le [scale]scale.
 
 [scena:chiusura]
 [suono:whoosh][commenta]Commenta *"MAPPA*" per ricevere [gratis]gratis il nostro [database]database con tutte le informazioni [essenziali]essenziali su questo e tanti altri composti.

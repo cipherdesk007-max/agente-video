@@ -16,7 +16,6 @@
             "tipo": "ginocchio",
             "etichetta": "Reta",
             "colore": "#5CF2C8",
-            "segno": "reta",
             "stato": {
               "dolore": 1
             },
@@ -34,7 +33,7 @@
             "tipo": "ginocchio",
             "etichetta": "Placebo",
             "colore": "#C9D4E0",
-            "segno": "placebo",
+            "segno": "ginocchio",
             "stato": {
               "dolore": 1
             },
@@ -70,9 +69,13 @@
           "onda": 0.6
         },
         {
-          "segno": "ginocchio",
-          "colore": "#FF4D5E",
-          "onda": 1.4
+          "segno": "reta",
+          "acceso": 1
+        },
+        {
+          "segno": "placebo",
+          "colore": "#C9D4E0",
+          "onda": 1.2
         },
         {
           "segno": "meno",
@@ -131,7 +134,7 @@
         "soggetti": [
           {
             "tipo": "foglio",
-            "etichetta": "2 studi sull'uomo",
+            "etichetta": "2 studi",
             "colore": "#5CF2C8",
             "segno": "pubblicati",
             "cambia": [
@@ -764,7 +767,7 @@
             "tipo": "ginocchio",
             "etichetta": "A quell'amico",
             "colore": "#FFD23F",
-            "segno": "amico",
+            "segno": "manda",
             "stato": {
               "dolore": 0.1
             },
@@ -815,7 +818,7 @@
           "onda": 0.9
         },
         {
-          "segno": "manda",
+          "segno": "amico",
           "acceso": 1,
           "grandezza": 0.74
         }

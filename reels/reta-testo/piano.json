@@ -8,62 +8,46 @@
   "scene": [
     {
       "nome": "aggancio",
-      "perche": "far vedere il ginocchio che fa meno male anche con il placebo: la sorpresa che apre il reel",
-      "blocco": "oggetto",
+      "perche": "le due ginocchia una accanto all'altra: fa meno male anche quella del placebo",
+      "blocco": "soggetti",
       "dati": {
-        "oggetto": "ginocchio",
-        "parametri": {
-          "dolore": 1,
-          "piega": 14,
-          "pos": [
-            0,
-            -70,
-            0
-          ],
-          "scala": 0.8
-        },
-        "cambia": [
+        "soggetti": [
           {
-            "segno": "meno",
-            "parametri": {
-              "dolore": 0.3,
-              "piega": 26
+            "tipo": "ginocchio",
+            "etichetta": "Reta",
+            "colore": "#5CF2C8",
+            "stato": {
+              "dolore": 1
             },
-            "durata": 1.2
-          }
-        ],
-        "etichette": [
-          {
-            "testo": "Reta",
-            "punto": [
-              0,
-              50,
-              24
-            ],
-            "segno": "reta"
+            "cambia": [
+              {
+                "segno": "meno",
+                "stato": {
+                  "dolore": 0.25
+                },
+                "durata": 1.2
+              }
+            ]
           },
           {
-            "testo": "Placebo",
-            "punto": [
-              0,
-              -166,
-              24
-            ],
-            "segno": "placebo",
-            "colore": "#5AA8FF"
-          },
-          {
-            "testo": "Meno dolore",
-            "punto": [
-              24,
-              -62,
-              48
-            ],
-            "segno": "meno",
-            "colore": "#7CF26B"
+            "tipo": "ginocchio",
+            "etichetta": "Placebo",
+            "colore": "#C9D4E0",
+            "segno": "ginocchio",
+            "stato": {
+              "dolore": 1
+            },
+            "cambia": [
+              {
+                "segno": "meno",
+                "stato": {
+                  "dolore": 0.5
+                },
+                "durata": 1.2
+              }
+            ]
           }
-        ],
-        "zoom": 1.35
+        ]
       },
       "segni": {
         "reta": "Reta",
@@ -75,7 +59,7 @@
         "Reta",
         "placebo"
       ],
-      "luogo": "corpo",
+      "luogo": "vuoto",
       "campo": "medio",
       "camera": "spinta",
       "protagonista": [
@@ -85,9 +69,13 @@
           "onda": 0.6
         },
         {
-          "segno": "ginocchio",
-          "colore": "#FF4D5E",
-          "onda": 1.4
+          "segno": "reta",
+          "acceso": 1
+        },
+        {
+          "segno": "placebo",
+          "colore": "#C9D4E0",
+          "onda": 1.2
         },
         {
           "segno": "meno",
@@ -115,7 +103,7 @@
       "enfasi": [
         "merito"
       ],
-      "luogo": "corpo",
+      "luogo": "vuoto",
       "campo": "stretto",
       "camera": "indietro",
       "protagonista": [
@@ -141,22 +129,29 @@
       "nome": "studi",
       "da": "Questo mese sono stati",
       "perche": "dare peso alla prova: due studi veri, su una rivista importante, su mille persone",
-      "blocco": "studio",
+      "blocco": "soggetti",
       "dati": {
-        "rivista": "New England Journal of Medicine",
-        "titolo": "Retatrutide e artrosi del ginocchio",
-        "segno": "pubblicati",
-        "dati": [
+        "soggetti": [
           {
-            "testo": "2 studi",
-            "segno": "due"
+            "tipo": "foglio",
+            "etichetta": "2 studi",
+            "colore": "#5CF2C8",
+            "segno": "pubblicati",
+            "cambia": [
+              {
+                "segno": "riviste",
+                "stato": {
+                  "evidenzia": 1
+                }
+              }
+            ]
           },
           {
-            "testo": "tra le più importanti",
-            "segno": "riviste"
-          },
-          {
-            "testo": "1.019 adulti",
+            "tipo": "icona",
+            "icona": "FaUsers",
+            "etichetta": "1.019 adulti",
+            "nota": "oltre un anno",
+            "colore": "#5AA8FF",
             "segno": "mille"
           }
         ],
@@ -166,10 +161,10 @@
         "pubblicati": "pubblicati",
         "due": "due",
         "riviste": "riviste",
-        "mille": "mille",
-        "anno": "anno",
         "mondo": "mondo",
-        "artrosi": "artrosi"
+        "mille": "mille",
+        "artrosi": "artrosi",
+        "anno": "anno"
       },
       "enfasi": [
         "due",
@@ -181,7 +176,7 @@
           "su": "mille"
         }
       ],
-      "luogo": "studio",
+      "luogo": "vuoto",
       "entra": "destra",
       "campo": "stretto",
       "camera": "destra",
@@ -190,6 +185,10 @@
           "acceso": 1,
           "carica": 0.6,
           "onda": 0.4
+        },
+        {
+          "segno": "due",
+          "carica": 0.7
         },
         {
           "segno": "mondo",
@@ -212,22 +211,35 @@
       "nome": "scala",
       "da": "Il dolore veniva valutato",
       "perche": "spiegare il metro: da zero a dieci, più è alto più fa male",
-      "blocco": "scala",
+      "blocco": "soggetti",
       "dati": {
-        "titolo": "Dolore, da 0 a 10",
-        "cursori": [
+        "soggetti": [
           {
-            "etichetta": "Dolore all'inizio",
-            "valore": 6,
-            "da": 0,
-            "segno": "scala"
+            "tipo": "quadrante",
+            "etichetta": "Dolore, da 0 a 10",
+            "colore": "#5CF2C8",
+            "stato": {
+              "valore": 0,
+              "massimo": 10
+            },
+            "cambia": [
+              {
+                "segno": "scala",
+                "stato": {
+                  "valore": 5
+                },
+                "durata": 1.1
+              },
+              {
+                "segno": "dieci",
+                "stato": {
+                  "valore": 10
+                },
+                "durata": 0.8
+              }
+            ]
           }
-        ],
-        "estremi": [
-          "nessun dolore",
-          "il più forte"
-        ],
-        "verso": "male"
+        ]
       },
       "segni": {
         "scala": "scala",
@@ -239,8 +251,8 @@
       "enfasi": [
         "scala"
       ],
-      "luogo": "laboratorio",
-      "campo": "largo",
+      "luogo": "vuoto",
+      "campo": "stretto",
       "camera": "sale",
       "protagonista": [
         {
@@ -258,25 +270,49 @@
       "nome": "risultati",
       "da": "Con la Reta, il",
       "perche": "i due numeri uno accanto all'altro: quasi quattro contro circa due",
-      "blocco": "confronto",
+      "blocco": "soggetti",
       "dati": {
-        "titolo": "Di quanto è calato il dolore",
-        "sinistra": {
-          "titolo": "Reta",
-          "valore": 3.96,
-          "decimali": 2,
-          "unita": "punti in meno",
-          "segno": "quattro",
-          "colore": "#5CF2C8"
-        },
-        "destra": {
-          "titolo": "Placebo",
-          "valore": 2.12,
-          "decimali": 2,
-          "unita": "punti in meno",
-          "segno": "duepunti",
-          "colore": "#5AA8FF"
-        },
+        "soggetti": [
+          {
+            "tipo": "quadrante",
+            "etichetta": "Reta",
+            "nota": "−3,96 punti",
+            "colore": "#5CF2C8",
+            "stato": {
+              "valore": 6,
+              "massimo": 10
+            },
+            "cambia": [
+              {
+                "segno": "quattro",
+                "stato": {
+                  "valore": 2.04
+                },
+                "durata": 1.3
+              }
+            ]
+          },
+          {
+            "tipo": "quadrante",
+            "etichetta": "Placebo",
+            "nota": "−2,12 punti",
+            "colore": "#C9D4E0",
+            "segno": "anche",
+            "stato": {
+              "valore": 6,
+              "massimo": 10
+            },
+            "cambia": [
+              {
+                "segno": "duepunti",
+                "stato": {
+                  "valore": 3.88
+                },
+                "durata": 1.3
+              }
+            ]
+          }
+        ],
         "fonte": "NEJM 2026, studio TRIUMPH-4"
       },
       "segni": {
@@ -325,29 +361,42 @@
       "nome": "applauso",
       "da": "È un po' come",
       "perche": "la metafora dell'effetto placebo: l'applauso prima che la band salga sul palco",
-      "blocco": "icone",
+      "blocco": "soggetti",
       "dati": {
-        "titolo": "Effetto placebo",
-        "voci": [
+        "soggetti": [
           {
-            "icona": "FaUsers",
-            "testo": "Il pubblico applaude",
-            "segno": "pubblico"
-          },
-          {
-            "icona": "FaGuitar",
-            "testo": "prima della band",
-            "segno": "band"
-          },
-          {
-            "icona": "FaFaceSmile",
-            "testo": "Aspettarsi di stare meglio",
-            "segno": "aspettarsi"
-          },
-          {
-            "icona": "FaHeartPulse",
-            "testo": "dà già un po' di sollievo",
-            "segno": "sollievo"
+            "tipo": "riflettori",
+            "etichetta": "Effetto placebo",
+            "colore": "#5CF2C8",
+            "stato": {
+              "luci": 0.15
+            },
+            "cambia": [
+              {
+                "segno": "pubblico",
+                "stato": {
+                  "luci": 1
+                }
+              },
+              {
+                "segno": "band",
+                "stato": {
+                  "luci": 0.45
+                }
+              },
+              {
+                "segno": "aspettarsi",
+                "stato": {
+                  "luci": 1
+                }
+              },
+              {
+                "segno": "sollievo",
+                "stato": {
+                  "luci": 0.7
+                }
+              }
+            ]
           }
         ]
       },
@@ -361,9 +410,9 @@
         "applaudire",
         "aspettarsi"
       ],
-      "luogo": "palco",
+      "luogo": "vuoto",
       "entra": "basso",
-      "campo": "largo",
+      "campo": "medio",
       "camera": "gira",
       "protagonista": {
         "colore": "#5AA8FF",
@@ -375,27 +424,49 @@
       "nome": "differenza",
       "da": "Quindi, per capire quanto",
       "perche": "quello che conta è lo scarto tra le due colonne, non la colonna più alta",
-      "blocco": "barre",
+      "blocco": "soggetti",
       "dati": {
-        "titolo": "Calo del dolore, in punti",
-        "dati": [
+        "soggetti": [
           {
+            "tipo": "batteria",
             "etichetta": "Placebo",
-            "valore": 2.12,
-            "segno": "capire"
+            "nota": "2,12 punti",
+            "colore": "#C9D4E0",
+            "segno": "capire",
+            "stato": {
+              "livello": 0,
+              "accesa": 0.3
+            },
+            "cambia": [
+              {
+                "segno": "funziona",
+                "stato": {
+                  "livello": 0.53
+                }
+              }
+            ]
           },
           {
+            "tipo": "batteria",
             "etichetta": "Reta",
-            "valore": 3.96,
-            "segno": "differenza"
+            "nota": "3,96 punti",
+            "colore": "#5CF2C8",
+            "segno": "differenza",
+            "stato": {
+              "livello": 0.53
+            },
+            "cambia": [
+              {
+                "segno": "unodue",
+                "stato": {
+                  "livello": 0.99
+                },
+                "durata": 1.2
+              }
+            ]
           }
         ],
-        "decimali": 2,
-        "fonte": "NEJM 2026: tra 1,35 e 1,84 punti di differenza",
-        "colori": [
-          "#5AA8FF",
-          "#5CF2C8"
-        ]
+        "fonte": "NEJM 2026: tra 1,35 e 1,84 punti di differenza"
       },
       "segni": {
         "capire": "capire",
@@ -408,9 +479,9 @@
       "enfasi": [
         "differenza"
       ],
-      "luogo": "laboratorio",
+      "luogo": "vuoto",
       "entra": "destra",
-      "campo": "medio",
+      "campo": "stretto",
       "camera": "sinistra",
       "protagonista": [
         {
@@ -466,7 +537,7 @@
       "enfasi": [
         "miracolo"
       ],
-      "luogo": "bilancia",
+      "luogo": "vuoto",
       "campo": "stretto",
       "camera": "indietro",
       "protagonista": {
@@ -478,18 +549,38 @@
       "nome": "rischi",
       "da": "C'è però un altro",
       "perche": "il rovescio della medaglia: gli effetti gravi sono più frequenti con il farmaco",
-      "blocco": "avviso",
+      "blocco": "soggetti",
       "dati": {
-        "titolo": "Effetti collaterali gravi",
-        "segno": "effetti",
-        "punti": [
+        "soggetti": [
           {
-            "testo": "Più frequenti con la Reta",
-            "segno": "frequenti"
-          },
-          {
-            "testo": "Soprattutto gastrointestinali",
-            "segno": "gastro"
+            "tipo": "stomaco",
+            "etichetta": "Effetti collaterali gravi",
+            "nota": "più frequenti con la Reta",
+            "colore": "#FF8FA0",
+            "segno": "autori",
+            "stato": {
+              "irritato": 0.1
+            },
+            "cambia": [
+              {
+                "segno": "effetti",
+                "stato": {
+                  "irritato": 0.55
+                }
+              },
+              {
+                "segno": "frequenti",
+                "stato": {
+                  "irritato": 0.8
+                }
+              },
+              {
+                "segno": "gastro",
+                "stato": {
+                  "irritato": 1
+                }
+              }
+            ]
           }
         ],
         "fonte": "NEJM 2026, riportato dagli autori"
@@ -510,7 +601,7 @@
           "su": "gravi"
         }
       ],
-      "luogo": "vaso",
+      "luogo": "vuoto",
       "tinta": "#E8455A",
       "entra": "avanti",
       "campo": "medio",
@@ -524,10 +615,6 @@
           "colore": "#FF4D5E",
           "onda": 1.6,
           "acceso": 1
-        },
-        {
-          "segno": "autori",
-          "grandezza": 0.74
         }
       ],
       "narratore": {
@@ -538,43 +625,55 @@
       "nome": "conclusione",
       "da": "In conclusione, due studi",
       "perche": "tirare le somme in quattro righe, compreso chi ha pagato gli studi",
-      "blocco": "lista",
+      "blocco": "soggetti",
       "dati": {
-        "titolo": "In conclusione",
-        "voci": [
+        "soggetti": [
           {
-            "testo": "2 studi sull'uomo",
-            "segno": "duestudi"
+            "tipo": "ginocchio",
+            "etichetta": "Reta",
+            "colore": "#5CF2C8",
+            "segno": "duestudi",
+            "stato": {
+              "dolore": 1
+            },
+            "cambia": [
+              {
+                "segno": "riduce",
+                "stato": {
+                  "dolore": 0.2
+                },
+                "durata": 1.2
+              }
+            ]
           },
           {
-            "testo": "La Reta riduce il dolore",
-            "segno": "riduce"
-          },
-          {
-            "testo": "più del placebo",
-            "segno": "piu"
-          },
-          {
-            "testo": "Coinvolta l'azienda che la produce",
-            "segno": "azienda"
-          },
-          {
-            "testo": "I dettagli contano",
-            "segno": "dettagli"
+            "tipo": "ginocchio",
+            "etichetta": "Placebo",
+            "colore": "#C9D4E0",
+            "segno": "dimostrato",
+            "stato": {
+              "dolore": 1
+            },
+            "cambia": [
+              {
+                "segno": "piu",
+                "stato": {
+                  "dolore": 0.5
+                },
+                "durata": 1.2
+              }
+            ]
           }
         ]
       },
       "segni": {
         "duestudi": "due",
+        "dimostrato": "dimostrato",
         "riduce": "riduce",
-        "piu": "più",
-        "azienda": "azienda",
-        "dettagli": "dettagli",
-        "condotti": "condotti"
+        "piu": "più"
       },
       "enfasi": [
-        "più",
-        "dettagli"
+        "più"
       ],
       "suoni": [
         {
@@ -582,22 +681,78 @@
           "su": "più"
         }
       ],
-      "luogo": "studio",
+      "luogo": "vuoto",
       "entra": "sinistra",
-      "campo": "largo",
+      "campo": "stretto",
       "camera": "destra",
+      "protagonista": {
+        "colore": "#5CF2C8",
+        "onda": 0.5,
+        "acceso": 1,
+        "carica": 1,
+        "grandezza": 0.62
+      }
+    },
+    {
+      "nome": "azienda",
+      "da": "Gli studi sono stati",
+      "perche": "chi ha pagato gli studi: la pagina dello studio con la riga che conta accesa",
+      "blocco": "soggetti",
+      "dati": {
+        "soggetti": [
+          {
+            "tipo": "foglio",
+            "etichetta": "Coinvolta l'azienda",
+            "nota": "i dettagli contano",
+            "colore": "#FFD23F",
+            "stato": {
+              "evidenzia": 0
+            },
+            "cambia": [
+              {
+                "segno": "azienda",
+                "stato": {
+                  "evidenzia": 0.6
+                }
+              },
+              {
+                "segno": "dettagli",
+                "stato": {
+                  "evidenzia": 1
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "segni": {
+        "condotti": "condotti",
+        "azienda": "azienda",
+        "dettagli": "dettagli",
+        "risultati": "risultati"
+      },
+      "enfasi": [
+        "dettagli"
+      ],
+      "luogo": "vuoto",
+      "entra": "avanti",
+      "campo": "medio",
+      "camera": "spinta",
       "protagonista": [
         {
-          "colore": "#5CF2C8",
-          "onda": 0.5,
-          "acceso": 1,
-          "carica": 1,
-          "grandezza": 0.62
+          "colore": "#FFD23F",
+          "acceso": 0.5,
+          "onda": 0.9
         },
         {
           "segno": "condotti",
-          "acceso": 0.5,
-          "onda": 0.9
+          "acceso": 0.8
+        },
+        {
+          "segno": "risultati",
+          "colore": "#5CF2C8",
+          "acceso": 1,
+          "onda": 0.5
         }
       ]
     },
@@ -605,73 +760,69 @@
       "nome": "amico",
       "da": "Manda questo video a",
       "perche": "l'invito a condividere, con il ginocchio che scricchiola sulle scale",
-      "blocco": "oggetto",
+      "blocco": "soggetti",
       "dati": {
-        "oggetto": "ginocchio",
-        "parametri": {
-          "dolore": 0.15,
-          "piega": 8,
-          "pos": [
-            0,
-            -70,
-            0
-          ],
-          "scala": 0.8
-        },
-        "cambia": [
+        "soggetti": [
           {
-            "segno": "scricchiolano",
-            "parametri": {
-              "dolore": 0.9,
-              "piega": 46
+            "tipo": "ginocchio",
+            "etichetta": "A quell'amico",
+            "colore": "#FFD23F",
+            "segno": "manda",
+            "stato": {
+              "dolore": 0.1
             },
-            "durata": 0.9
+            "cambia": [
+              {
+                "segno": "scricchiolano",
+                "stato": {
+                  "dolore": 0.95
+                },
+                "durata": 0.6
+              }
+            ]
           },
           {
-            "segno": "scale",
-            "parametri": {
-              "piega": 12
+            "tipo": "scale",
+            "etichetta": "Le scale",
+            "colore": "#5CF2C8",
+            "segno": "volta",
+            "stato": {
+              "passo": 0
             },
-            "durata": 0.7
+            "cambia": [
+              {
+                "segno": "scale",
+                "stato": {
+                  "passo": 6
+                },
+                "durata": 1.4
+              }
+            ]
           }
-        ],
-        "etichette": [
-          {
-            "testo": "Manda questo video",
-            "punto": [
-              0,
-              50,
-              24
-            ],
-            "segno": "manda"
-          },
-          {
-            "testo": "a quell'amico",
-            "punto": [
-              0,
-              -166,
-              24
-            ],
-            "segno": "amico",
-            "colore": "#FFD23F"
-          }
-        ],
-        "zoom": 1.35
+        ]
       },
       "segni": {
         "manda": "Manda",
         "amico": "amico",
         "scricchiolano": "scricchiolano",
+        "volta": "volta",
         "scale": "scale"
       },
-      "luogo": "stadio",
+      "luogo": "vuoto",
       "entra": "basso",
       "campo": "stretto",
       "camera": "sale",
-      "protagonista": {
-        "acceso": 0.6,
-        "onda": 0.9
-      }
+      "protagonista": [
+        {
+          "acceso": 0.6,
+          "onda": 0.9
+        },
+        {
+          "segno": "amico",
+          "acceso": 1,
+          "grandezza": 0.74
+        }
+      ]
     },
     {
       "nome": "chiusura",

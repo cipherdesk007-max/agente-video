@@ -58,6 +58,11 @@
     {
       "nome": "conclusione",
       "inizio": 81.853,
+      "fine": 88.839
+    },
+    {
+      "nome": "azienda",
+      "inizio": 88.839,
       "fine": 97.673
     },
     {
@@ -110,14 +115,17 @@
     "frequenti": 78.316,
     "gastro": 80.71,
     "duestudi": 83.023,
+    "dimostrato": 84.427,
     "riduce": 85.831,
     "piu": 87.734,
     "condotti": 90.275,
     "azienda": 91.975,
     "dettagli": 94.424,
+    "risultati": 96.826,
     "manda": 97.853,
     "amico": 99.109,
     "scricchiolano": 100.162,
+    "volta": 101.862,
     "scale": 102.822,
     "commenta": 103.553,
     "gratis": 105.253,
