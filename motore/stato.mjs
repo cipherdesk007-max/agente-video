@@ -18,6 +18,12 @@ function riassunto(slug, variante = null) {
   const verifica = esiste(fileVerifica) ? (/\*\*Esito: (.+?)\*\*/.exec(fs.readFileSync(fileVerifica, 'utf8'))?.[1] ?? '?') : null;
   const data = (f) => fs.statSync(f).mtimeMs;
   const prossimo = (() => {
+    // un reel nato da un testo già scritto si porta avanti con il piano di regia: un comando solo riparte da dove serve
+    if (esiste(path.join(reel.dir, 'testo.txt')) && !reel.suffisso) {
+      if (!esiste(path.join(reel.dir, 'piano.json'))) return `npm run fai ${slug}   (il testo c'è: scrive il piano di regia di serie e i provini)`;
+      const pronto = verifica && esiste(reel.video) && data(fileVerifica) >= data(reel.video) && !/NON PRONTO/.test(verifica) && data(path.join(reel.dir, 'piano.json')) < data(reel.video);
+      if (!pronto) return `migliora piano.json (npm run piano ${slug}), poi  npm run fai ${slug}`;
+    }
     if (!dati) return `npm run voce ${slug} stima`;
     if (dati.impronta !== copione.impronta) return `npm run voce ${slug}   (il copione è cambiato dopo la voce)`;
     if (dati.motore === 'stima') return `provini e scene; poi la voce vera: npm run voce ${slug}`;

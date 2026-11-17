@@ -125,7 +125,8 @@ export async function comandoFai(slug, argomenti = []) {
     },
     confronta: async () => {
       const {comandoConfronta} = await import('./confronta.mjs');
-      await comandoConfronta([slug]);
+      // la bozza ha il suo file: si misura quella (il metro lavora su fotogrammi rimpiccioliti, la risoluzione non conta)
+      await comandoConfronta([bozza ? path.join(dir, `${slug}.bozza.mp4`) : slug]);
     },
   };
 
