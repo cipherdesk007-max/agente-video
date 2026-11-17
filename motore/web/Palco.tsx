@@ -8,6 +8,7 @@ import type {AtmosferaScena, DefinizioneScena, Reel} from '../../libreria/reel';
 import {Atmosfera, tramaFumo} from '../../libreria/Atmosfera';
 import {Mondo, cameraMondo} from '../../libreria/Mondo';
 import type {NomeLuogo, Verso} from '../../libreria/Mondo';
+import {Protagonista, STATO_BASE, statoProtagonista} from '../../libreria/Protagonista';
 import {Firma, Guide} from '../../libreria/Firma';
 import {Sottotitoli} from '../../libreria/Sottotitoli';
 import {Personaggio, scalettaPose} from '../../libreria/Personaggio';
@@ -182,6 +183,20 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
   );
   const camera = cameraMondo(tempo.ora, inizi, segni, durata || PASSAGGIO);
 
+  // il protagonista: un solo oggetto per tutto il reel, sopra le scene. Resta mentre intorno cambia tutto.
+  const statoProt = reel.protagonista
+    ? statoProtagonista(
+        tempo.ora,
+        {...STATO_BASE, colore: reel.protagonista.colore ?? stile.colori.luce},
+        elenco.map((s) => {
+          const def = reel.scene[s.nome];
+          return {inizio: s.inizio, stati: def && typeof def === 'object' && 'componente' in def ? def.protagonista : undefined};
+        }),
+        dati.segni,
+        (durata || PASSAGGIO) * 1.3
+      )
+    : null;
+
   // atmosfera, umore e presenza del narratore si mescolano durante il passaggio
   let aria = atmosferaDi(reel, corrente.nome);
   let luogoPrima: NomeLuogo | undefined;
@@ -239,6 +254,7 @@ export function Palco({reel, dati, slug, frame, guide = false, impostazioni = IM
             </ScenaCtx.Provider>
           );
         })}
+        {reel.protagonista && statoProt ? <Protagonista def={reel.protagonista} stato={statoProt} /> : null}
         {reel.firma === false || !stile.firma.mostra ? null : <Firma />}
         <Personaggio config={config} narratore={narratore} cambi={cambi} assetti={assetti} eventi={eventi} visibile={stato.visibile} sorriso={stato.sorriso} sopracciglia={stato.sopracciglia} personaggi={personaggi} />
         {reel.sottotitoli === false ? null : <Sottotitoli />}

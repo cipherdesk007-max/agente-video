@@ -2,6 +2,7 @@
 import type {ComponentType} from 'react';
 import type {Regia} from './Personaggio';
 import type {NomeLuogo, Verso} from './Mondo';
+import type {DefinizioneProtagonista, StatoProtagonista} from './Protagonista';
 
 export type AtmosferaScena = {
   /** Colore della foschia in questa scena (es. rosso scuro per l'interno del corpo). */
@@ -29,6 +30,12 @@ export type DefinizioneScena =
        * 'sinistra', 'destra', 'alto', 'basso' (carrellata: la scena prima esce dalla parte opposta).
        */
       entra?: Verso;
+      /**
+       * Lo stato del protagonista in questa scena (dove sta, acceso/spento, pieno/vuoto, colore, calmo/agitato).
+       * Più stati: il primo all'ingresso, gli altri ognuno al suo `segno`. false = esce di scena.
+       * Quello che non dici resta com'era nella scena prima: è lo stesso oggetto che cambia, non uno nuovo.
+       */
+      protagonista?: StatoProtagonista | StatoProtagonista[] | false;
     };
 
 export type Reel = {
@@ -37,6 +44,8 @@ export type Reel = {
   scene: Record<string, DefinizioneScena>;
   /** Regia di base del narratore, per le scene che non dicono altro. */
   dottore?: Regia;
+  /** Il protagonista del reel: un oggetto che resta in scena da una scena all'altra e cambia stato (per PEPTMAP la catena del peptide). */
+  protagonista?: DefinizioneProtagonista;
   /** Atmosfera di base, per le scene che non dicono altro. */
   atmosfera?: AtmosferaScena;
   /** false per togliere i sottotitoli o la firma in alto. */

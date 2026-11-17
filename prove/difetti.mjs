@@ -405,6 +405,49 @@ await prova('mondo: tutti i luoghi pronti si disegnano, e ci sono quelli chiesti
   }
 });
 
+await prova('protagonista: resta da una scena all\'altra e cambia stato senza salti (stati, non sostituzioni)', async () => {
+  const {protagonista: pr, disegna} = await ts('prove/sostegno/disegna.tsx');
+  const scene = [
+    {inizio: 0, stati: {x: 300, y: 1200}},
+    {inizio: 10, stati: [{colore: '#FF4D5E', onda: 1.6}, {segno: 'stop', acceso: 0.1, carica: 0.3}]},
+    {inizio: 20, stati: undefined}, // non dice niente: resta com'era
+    {inizio: 30, stati: false}, // esce
+    {inizio: 40, stati: {x: 700}}, // rientra, altrove
+  ];
+  const stato = (t) => pr.statoProtagonista(t, pr.STATO_BASE, scene, {stop: 14});
+  assert.equal(stato(5).x, 300);
+  assert.equal(stato(5).acceso, 1);
+  // nella seconda scena cambia colore e si agita; la posizione resta quella di prima
+  assert.equal(stato(12).x, 300);
+  assert.equal(stato(12).onda, 1.6);
+  assert.equal(stato(12).colore, 'rgb(255,77,94)');
+  // al segno "stop" si spegne e si svuota, gradualmente
+  assert.equal(stato(13.9).acceso, 1);
+  assert.ok(stato(14.3).acceso < 1 && stato(14.3).acceso > 0.1);
+  assert.ok(Math.abs(stato(15).acceso - 0.1) < 1e-9 && Math.abs(stato(15).carica - 0.3) < 1e-9);
+  // la terza scena non dichiara niente: lo stato è quello lasciato dalla seconda
+  assert.deepEqual(stato(25), stato(19));
+  // esce, poi rientra spostato ma ancora spento: è lo stesso oggetto
+  assert.equal(stato(35).presenza, 0);
+  assert.equal(stato(45).presenza, 1);
+  assert.equal(stato(45).x, 700);
+  assert.ok(Math.abs(stato(45).acceso - 0.1) < 1e-9);
+  // nessun salto: da un fotogramma al successivo ogni grandezza cambia poco
+  for (let t = 0; t < 50; t += 1 / 30) {
+    const a = stato(t);
+    const b = stato(t + 1 / 30);
+    assert.ok(Math.abs(b.x - a.x) < 40 && Math.abs(b.acceso - a.acceso) < 0.15 && Math.abs(b.presenza - a.presenza) < 0.15 && Math.abs(b.onda - a.onda) < 0.2, `salto al secondo ${t.toFixed(2)}`);
+  }
+  // i tre tipi si disegnano; fuori scena non si disegna niente
+  const {createElement} = await import('react');
+  for (const tipo of ['peptide', 'goccia', 'cellula']) {
+    const html = disegna(() => createElement(pr.Protagonista, {def: {tipo}, stato: stato(12)}));
+    assert.match(html, new RegExp(`data-fmlab-protagonista="${tipo}"`));
+    assert.doesNotMatch(html, /NaN|undefined/);
+  }
+  assert.equal(disegna(() => createElement(pr.Protagonista, {def: {tipo: 'peptide'}, stato: stato(35)})), '');
+});
+
 // ───────────────────────── immagini generate (fase 2) ─────────────────────────
 
 await prova('immagini: stessa richiesta, stessa impronta; senza fornitore non si genera niente e lo si dice', async () => {
