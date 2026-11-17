@@ -182,7 +182,7 @@ contrasto), luminosità, tinte, palco occupato.
 Le quattro misure ancora fuori: il movimento, e le tre del narratore (fase 4).
 
 Prove a fine fase: `npm test` 65 prove in 8,9 s (17 motore, 21 libreria, 27 difetti e fasi); `npm run prove:lente`
-9 su 9 in 11 min 43 s su questo computer (collaudo, modelli, render fermato, durata con voce finta, metro, mondo,
+9 su 9 in 11 min 23 s su questo computer (collaudo, modelli, render fermato, durata con voce finta, metro, mondo,
 soglie dei riferimenti, numeri e fonti, pannello dal telefono).
 
 ### Punti aperti della fase 2
