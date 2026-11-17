@@ -90,6 +90,21 @@ novità visive e palco occupato; tempo di render misurato e scritto in `STATO.md
 
 Oggi le scene le scrive a mano un agente esterno. Deve farlo il kit.
 
+> **Decisioni prese dopo l'incarico (17/11/2026), che valgono più del testo qui sotto:**
+>
+> 1. **Il regista è l'agente che lavora sul kit**, non un modello chiamato dal kit. Niente fornitore di linguaggio
+>    nel `.env`: il punto "Modello di linguaggio dietro un'unica interfaccia" è tolto. Il kit dà all'agente un solo
+>    file da scrivere (`piano.json`), il controllo che dice se è scritto bene (`npm run piano`) e un comando che fa
+>    il resto (`npm run fai`). Il regista di serie (`npm run regia`) resta come base senza rete.
+> 2. **"Si corregge da solo" diventa "dice esattamente cosa correggere"**: il giro di correzione lo fa l'agente,
+>    al massimo due volte, guardando `piano`, `verifica`, `affianca`.
+> 3. **LTX è stato solo studiato**, non integrato: non può girare sul Mac del 2017 e non deve fare il reel. Ne viene
+>    il modo di descrivere una scena come una ripresa (inquadratura, movimento di camera, azione). Da OpenMontage
+>    vengono le tappe salvate e il controllo che ferma un reel fatto di cartelli. Dettagli in `riferimenti/ANALISI.md`.
+> 4. **Il giudice è l'occhio, il metro viene dopo.** Prima `npm run affianca` (dodici fotogrammi del reel accanto a
+>    dodici del riferimento), poi `npm run prova-cieca`, poi `npm run confronta`. Niente si dichiara chiuso senza
+>    averlo guardato a fotogrammi; se un numero migliora e il foglio affiancato no, si dice.
+
 - `motore/regista.mjs`: dal testo produce un **piano di regia** in JSON (scene, protagonista, per ogni scena
   ambiente, soggetto, stati, parola a cui si aggancia ogni novità, posa del narratore, suoni, immagini da
   generare). Il piano è validato da uno schema: se non è valido si richiede, non si improvvisa.
