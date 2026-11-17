@@ -11,7 +11,9 @@ Comincia sempre da `npm run stato`: dice a che punto è ogni reel e qual è il p
 
 ## 1. Cosa produce il kit
 
-Un reel verticale 1080x1920 a 30 fotogrammi al secondo, nello stile FMLAB:
+Un reel verticale 1080x1920 a 30 fotogrammi al secondo, nello stile FMLAB (a richiesta quadrato 1080x1080 o
+orizzontale 1920x1080: `npm run imposta <reel> formato=1:1`, stesse scene; lì guarda i provini, la verifica non
+controlla zone sicure e narratore):
 
 - fondo quasi nero con foschia colorata, pulviscolo e luci;
 - al centro un oggetto luminoso per volta, che cambia ogni 2-3 secondi **sulla parola esatta**;
@@ -81,6 +83,10 @@ Fai domande solo se la risposta cambia il reel e non puoi deciderla tu (al massi
 Per il resto decidi, e scrivi le scelte in `piano.md`.
 
 ## 4. Procedura per un reel nuovo
+
+**Se il testo è già scritto, questa procedura non serve**: `npm run fai <reel> testo=<file>` fa le otto tappe da
+solo (regia, monta, tempi, provini, voce, render, verifica, confronta), tu migliori `piano.json` e rilanci. È il
+primo capitolo di `SCHEDA.md`. Quello che segue vale quando il testo è da scrivere.
 
 Non saltare passaggi e non cambiarne l'ordine: ognuno prepara il successivo.
 
@@ -605,6 +611,9 @@ Le scene sono agganciate ai segni, non ai secondi: lo stesso `scene.tsx` vale pe
 Escono `parole.en.json`, `voce.en.mp3`, `<reel>.en.mp4`. Per una voce diversa in quella lingua:
 `ELEVENLABS_VOICE_ID_EN` nel file `.env`. Traduci anche `didascalia.md`.
 
+Le lingue scritte senza spazi (giapponese, cinese, tailandese) si dividono in parole da sole: nel piano e nei
+segni si indica la parola com'è scritta nel testo. Le parole lunghe (tedesco) stringono il corpo dei sottotitoli.
+
 ## 12. Cosa controlla la verifica
 
 - la voce corrisponde al copione attuale; durata, ritmo, lunghezza dell'aggancio;
@@ -672,7 +681,10 @@ Dal pannello la persona può:
 - **scrivere la richiesta di un nuovo reel**: argomento, lingua, durata, narratore (o nessuno), grandezza e
   lato con l'anteprima nel telefono disegnato, stile 2D / 3D / automatico, parola dell'invito finale.
   Il pannello crea `reels/<nome>/` con `richiesta.md` e `impostazioni.json` e le dà la frase da passare a te;
-- **cambiare narratore, grandezza, seconda mano, stile e volume della musica** di un reel che esiste già;
+- **cambiare narratore, grandezza, seconda mano, stile, volume della musica e formato** (verticale, quadrato,
+  orizzontale) di un reel che esiste già;
+- **"Fai il reel"**, per un reel nato da un testo già scritto: le otto tappe di `npm run fai` una dopo l'altra, con
+  il sì della persona prima della voce a pagamento;
 - **copiare i prompt pronti** (quelli di `PROMPT.md`) e **guardare il catalogo** di tutto quello che è già fatto,
   nella scheda "Catalogo e prompt";
 - **lanciare voce, provini, bozza, video finale e verifica**, e seguire l'avanzamento;
