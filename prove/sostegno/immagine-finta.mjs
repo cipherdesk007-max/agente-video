@@ -1,6 +1,7 @@
 // FMLAB Reel Kit — sostegno alle prove: un "fornitore di immagini" finto per il motore "comando".
 //   FMLAB_IMMAGINI_COMANDO="node prove/sostegno/immagine-finta.mjs {prompt} {uscita}"
-// Scrive un PNG 64×64: fondo verde pieno con un quadrato bianco al centro (il "soggetto"). Segna ogni chiamata in
+// Scrive un PNG 64×64: fondo pieno del colore chiesto nel prompt (verde, o magenta se il prompt dice #FF00FF) con un
+// quadrato bianco al centro (il "soggetto"). Segna ogni chiamata in
 // un file accanto, così le prove contano quante volte è stato davvero chiamato (cioè quanto si sarebbe speso).
 import fs from 'node:fs';
 import zlib from 'node:zlib';
@@ -11,7 +12,7 @@ for (let y = 0; y < L; y++) {
   const riga = Buffer.alloc(1 + L * 3);
   for (let x = 0; x < L; x++) {
     const dentro = x >= 20 && x < 44 && y >= 20 && y < 44;
-    riga.set(dentro ? [255, 255, 255] : [0, 255, 0], 1 + x * 3);
+    riga.set(dentro ? [255, 255, 255] : /#FF00FF/i.test(prompt) ? [255, 0, 255] : [0, 255, 0], 1 + x * 3);
   }
   righe.push(riga);
 }

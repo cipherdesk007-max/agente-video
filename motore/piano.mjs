@@ -123,6 +123,7 @@ export const SOGGETTI = {
   riflettori: ['luci'],
   foglio: ['evidenzia'],
   scale: ['passo'],
+  immagine: ['acceso'],
 };
 
 const CAMPI_SCENA = ['nome', 'da', 'blocco', 'dati', 'segni', 'enfasi', 'suoni', 'luogo', 'entra', 'campo', 'camera', 'tinta', 'protagonista', 'narratore', 'perche', 'nota'];
@@ -291,8 +292,12 @@ function controllaSoggetti(dati, dove, esito) {
     const qui = `${dove} · soggetto ${i + 1}`;
     const numeri = SOGGETTI[sg?.tipo];
     if (!numeri) return void esito.errori.push(`${qui}: il tipo ${JSON.stringify(sg?.tipo)} non esiste. Tipi: ${Object.keys(SOGGETTI).join(', ')}.`);
-    const {tipo: _t, stato: _s, cambia: _c, icona: _i, ...semplici} = sg;
+    const {tipo: _t, stato: _s, cambia: _c, icona: _i, file: _f, ...semplici} = sg;
     controllaCampi(semplici, {etichetta: [T], nota: [T], colore: [C], segno: [S]}, qui, esito);
+    if (sg.tipo === 'immagine') {
+      if (typeof sg.file !== 'string' || !/\.(png|webp)$/i.test(sg.file)) esito.errori.push(`${qui}: un soggetto "immagine" vuole "file", l'illustrazione su fondo trasparente (es. "libreria/immagini/ginocchio-1a2b3c4d5e6f.png": lo dice npm run immagine).`);
+      else if (!fs.existsSync(path.join(RADICE, sg.file))) esito.errori.push(`${qui}: il file ${sg.file} non c'è. Generalo con: npm run immagine <reel> "soggetto" (e copia qui il percorso che stampa).`);
+    } else if (sg.file !== undefined) esito.errori.push(`${qui}: "file" serve solo con il tipo "immagine".`);
     if (sg.tipo === 'icona') controllaValore(sg.icona, I, `${qui} · icona`, esito);
     else if (sg.icona !== undefined) esito.errori.push(`${qui}: "icona" serve solo con il tipo "icona".`);
     const controllaNumeri = (st, q) => {

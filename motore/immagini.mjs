@@ -29,6 +29,11 @@ export const CARTELLA_IMMAGINI = path.join(RADICE, 'libreria', 'immagini');
 export const FORNITORI = ['nessuno', 'higgsfield', 'stability', 'comando'];
 const FORMATI = {'1:1': [1024, 1024], '9:16': [864, 1536], '16:9': [1536, 864], '4:5': [896, 1120], '3:4': [896, 1152]};
 const VERDE = '00FF00';
+/**
+ * Il colore del fondo da togliere. Di serie verde; se i soggetti del reel sono verdi (come nei riferimenti, dove il
+ * verde è il colore del farmaco) il foglio di stile chiede "fondo": "magenta", che nel soggetto non c'è.
+ */
+export const FONDI = {verde: {hex: VERDE, nome: 'verde', togliRiflesso: ',despill=type=green'}, magenta: {hex: 'FF00FF', nome: 'magenta', togliRiflesso: ''}};
 
 /** Il foglio di stile di serie: come devono essere disegnati tutti i soggetti del kit. */
 export const STILE_DI_SERIE = {
@@ -44,20 +49,23 @@ export function foglioDiStile(slug) {
     const dati = leggiJson(file);
     if (typeof dati.stile !== 'string' || !dati.stile.trim()) throw new ErroreFmlab(`${rel(file)}: manca il campo "stile" (una frase che descrive come sono disegnate le immagini del reel).`);
     if (dati.formato && !FORMATI[dati.formato]) throw new ErroreFmlab(`${rel(file)}: formato "${dati.formato}" non valido. Scegli tra: ${Object.keys(FORMATI).join(', ')}.`);
-    return {stile: dati.stile.trim(), formato: dati.formato ?? STILE_DI_SERIE.formato, file};
+    if (dati.fondo && !FONDI[dati.fondo]) throw new ErroreFmlab(`${rel(file)}: "fondo" può essere ${Object.keys(FONDI).join(' o ')}.`);
+    return {stile: dati.stile.trim(), formato: dati.formato ?? STILE_DI_SERIE.formato, fondo: dati.fondo ?? 'verde', file};
   }
-  return {...STILE_DI_SERIE, file: null};
+  return {...STILE_DI_SERIE, fondo: 'verde', file: null};
 }
 
 const pulito = (t) => String(t).toLowerCase().replace(/\s+/g, ' ').trim();
 /** L'impronta di un'immagine: stesso soggetto, stesso stile e stesso formato → stessa impronta (spazi e maiuscole non contano). */
-export function improntaImmagine({soggetto, stile, formato}) {
-  return crypto.createHash('sha256').update(`${pulito(soggetto)}\n${pulito(stile)}\n${formato}`).digest('hex').slice(0, 12);
+export function improntaImmagine({soggetto, stile, formato, fondo = 'verde'}) {
+  // il fondo entra nell'impronta solo se non è quello di serie: le immagini già in biblioteca restano trovabili
+  return crypto.createHash('sha256').update(`${pulito(soggetto)}\n${pulito(stile)}\n${formato}${fondo === 'verde' ? '' : `\nfondo ${fondo}`}`).digest('hex').slice(0, 12);
 }
 
 /** Il prompt completo mandato al fornitore. Il fondo verde serve a ritagliare il soggetto. */
-export function componiPrompt({soggetto, stile}) {
-  return `${soggetto.trim()}. Stile: ${stile}. Un solo soggetto, intero e centrato, isolato su uno sfondo verde pieno uniforme (#${VERDE}), senza ombre a terra, senza sfumature nello sfondo, niente verde nel soggetto.`;
+export function componiPrompt({soggetto, stile, fondo = 'verde'}) {
+  const f = FONDI[fondo] ?? FONDI.verde;
+  return `${soggetto.trim()}. Stile: ${stile}. Un solo soggetto, intero e centrato, isolato su uno sfondo ${f.nome} pieno uniforme (#${f.hex}), senza ombre a terra, senza sfumature nello sfondo, niente ${f.nome} nel soggetto.`;
 }
 
 const nomeFile = (soggetto, impronta) => `${pulito(soggetto).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'immagine'}-${impronta}`;
@@ -159,9 +167,10 @@ const fornitori = {
 };
 
 /** Toglie il fondo verde e ritaglia: resta il soggetto su trasparente. Restituisce quanta parte dell'immagine è trasparente (0…1). */
-async function ritaglia(grezzo, uscita) {
+async function ritaglia(grezzo, uscita, fondo = 'verde') {
+  const f = FONDI[fondo] ?? FONDI.verde;
   const ff = await trovaFfmpeg();
-  const r = spawnSync(ff.percorso, ['-hide_banner', '-nostdin', '-loglevel', 'error', '-y', '-i', grezzo, '-vf', `format=rgba,colorkey=0x${VERDE}:0.34:0.12,despill=type=green`, '-frames:v', '1', uscita], {encoding: 'utf8'});
+  const r = spawnSync(ff.percorso, ['-hide_banner', '-nostdin', '-loglevel', 'error', '-y', '-i', grezzo, '-vf', `format=rgba,colorkey=0x${f.hex}:0.34:0.12${f.togliRiflesso}`, '-frames:v', '1', uscita], {encoding: 'utf8'});
   if (r.status !== 0) throw new ErroreFmlab(`Non riesco a togliere il fondo dall'immagine:\n${(r.stderr || '').trim().split('\n').slice(-3).join('\n')}`);
   // quanta trasparenza c'è: se è quasi zero il fornitore non ha rispettato il fondo verde
   const m = spawnSync(ff.percorso, ['-hide_banner', '-nostdin', '-loglevel', 'error', '-i', uscita, '-vf', 'alphaextract,scale=64:64,format=gray', '-f', 'rawvideo', '-'], {maxBuffer: 1 << 20});
@@ -178,8 +187,8 @@ export async function immagine({soggetto, reel, fornitore = process.env.FMLAB_IM
   if (!soggetto || soggetto.trim().length < 3) throw new ErroreFmlab('Descrivi il soggetto dell\'immagine (per esempio: "un ginocchio in sezione, cartilagine azzurra").');
   if (!FORNITORI.includes(fornitore)) throw new ErroreFmlab(`FMLAB_IMMAGINI="${fornitore}" non esiste. Scegli tra: ${FORNITORI.join(', ')}.`);
   const foglio = foglioDiStile(reel);
-  const impronta = improntaImmagine({soggetto, stile: foglio.stile, formato: foglio.formato});
-  const prompt = componiPrompt({soggetto, stile: foglio.stile});
+  const impronta = improntaImmagine({soggetto, stile: foglio.stile, formato: foglio.formato, fondo: foglio.fondo});
+  const prompt = componiPrompt({soggetto, stile: foglio.stile, fondo: foglio.fondo});
   const pronta = cercaInBiblioteca(impronta, cartella);
   if (pronta && !nuova) return {file: pronta, impronta, daBiblioteca: true, fornitore: leggiJson(pronta.replace(/\.png$/, '.json')).fornitore ?? 'sconosciuto', prompt};
   if (fornitore === 'nessuno') {
@@ -195,7 +204,7 @@ export async function immagine({soggetto, reel, fornitore = process.env.FMLAB_IM
     const esito = await fornitori[fornitore]({prompt, formato: foglio.formato, uscita: grezzo});
     if (!fs.existsSync(grezzo) || fs.statSync(grezzo).size < 68) throw new ErroreFmlab(`Il fornitore "${fornitore}" non ha prodotto nessuna immagine.`);
     const file = path.join(cartella, `${nomeFile(soggetto, impronta)}.png`);
-    const trasparente = await ritaglia(grezzo, file);
+    const trasparente = await ritaglia(grezzo, file, foglio.fondo);
     scriviJson(file.replace(/\.png$/, '.json'), {soggetto: soggetto.trim(), stile: foglio.stile, formato: foglio.formato, prompt, impronta, fornitore, modello: esito?.modello ?? null, trasparente: Math.round(trasparente * 100) / 100, creata: new Date().toISOString().slice(0, 10)});
     return {file, impronta, daBiblioteca: false, fornitore, prompt, trasparente};
   } finally {

@@ -21,7 +21,7 @@ const CY = stile.palco.centroY;
 type Testo = string | Record<string, string>;
 type Quando = string | number;
 
-export type TipoSoggetto = 'ginocchio' | 'quadrante' | 'batteria' | 'icona' | 'stomaco' | 'riflettori' | 'foglio' | 'scale';
+export type TipoSoggetto = 'ginocchio' | 'quadrante' | 'batteria' | 'icona' | 'stomaco' | 'riflettori' | 'foglio' | 'scale' | 'immagine';
 export const SOGGETTI: Record<TipoSoggetto, {cosa: string; stato: Record<string, number>}> = {
   ginocchio: {cosa: 'un ginocchio che brilla: rosso se fa male, verde se sta bene', stato: {dolore: 0}},
   quadrante: {cosa: 'un quadrante da 0 al massimo con la lancetta', stato: {valore: 0, massimo: 10}},
@@ -31,10 +31,13 @@ export const SOGGETTI: Record<TipoSoggetto, {cosa: string; stato: Record<string,
   riflettori: {cosa: 'un palco con i fari che girano', stato: {luci: 1}},
   foglio: {cosa: 'la pagina di uno studio, con una riga che si accende', stato: {evidenzia: 0}},
   scale: {cosa: 'una scala i cui gradini si accendono uno dopo l\'altro', stato: {passo: 0}},
+  immagine: {cosa: 'un\'illustrazione generata, su fondo trasparente (npm run immagine): prende il posto di un soggetto disegnato', stato: {acceso: 1}},
 };
 
 export type Soggetto = {
   tipo: TipoSoggetto;
+  /** Solo per tipo 'immagine': il file, es. "libreria/immagini/ginocchio-1a2b3c4d5e6f.png" (lo dice `npm run immagine`). */
+  file?: string;
   /** Solo per tipo 'icona'. */
   icona?: ComponentType<{size?: number | string; color?: string}>;
   etichetta?: Testo;
@@ -49,14 +52,14 @@ export type Soggetto = {
   cambia?: {segno: Quando; stato: Record<string, number>; durata?: number}[];
 };
 
-type Disegno = {p: Record<string, number>; t: number; colore: string; lato: number; icona?: Soggetto['icona']};
+type Disegno = {p: Record<string, number>; t: number; colore: string; lato: number; icona?: Soggetto['icona']; /** Solo la forma, senza aloni: è la copia su cui passa il riflesso. */ nudo?: boolean};
 
 const ARIA = 'drop-shadow(0 0 14px VAR)';
 const luceDi = (colore: string, forza = 1) => ({filter: ARIA.replace('VAR', alfa(colore, 0.75 * forza))});
 
 // ───────────────────────── i disegni (in una scatola da -100 a 100) ─────────────────────────
 
-function Ginocchio({p, t, colore}: Disegno) {
+function Ginocchio({p, t, colore, nudo}: Disegno) {
   const dolore = limita(p.dolore ?? 0);
   const giunto = miscela(C.positivo, C.negativo, dolore);
   const batte = 0.5 + 0.5 * Math.sin(t * (3 + 4 * dolore));
@@ -64,9 +67,9 @@ function Ginocchio({p, t, colore}: Disegno) {
     <>
       <defs>
         <linearGradient id="osso" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#FFFFFF" stopOpacity="0.95" />
-          <stop offset="0.55" stopColor="#E9E2D2" stopOpacity="0.8" />
-          <stop offset="1" stopColor="#B9B09C" stopOpacity="0.6" />
+          <stop offset="0" stopColor="#FFFFFF" stopOpacity="0.62" />
+          <stop offset="0.55" stopColor="#E9E2D2" stopOpacity="0.34" />
+          <stop offset="1" stopColor="#B9B09C" stopOpacity="0.2" />
         </linearGradient>
         <radialGradient id="male">
           <stop offset="0" stopColor={giunto} stopOpacity={0.85} />
@@ -75,12 +78,14 @@ function Ginocchio({p, t, colore}: Disegno) {
       </defs>
       {/* visto di fronte e largo: le due teste dell'osso riempiono la scatola, come nei riferimenti */}
       <g transform="scale(1.42 1.06)">
-      <circle cx="0" cy="-2" r={46 + 22 * dolore + 10 * batte * dolore} fill="url(#male)" opacity={0.35 + 0.55 * dolore} />
-      {[0, 1, 2].map((k) => {
-        const giro = (t * (0.5 + 0.6 * dolore) + k / 3) % 1;
-        return <circle key={k} cx="0" cy="-2" r={30 + 62 * giro} fill="none" stroke={giunto} strokeWidth={2.4} opacity={(1 - giro) * (0.25 + 0.6 * dolore)} />;
-      })}
-      <g style={luceDi(colore)} stroke={colore} strokeWidth="2.2" strokeLinejoin="round" fill="url(#osso)">
+      {nudo ? null : <circle cx="0" cy="-2" r={46 + 22 * dolore + 10 * batte * dolore} fill="url(#male)" opacity={0.35 + 0.55 * dolore} />}
+      {nudo
+        ? null
+        : [0, 1, 2].map((k) => {
+            const giro = (t * (0.5 + 0.6 * dolore) + k / 3) % 1;
+            return <circle key={k} cx="0" cy="-2" r={30 + 62 * giro} fill="none" stroke={giunto} strokeWidth={2.4} opacity={(1 - giro) * (0.25 + 0.6 * dolore)} />;
+          })}
+      <g style={luceDi(colore, 1.4)} stroke={colore} strokeWidth="2.8" strokeLinejoin="round" fill="url(#osso)">
         <path d="M-19 -100 L19 -100 L23 -47 C50 -47 55 -9 31 -7 C19 -6 9 -13 0 -13 C-9 -13 -19 -6 -31 -7 C-55 -9 -50 -47 -23 -47 Z" />
         <path d="M-45 8 C-44 3 44 3 45 8 C47 27 27 35 21 46 L17 100 L-17 100 L-21 46 C-27 35 -47 27 -45 8 Z" />
         <path d="M33 42 C41 42 41 52 37 58 L35 100 L27 100 L29 58 C27 50 27 42 33 42 Z" opacity="0.8" />
@@ -143,7 +148,7 @@ function Batteria({p, t, colore}: Disegno) {
         const y = 78 - (i + 1) * (alta + 5) + 5;
         if (piena <= 0) return <rect key={i} x="-33" y={y} width="66" height={alta} rx="6" fill="none" stroke={alfa(tinta, 0.25)} strokeWidth="1.5" />;
         const h = alta * piena;
-        return <rect key={i} x="-33" y={y + alta - h} width="66" height={h} rx="6" fill={tinta} opacity={0.82 + 0.18 * Math.sin(t * 3.1 + i)} style={luceDi(tinta, accesa)} />;
+        return <rect key={i} x="-33" y={y + alta - h} width="66" height={h} rx="6" fill={miscela(tinta, '#FFFFFF', 0.25)} opacity={0.88 + 0.12 * Math.sin(t * 3.1 + i)} style={luceDi(tinta, accesa)} />;
       })}
       <clipPath id={`corpo-${Math.round(livello * 100)}`}>
         <rect x="-42" y="-84" width="84" height="172" rx="13" />
@@ -153,7 +158,7 @@ function Batteria({p, t, colore}: Disegno) {
   );
 }
 
-function Stomaco({p, t, colore}: Disegno) {
+function Stomaco({p, t, colore, nudo}: Disegno) {
   const irritato = limita(p.irritato ?? 0);
   const tinta = miscela(colore, C.negativo, irritato);
   const onda = (k: number) => 3 * Math.sin(t * (2 + 3 * irritato) + k);
@@ -169,7 +174,7 @@ function Stomaco({p, t, colore}: Disegno) {
       {[0, 1, 2, 3].map((k) => (
         <path key={k} d={`M${-62 + k * 5} ${-22 + k * 22 + onda(k)} C${-48 + k * 8} ${-8 + k * 22 - onda(k)} ${-36 + k * 12} ${2 + k * 20 + onda(k + 1)} ${-22 + k * 16} ${10 + k * 17 - onda(k)}`} stroke={tinta} strokeWidth="3.4" opacity={0.55 + 0.4 * irritato} />
       ))}
-      {[0, 1, 2].map((k) => {
+      {(nudo ? [] : [0, 1, 2]).map((k) => {
         const giro = (t * (0.4 + 0.7 * irritato) + k / 3) % 1;
         return <circle key={k} cx="-20" cy="34" r={20 + 70 * giro} stroke={tinta} strokeWidth="2.2" opacity={(1 - giro) * irritato * 0.7} />;
       })}
@@ -177,8 +182,8 @@ function Stomaco({p, t, colore}: Disegno) {
   );
 }
 
-function Riflettori({p, t, colore}: Disegno) {
-  const luci = limita(p.luci ?? 1);
+function Riflettori({p, t, colore, nudo}: Disegno) {
+  const luci = nudo ? 0 : limita(p.luci ?? 1);
   return (
     <>
       <path d="M-98 -78 L98 -78" stroke="#C9D4E0" strokeWidth="3" />
@@ -254,6 +259,7 @@ const DISEGNI: Record<TipoSoggetto, (d: Disegno) => ReactNode> = {
   foglio: Foglio,
   scale: Scale,
   icona: () => null,
+  immagine: () => null,
 };
 
 // ───────────────────────── il soggetto vivo ─────────────────────────
@@ -280,7 +286,9 @@ export function SoggettoVivo({soggetto, x, y, lato, p, da, indice = 0}: {soggett
     <div style={{position: 'absolute', left: x - lato / 2, top: y - lato / 2, width: lato, height: lato, opacity: rampa(da, 0.25), transform: `translate(${deriva.toFixed(2)}px, ${((1 - entra) * 90 + galleggia).toFixed(2)}px) rotate(${dondola.toFixed(3)}deg) scale(${(mix(0.7, 1, entra) * respira).toFixed(4)})`}}>
       {/* il bagliore dietro, che respira */}
       <div style={{position: 'absolute', inset: -lato * 0.18, borderRadius: '50%', background: `radial-gradient(circle, ${alfa(colore, 0.3 + 0.22 * battito)} 0%, ${alfa(colore, 0.1 + 0.08 * battito)} 38%, transparent 68%)`}} />
-      {soggetto.tipo === 'icona' && Icona ? (
+      {soggetto.tipo === 'immagine' && soggetto.file ? (
+        <img src={tempo.risorsa(soggetto.file)} alt="" style={{position: 'absolute', left: '5%', top: '5%', width: '90%', height: '90%', objectFit: 'contain', filter: `drop-shadow(0 0 ${Math.round(16 + 14 * battito)}px ${alfa(colore, 0.8)})`, opacity: 0.55 + 0.45 * limita(p.acceso ?? 1)}} />
+      ) : soggetto.tipo === 'icona' && Icona ? (
         <div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', filter: `drop-shadow(0 0 ${Math.round(18 + 16 * battito)}px ${alfa(colore, 0.85)})`, opacity: 0.55 + 0.45 * limita(p.acceso ?? 1)}}>
           <Icona size={lato * 0.62} color={colore} />
         </div>
@@ -291,13 +299,15 @@ export function SoggettoVivo({soggetto, x, y, lato, p, da, indice = 0}: {soggett
       )}
       {passa < 115 ? (
         <div style={{position: 'absolute', inset: 0, opacity: 0.6, mixBlendMode: 'plus-lighter', filter: 'brightness(0) invert(1)', WebkitMaskImage: `linear-gradient(108deg, transparent ${(passa - 13).toFixed(1)}%, #000 ${passa.toFixed(1)}%, transparent ${(passa + 13).toFixed(1)}%)`, maskImage: `linear-gradient(108deg, transparent ${(passa - 13).toFixed(1)}%, #000 ${passa.toFixed(1)}%, transparent ${(passa + 13).toFixed(1)}%)`}}>
-          {soggetto.tipo === 'icona' && Icona ? (
+          {soggetto.tipo === 'immagine' && soggetto.file ? (
+            <img src={tempo.risorsa(soggetto.file)} alt="" style={{position: 'absolute', left: '5%', top: '5%', width: '90%', height: '90%', objectFit: 'contain'}} />
+          ) : soggetto.tipo === 'icona' && Icona ? (
             <div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
               <Icona size={lato * 0.62} color="#fff" />
             </div>
           ) : (
             <svg width={lato} height={lato} viewBox="-100 -100 200 200" style={{position: 'absolute', inset: 0, overflow: 'visible'}}>
-              <Disegno p={p} t={t} colore={colore} lato={lato} />
+              <Disegno p={p} t={t} colore={colore} lato={lato} nudo />
             </svg>
           )}
         </div>

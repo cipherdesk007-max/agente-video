@@ -457,6 +457,10 @@ await prova('immagini: stessa richiesta, stessa impronta; senza fornitore non si
   assert.equal(a, im.improntaImmagine({soggetto: '  un  GINOCCHIO in sezione ', stile: 'Morbido', formato: '1:1'}));
   assert.notEqual(a, im.improntaImmagine({soggetto: 'Un ginocchio in sezione', stile: 'a matita', formato: '1:1'}));
   assert.match(im.componiPrompt({soggetto: 'Una fiala', stile: 'morbido'}), /Una fiala\. Stile: morbido\..*sfondo verde pieno/);
+  // soggetti verdi: il fondo da togliere diventa magenta, e l'impronta cambia (non si confonde con quella su verde)
+  assert.match(im.componiPrompt({soggetto: 'Una fiala', stile: 'morbido', fondo: 'magenta'}), /sfondo magenta pieno uniforme \(#FF00FF\).*niente magenta nel soggetto/);
+  assert.notEqual(im.improntaImmagine({soggetto: 'a', stile: 'b', formato: '1:1'}), im.improntaImmagine({soggetto: 'a', stile: 'b', formato: '1:1', fondo: 'magenta'}));
+  assert.equal(im.improntaImmagine({soggetto: 'a', stile: 'b', formato: '1:1'}), im.improntaImmagine({soggetto: 'a', stile: 'b', formato: '1:1', fondo: 'verde'}));
   const cartella = fs.mkdtempSync(path.join(os.tmpdir(), 'fmlab-immagini-'));
   await assert.rejects(im.immagine({soggetto: 'una fiala di vetro', fornitore: 'nessuno', cartella}), /non genero niente[\s\S]*una fiala di vetro\. Stile:/);
   await assert.rejects(im.immagine({soggetto: 'una fiala di vetro', fornitore: 'inventato', cartella}), /non esiste/);
@@ -495,7 +499,7 @@ await prova('immagini: generata una volta, la seconda esce dalla biblioteca e no
   const scheda = JSON.parse(fs.readFileSync(prima.file.replace(/\.png$/, '.json'), 'utf8'));
   assert.equal(scheda.impronta, prima.impronta);
   assert.equal(scheda.soggetto, 'Una fiala di vetro');
-  assert.match(scheda.prompt, /sfondo verde/);
+  assert.match(scheda.prompt, /sfondo (verde|magenta) pieno/);
   // seconda volta, anche scritta in un altro modo e senza fornitore: stessa immagine, nessuna chiamata
   const seconda = await im.immagine({soggetto: 'una  fiala di VETRO', fornitore: 'nessuno', cartella});
   assert.equal(seconda.daBiblioteca, true);
@@ -520,7 +524,8 @@ await prova('immagini: Higgsfield (richiesta, stato, scarico) e Stability (una c
   const im = await carica('motore/immagini.mjs');
   const cartella = fs.mkdtempSync(path.join(os.tmpdir(), 'fmlab-immagini-'));
   const png = path.join(cartella, 'finta.png');
-  spawnSync(process.execPath, [path.join(K, 'prove/sostegno/immagine-finta.mjs'), 'x', png]);
+  // il servizio finto disegna sul fondo che il foglio di stile del kit chiede (verde o magenta)
+  spawnSync(process.execPath, [path.join(K, 'prove/sostegno/immagine-finta.mjs'), im.componiPrompt({soggetto: 'x', stile: 'x', fondo: im.foglioDiStile().fondo}), png]);
   const viste = [];
   let giri = 0;
   const server = http.createServer((req, res) => {
