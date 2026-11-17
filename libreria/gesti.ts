@@ -334,7 +334,8 @@ export function scalettaAssetti(dati: DatiReel, regiaDi: (nomeScena: string) => 
         if (!ruolo) return;
         const alto = nota('alto') ?? alterna[0];
         const precedenteQui = cambi.length ? cambi[cambi.length - 1].posa : 'dito';
-        const altra = () => scegli(alterna.filter((a) => a !== alto), precedenteQui);
+        // tra un dito in alto e l'altro una posa che invita (mano aperta, indica, presenta): mai braccia conserte, che frenano
+        const altra = () => scegli(['aperto', 'presenta', 'lato'], precedenteQui);
         const posa = ruolo === 'altra' ? altra() : precedenteQui === alto && f !== ultimoInvito ? altra() : alto;
         if (posa !== precedenteQui) {
           cambi.push({t: Math.max(0, f.inizio - 0.25), posa, seconda: secondaPer(posa, regia?.seconda)});
