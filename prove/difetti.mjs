@@ -723,6 +723,23 @@ await prova('affianca: stessi momenti = stessa frazione della durata; senza il v
   assert.ok(html.indexOf('data:a') < html.indexOf('data:b'), 'il kit sta a sinistra');
 });
 
+await prova('prova cieca: stesso seme stessa prova, spezzoni che non si toccano, soluzione non in chiaro nella pagina', async () => {
+  const {caso, scegliSpezzoni, paginaProvaCieca, SPEZZONE, RITAGLIO} = await carica('motore/provacieca.mjs');
+  const video = [{nome: 'a', durata: 55}, {nome: 'b', durata: 52}, {nome: 'corto', durata: 8}];
+  const uno = scegliSpezzoni(video, 5, caso(1));
+  assert.deepEqual(uno, scegliSpezzoni(video, 5, caso(1)));
+  assert.notDeepEqual(uno, scegliSpezzoni(video, 5, caso(2)));
+  assert.equal(uno.length, 5);
+  assert.ok(uno.every((s) => s.nome !== 'corto' && s.da >= 2.5 && s.da + SPEZZONE <= 55 - 2.4));
+  for (const x of uno) for (const y of uno) if (x !== y && x.nome === y.nome) assert.ok(Math.abs(x.da - y.da) >= SPEZZONE + 1, 'due spezzoni dello stesso video si toccano');
+  // il ritaglio lascia fuori la fascia dei sottotitoli (fino al 22,5%) e il narratore (dal 70%)
+  assert.ok(RITAGLIO.y0 > 0.225 && RITAGLIO.y1 < 0.7);
+  const html = paginaProvaCieca([{kit: true, src: 'data:k'}, {kit: false, src: 'data:r'}]);
+  assert.doesNotMatch(html.replace(/<button[^>]*>[^<]*<\/button>/g, '').replace(/<p>.*?<\/p>/s, ''), /"kr"|KIT|RIFERIMENTO/);
+  assert.match(html, /atob\("a3I="\)/);
+  assert.match(html, /persone\.every\(\(n\) => n <= 6\)/);
+});
+
 if (pannello) await pannello.server.chiudi();
 cancella();
 const falliti = esiti.filter((e) => !e.ok);

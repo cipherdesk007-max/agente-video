@@ -16,6 +16,7 @@
     "nuovo": "node motore/cli.mjs nuovo",
     "fai": "node motore/cli.mjs fai",
     "affianca": "node motore/cli.mjs affianca",
+    "prova-cieca": "node motore/cli.mjs prova-cieca",
     "regia": "node motore/cli.mjs regia",
     "piano": "node motore/cli.mjs piano",
     "monta": "node motore/cli.mjs monta",

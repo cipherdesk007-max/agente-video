@@ -16,6 +16,8 @@ FMLAB Reel Kit — comandi
                                            confronta. Riparte dalla tappa fallita; si ferma prima di spendere (voce=si per dire sì).
                                            Con testo=<file.txt> crea il reel; scelte: durata=60 narratore=nessuno regalo=mappa · bozza
   npm run affianca <reel> [rif1|rif2|rif3]  IL GIUDICE: 12 fotogrammi del reel accanto a 12 del riferimento, stessi momenti
+  npm run prova-cieca [seme=N] [reel=a,b]  una pagina con 10 spezzoni di 5 s (5 riferimenti, 5 kit resi adesso), mescolati,
+                                           solo il palco: tre persone dicono "riferimento" o "kit". Passata fino a 6 su 10
   npm run regia <reel> [nuova]             scrive il piano di regia di serie (piano.json) dal testo: una base da migliorare
   npm run piano [reel]                     controlla il piano e il suo "rischio cartelli" (senza reel: blocchi, luoghi, camere)
   npm run monta <reel>                     piano.json → copione.md + scene.tsx (il testo resta parola per parola)
@@ -127,6 +129,10 @@ async function principale() {
     case 'confronta': {
       const {comandoConfronta} = await import('./confronta.mjs');
       return comandoConfronta(argomenti);
+    }
+    case 'prova-cieca': {
+      const {comandoProvaCieca} = await import('./provacieca.mjs');
+      return comandoProvaCieca(argomenti);
     }
     case 'affianca': {
       const {comandoAffianca} = await import('./affianca.mjs');

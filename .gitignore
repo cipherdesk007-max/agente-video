@@ -14,6 +14,9 @@ reels/*/verifica.*.md
 *.tmp.wav
 .DS_Store
 
+# la prova cieca: contiene pezzi dei video di riferimento, resta sul computer
+prova-cieca/
+
 # video di riferimento: sono di altri, restano solo sul computer
 riferimenti/*.mp4
 riferimenti/*.MP4
