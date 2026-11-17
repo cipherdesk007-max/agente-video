@@ -589,7 +589,7 @@ sempre: lo mette la persona, e deve averne i diritti. Altrimenti il kit usa una 
 (`quiete`, `marea`, `brina`, `orbita`), che genera da solo e non hanno diritti: con `musica=auto` è quella che il
 regista di serie ha scritto in `piano.json` dal nome del reel, con `npm run imposta <reel> musica=<nome>` quella
 scelta a mano, con `musica=no` nessuna. Il volume è `npm run imposta <reel> musica=30` (da 0 a 100), o dal pannello.
-La musica sta sotto la voce e si abbassa ancora mentre la voce parla, come sempre.
+La musica sta sotto la voce e si abbassa ancora mentre la voce parla, come sempre. Non scaricare musica da internet.
 
 Per ElevenLabs copia `.env.esempio` in `.env` e riempi `ELEVENLABS_API_KEY` ed `ELEVENLABS_VOICE_ID`.
 Non scrivere mai la chiave in altri file e non mostrarla.

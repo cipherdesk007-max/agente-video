@@ -1164,6 +1164,44 @@ await prova('B30 · musica: le trame le genera il kit da una formula; dal nome d
   assert.match(controllaPiano(piano, TESTO_RETA).errori.join('\n'), /la musica "valzer" non esiste/);
 });
 
+// ───────────────────────── B31 · le voci alternative documentate ─────────────────────────
+
+await prova('B31 · voci: gli esempi di voci/COME-FARE.md si leggono come li legge il motore "comando", e la sintassi documentata produce l\'audio', async () => {
+  const {spezza} = await carica('motore/voce.mjs');
+  const guida = fs.readFileSync(path.join(K, 'voci/COME-FARE.md'), 'utf8');
+  const righe = guida.split('\n').filter((r) => r.startsWith('FMLAB_VOCE_COMANDO=')).map((r) => r.slice('FMLAB_VOCE_COMANDO='.length));
+  assert.ok(righe.length >= 4, `nella guida ci sono ${righe.length} righe FMLAB_VOCE_COMANDO: servono il modello e tre esempi`);
+  for (const riga of righe) {
+    const pezzi = spezza(riga);
+    assert.ok(pezzi.length >= 3, riga);
+    assert.ok(pezzi.includes('{testo}') && pezzi.includes('{uscita}'), `l'esempio non dice dove leggere la frase o dove scrivere l'audio: ${riga}`);
+    assert.ok(!/["\\]/.test(pezzi[0]), `il programma da lanciare non si legge: ${riga}`);
+  }
+  // l'esempio con "sh -c": lo script resta un pezzo solo, con le sue virgolette, e riceve i due percorsi
+  const conShell = spezza(righe.find((r) => r.startsWith('sh -c ')));
+  assert.deepEqual([conShell[0], conShell[1], conShell.length], ['sh', '-c', 6]);
+  assert.match(conShell[2], /--output_file "\$2" < "\$1"$/);
+  // la stessa sintassi, con una voce finta al posto del programma: il kit la lancia così, frase per frase
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fmlab-b31-'));
+  try {
+    const testo = path.join(tmp, 'frase con spazi.txt');
+    const uscita = path.join(tmp, 'audio con spazi.grezzo');
+    fs.writeFileSync(testo, 'Vediamo cosa è successo.');
+    const riga = `sh -c "node prove/sostegno/voce-finta.mjs \\"$1\\" \\"$2\\"" voce {testo} {uscita}`;
+    const pezzi = spezza(riga).map((p) => p.replaceAll('{testo}', testo).replaceAll('{uscita}', uscita));
+    const r = spawnSync(pezzi[0], pezzi.slice(1), {cwd: K, encoding: 'utf8'});
+    assert.equal(r.status, 0, r.stderr);
+    assert.equal(fs.readFileSync(uscita).subarray(0, 4).toString(), 'RIFF', 'l\'audio è stato scritto dove il kit lo aspetta');
+  } finally {
+    fs.rmSync(tmp, {recursive: true, force: true});
+  }
+  // l'onestà su cosa parte in rete: la guida lo dice per ogni esempio, e LEGGIMI non parla più solo di ElevenLabs
+  assert.equal((guida.match(/In rete:/g) ?? []).length, 3);
+  const leggimi = fs.readFileSync(path.join(K, 'LEGGIMI.md'), 'utf8');
+  assert.doesNotMatch(leggimi, /L'unica cosa che manda in rete è il testo del copione a ElevenLabs/);
+  assert.match(leggimi, /FMLAB_VOCE_COMANDO/);
+});
+
 if (pannello) await pannello.server.chiudi();
 cancella();
 const falliti = esiti.filter((e) => !e.ok);

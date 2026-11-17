@@ -184,7 +184,8 @@ voce del Mac (gratuita) la sincronia è esatta sulle frasi e sulle pause.
   l'mp3 e lancia `npm run frasi audio.mp3 testo.txt`: il kit lo taglia frase per frase. Da lì, scritte uguali, non
   costano mai. Dalla stessa registrazione il kit misura il passo della voce e lo usa per i tempi stimati.
   Una banca non fa dire parole nuove: per quelle serve la voce.
-- Qualsiasi altro servizio di voce si collega con un piccolo programma: `voci/COME-FARE.md`.
+- Qualsiasi altro servizio di voce si collega con una riga nel `.env`: `voci/COME-FARE.md` ha tre esempi pronti
+  (Piper sul computer, la voce del Mac scelta a mano, un servizio in rete).
 
 **Musica di sottofondo.** Il kit ha la sua banca: quattro trame ambientali (`quiete`, `marea`, `brina`, `orbita`)
 che genera lui stesso da una formula, come gli effetti di `suoni/`. Non c'è nessun file di altri e nessun diritto da
@@ -380,5 +381,8 @@ Scritti qui perché chi fa i reel sappia cosa non è stato ancora provato.
 - Se chiudi un reel con "Commenta X e ti mando le fonti", poi le fonti vanno mandate davvero: sono già
   pronte in `didascalia.md`.
 - I caratteri inclusi (Inter) hanno licenza libera: vedi `stile/font/LICENZA-Inter.txt`.
-- Il kit non pubblica niente. L'unica cosa che manda in rete è il testo del copione a ElevenLabs, quando
-  generi la voce con quel servizio.
+- Il kit non pubblica niente. In rete manda solo il testo del copione, e solo al servizio di voce che scegli tu:
+  a ElevenLabs quando generi la voce con quel servizio, oppure al servizio che colleghi con `FMLAB_VOCE_COMANDO`
+  (`voci/COME-FARE.md` ha tre esempi: due lavorano sul computer e non mandano niente, uno manda le frasi al servizio
+  che indichi). Con la voce del Mac e con i tempi stimati non parte niente. Le immagini generate, se le accendi,
+  mandano la descrizione dell'immagine al servizio scelto in `FMLAB_IMMAGINI`.

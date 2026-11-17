@@ -57,3 +57,36 @@ file `.env`, mai nel programma.
 
 Per provarlo: `npm run voce <reel> comando`. Se qualcosa non va, il messaggio riporta quello che ha risposto
 il programma.
+
+## Tre esempi pronti da incollare nel `.env`
+
+Sono righe complete: si incollano così come sono e si cambia solo il nome della voce. Dopo: `npm run voce <reel> comando`.
+Il kit non aggiunge niente a queste voci: nessun servizio e nessuna chiave diventano obbligatori. I primi due esempi
+sono stati scritti senza poterli lanciare qui (servono i loro programmi): la sintassi della riga è controllata da
+una prova (`prove/difetti.mjs`, B31), la voce va ascoltata al primo reel.
+
+**1 · Piper, sul computer.** Un programma libero che legge il testo senza rete. Si installa a parte, insieme al file
+di una voce italiana (`.onnx`). Costo: nessuno. In rete: non parte niente.
+
+```
+FMLAB_VOCE_COMANDO=sh -c "piper --model voci/it_IT-paola-medium.onnx --output_file \"$2\" < \"$1\"" piper {testo} {uscita}
+```
+
+**2 · La voce del Mac, scelta a mano.** Il comando `say` di macOS, con la voce e la velocità che vuoi (le voci si
+scaricano da Impostazioni di Sistema). Costo: nessuno. In rete: non parte niente. È la stessa voce del motore `mac`
+del kit: questa riga serve quando vuoi fissare tu voce e velocità.
+
+```
+FMLAB_VOCE_COMANDO=say -v Federica -r 185 -o {uscita} --file-format=WAVE --data-format=LEI16@22050 -f {testo}
+```
+
+**3 · Un servizio in rete, con `voci/modello.mjs`.** Per i servizi a pagamento che hanno un indirizzo a cui mandare
+il testo. Si completano le tre righe segnate `DA COMPLETARE` nel modello e si mette la chiave nel `.env`. Costo: a
+consumo, lo decide il servizio (il prezzo è nel suo listino: qui non è scritto perché cambia). `npm run voce` dice
+quante frasi ha chiesto e quanti caratteri ha mandato. In rete: **il testo di ogni frase del copione va a quel
+servizio**, insieme alla tua chiave. Le frasi già fatte non vengono mandate di nuovo.
+
+```
+FMLAB_VOCE_COMANDO=node voci/modello.mjs {testo} {uscita} {lingua} {voce}
+MIA_VOCE_CHIAVE=la-chiave-del-servizio
+```
