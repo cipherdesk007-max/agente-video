@@ -155,6 +155,20 @@ await prova('metro: lo stesso video misurato due volte dà gli stessi numeri; su
   assert.equal(senza.narratore.presente, false);
 });
 
+await prova('mondo: un reel appena creato, reso con il mondo a livelli, sta nelle soglie su tagli, novità e palco fermo', () => {
+  const slug = nuovo('mondo', 'dati');
+  const reso = kit(['render', slug]);
+  assert.equal(reso.codice, 0, reso.testo);
+  const m = JSON.parse(kit(['confronta', path.join(REELS, slug, `${slug}.mp4`), 'json']).testo).misura;
+  const soglie = JSON.parse(fs.readFileSync(path.join(K, 'riferimenti', 'misure.json'), 'utf8')).soglie;
+  assert.equal(m.tagli.quanti, 0);
+  assert.ok(m.palco.fermoPercento <= soglie['palco.fermoPercento'].max, `palco fermo per il ${m.palco.fermoPercento}% del tempo (soglia ${soglie['palco.fermoPercento'].max})`);
+  assert.ok(m.palco.fermoMassimo <= soglie['palco.fermoMassimo'].max, `fermo più lungo ${m.palco.fermoMassimo} s`);
+  assert.ok(m.palco.occupato >= soglie['palco.occupato'].min, `palco occupato ${m.palco.occupato}`);
+  assert.ok(m.novita.intervalloMediano <= soglie['novita.intervalloMediano'].max, `una novità ogni ${m.novita.intervalloMediano} s (soglia ${soglie['novita.intervalloMediano'].max})`);
+  assert.ok(m.sottotitoli.contrastoMinimo >= soglie['sottotitoli.contrastoMinimo'].min, `contrasto dei sottotitoli ${m.sottotitoli.contrastoMinimo}`);
+});
+
 await prova('metro: rimisurando i video di riferimento escono le soglie salvate in riferimenti/misure.json', () => {
   const cartella = path.join(K, 'riferimenti');
   const video = fs.readdirSync(cartella).filter((f) => /\.(mp4|mov|m4v)$/i.test(f));
