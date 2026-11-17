@@ -674,7 +674,15 @@ Valgono per ogni reel che parla di corpo, farmaci, integratori, peptidi, diete, 
 - Non pubblicare e non mandare niente a nome della persona.
 - Non scrivere nelle scene chi è il narratore o quanto è grande: sta in `impostazioni.json`.
 
-## 16. Il pannello
+## 16. Il pannello (la dashboard)
+
+**Si accende da sola al tuo primo `npm run stato`** e si apre nel browser sulla pagina "Adesso": chi ti segue vede
+in diretta il comando in corso, la tappa, la percentuale del render, i provini, gli errori e i crediti. Tutto quello
+che lanci finisce nel registro (`.fmlab/registro.jsonl`): non devi fare niente perché si veda. Dalla dashboard la
+persona può mettere in coda **richieste**: `npm run stato` te le mostra (`[id] reel: testo`, e sotto, se ci sono
+pulsanti scelti, `→ npm run imposta …` da lanciare così com'è). Falle in ordine, poi `npm run richieste fatta <id>`.
+Le pagine Riferimenti, Chiavi, Catalogo e Diario sono per la persona; a te servono `diario.md` (leggilo prima di un
+reel nuovo) e la regola delle chiavi: stanno solo nel file `.env`, non chiederle e non stamparle.
 
 `npm run pannello` apre una pagina nel browser; `npm run pannello rete` la rende raggiungibile anche dal
 telefono, sulla stessa rete Wi-Fi. Si entra con il codice che compare nel Terminale.

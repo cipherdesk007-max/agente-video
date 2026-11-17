@@ -186,7 +186,7 @@ export function stampaRichiesta(r) {
 // ───────────────────────── il diario ─────────────────────────
 
 /** Aggiunge una voce al diario (in cima: la più nuova per prima). righe: frasi brevi, una per riga. */
-export function scriviDiario(titolo, righe = []) {
+export function scriviDiario(titolo, righe = [], {chiave = null} = {}) {
   const file = fileDiario();
   const testa = '# Diario del kit\n\nUna voce per ogni reel chiuso: cosa è entrato in catalogo, cosa è rimasto da sistemare. La scrive il kit da solo\n(`npm run fai`, alla fine); chi fa i reel la legge prima di cominciare il prossimo.\n';
   let vecchio = '';
@@ -196,8 +196,11 @@ export function scriviDiario(titolo, righe = []) {
     vecchio = testa;
   }
   const corpo = vecchio.startsWith('# Diario del kit') ? vecchio.slice(vecchio.indexOf('\n## ') === -1 ? vecchio.length : vecchio.indexOf('\n## ')) : `\n${vecchio}`;
-  const voce = `\n## ${new Date().toISOString().slice(0, 10)} · ${titolo}\n\n${righe.filter(Boolean).map((r) => `- ${r}`).join('\n')}\n`;
-  fs.writeFileSync(file, `${testa}${voce}${corpo}`.replace(/\n{3,}/g, '\n\n'));
+  const oggi = new Date().toISOString().slice(0, 10);
+  const voce = `\n## ${oggi} · ${titolo}\n\n${righe.filter(Boolean).map((r) => `- ${r}`).join('\n')}\n`;
+  // lo stesso reel rifatto nello stesso giorno ha una voce sola: l'ultima
+  const resto = chiave ? corpo.split(/\n(?=## )/).filter((b) => !b.replace(/^\n/, '').startsWith(`## ${oggi} · ${chiave} ·`)).join('\n') : corpo;
+  fs.writeFileSync(file, `${testa}${voce}${resto.startsWith('\n') ? '' : '\n'}${resto}`.replace(/\n{3,}/g, '\n\n'));
 }
 
 export function leggiDiario() {

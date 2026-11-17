@@ -2,6 +2,14 @@
 
 Per fare un reel bastano queste pagine. `FMLAB_AVVIA.md` si apre solo per il dettaglio di un capitolo.
 
+## Prima di tutto: `npm run stato`
+
+Lancialo all'inizio e dopo ogni passo. Fa tre cose: dice a che punto è ogni reel; accende la **dashboard** (se non è
+già accesa) e ne scrive l'indirizzo, così chi ti segue vede in diretta tappe, provini, errori e crediti; ti mostra le
+**richieste** che quella persona ha scritto nella dashboard. Le richieste si fanno in ordine: se hanno una riga
+`→ npm run imposta …` lanciala così com'è, poi rifai quello che serve (`npm run fai <reel>`) e chiudi con
+`npm run richieste fatta <id>`. Leggi anche le ultime voci di `diario.md`: dicono cosa è andato storto negli ultimi reel.
+
 ## Dal testo al reel: il regista sei tu, il kit fa il resto
 
 Quando arriva **un testo già scritto** (incollato in chat, dal pannello, in un file) il lavoro è questo, e non altro:

@@ -169,5 +169,33 @@ export async function comandoFai(slug, argomenti = []) {
     stato.fatte.push(tappa);
     salva();
   }
-  console.log(`\nFatto: tutte le ${TAPPE.length} tappe riuscite. Il video è in ${rel(dir)}.${bozza ? ' È una bozza: per il video finale rilancia senza "bozza".' : ''}\nResta la chiusura del reel: npm run riuso ${slug}`);
+  // La chiusura: il riuso parte da solo e il diario prende nota. Così il kit impara da ogni reel senza che nessuno
+  // debba ricordarsi di farlo, e chi fa il prossimo reel legge cosa è andato storto in questo.
+  let chiusura = '';
+  if (!bozza) {
+    try {
+      const {analizzaRiuso} = await import('./riuso.mjs');
+      const {scriviDiario, creditiSpesi} = await import('./registro.mjs');
+      const r = analizzaRiuso(fs.readFileSync(path.join(dir, 'scene.tsx'), 'utf8'));
+      const verifica = fs.existsSync(path.join(dir, 'verifica.md')) ? fs.readFileSync(path.join(dir, 'verifica.md'), 'utf8') : '';
+      const avvisi = [...verifica.matchAll(/^- ⚠ (.+?)\s*$/gm)].map((m) => m[1]);
+      const durata = leggiJson(path.join(dir, 'parole.json')).durata;
+      const spesi = creditiSpesi().perReel[slug] ?? 0;
+      scriviDiario(`${slug} · ${r.scene} scene, ${String(Math.round(durata * 10) / 10).replace('.', ',')} s`, [
+        r.pezzi.length
+          ? `da portare in libreria (scritto a mano in questo reel): ${r.pezzi.map((p) => `${p.nome} (${p.tipo}, ${p.righe} righe)`).join(', ')}. Come: npm run riuso ${slug}`
+          : `in catalogo: niente di nuovo, ${r.scene} scene su ${r.scene} fatte con i pezzi pronti${r.pronte.length ? ` (${r.pronte.join(', ')})` : ''}`,
+        `verifica: ${/\*\*Esito: (.+?)\*\*/.exec(verifica)?.[1] ?? 'non fatta'}`,
+        ...avvisi.filter((a) => !/Tempi stimati|Stile ancora/.test(a)).slice(0, 6).map((a) => `da sistemare: ${a}`),
+        spesi ? `crediti spesi per la voce: ${spesi}` : 'crediti spesi: 0 (voce non generata, o tutta già pronta)',
+      ], {chiave: slug});
+      annota('nota', {reel: slug, testo: `reel chiuso: ${r.pezzi.length ? `${r.pezzi.length} pezzi da portare in libreria` : 'niente di nuovo per il catalogo'}; scritto nel diario`});
+      chiusura = r.pezzi.length
+        ? `\nRiuso: ${r.pezzi.length} ${r.pezzi.length === 1 ? 'pezzo scritto a mano può' : 'pezzi scritti a mano possono'} entrare in libreria (${r.pezzi.map((p) => p.nome).join(', ')}): npm run riuso ${slug} dice come. È scritto nel diario (diario.md).`
+        : '\nRiuso: il reel usa solo pezzi pronti, niente da portare in libreria. È scritto nel diario (diario.md).';
+    } catch (e) {
+      chiusura = `\nIl diario non è stato scritto (${String(e?.message ?? e).split('\n')[0]}): lancia  npm run riuso ${slug}`;
+    }
+  }
+  console.log(`\nFatto: tutte le ${TAPPE.length} tappe riuscite. Il video è in ${rel(dir)}.${bozza ? ' È una bozza: per il video finale rilancia senza "bozza".' : ''}${chiusura}`);
 }

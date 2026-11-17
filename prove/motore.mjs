@@ -292,4 +292,69 @@ prova('distribuzione senza pause rilevate', () => {
   }
 }
 
+// ───────────────────────── registro, coda, chiavi, diario (la dashboard) ─────────────────────────
+{
+  const fs = await import('node:fs');
+  const os = await import('node:os');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fmlab-registro-'));
+  const prima = {...process.env};
+  Object.assign(process.env, {FMLAB_REGISTRO: tmp, FMLAB_ENV: path.join(tmp, 'env'), FMLAB_DIARIO: path.join(tmp, 'diario.md')});
+  const r = await import(`${K}/motore/registro.mjs`);
+  const chiavi = await import(`${K}/motore/chiavi.mjs`);
+  try {
+    prova('registro: i fatti si rileggono in ordine, i crediti si sommano per reel, una chiave non ci finisce mai', () => {
+      r.annota('inizio', {comando: 'fai', reel: 'uno'});
+      r.annota('spesa', {reel: 'uno', caratteri: 100});
+      r.annota('spesa', {reel: 'due', caratteri: 40});
+      r.annota('spesa', {reel: 'uno', caratteri: 5});
+      assert.deepEqual(r.leggiRegistro().map((f) => f.tipo), ['inizio', 'spesa', 'spesa', 'spesa']);
+      assert.deepEqual(r.creditiSpesi(), {totale: 145, perReel: {uno: 105, due: 40}});
+      assert.equal(r.senzaSegreti('voce sk_finta_0000000000000000 chiave=abc123 reel'), 'voce … chiave=… reel');
+      assert.equal(r.leggiAdesso(), null);
+      r.adesso({comando: 'render', reel: 'uno', percento: 12});
+      assert.equal(r.leggiAdesso().percento, 12);
+      r.adesso(null);
+      assert.equal(r.leggiAdesso(), null);
+    });
+    prova('coda: una richiesta con i pulsanti porta il comando che la applica; nuova, vista, fatta; vuota non entra', () => {
+      assert.throws(() => r.aggiungiRichiesta({reel: 'uno', testo: '  '}), /vuota/);
+      const q = r.aggiungiRichiesta({reel: 'uno', testo: 'senza dottore', scelte: {narratore: 'nessuno', formato: '1:1; echo ciao'}});
+      assert.equal(q.comando, 'npm run imposta uno narratore=nessuno formato=1:1echociao', 'i valori dei pulsanti non possono portare altri comandi');
+      assert.equal(r.leggiCoda()[0].stato, 'nuova');
+      assert.equal(r.segnaRichiesta(q.id, 'vista').stato, 'vista');
+      assert.equal(r.segnaRichiesta(q.id, 'fatta').stato, 'fatta');
+      assert.equal(r.segnaRichiesta('zzzzzz', 'fatta'), null);
+    });
+    prova('chiavi: si scrivono solo quelle dell\'elenco, su una riga; quelle segrete non tornano indietro; si tolgono', () => {
+      fs.writeFileSync(process.env.FMLAB_ENV, '# mio\nALTRA=resta\n');
+      chiavi.scriviChiave('ELEVENLABS_API_KEY', ' chiave-finta-123 ');
+      chiavi.scriviChiave('ELEVENLABS_MODEL', 'eleven_v4');
+      assert.equal(fs.readFileSync(process.env.FMLAB_ENV, 'utf8'), '# mio\nALTRA=resta\nELEVENLABS_API_KEY=chiave-finta-123\nELEVENLABS_MODEL=eleven_v4\n');
+      const stato = Object.fromEntries(chiavi.statoChiavi().map((c) => [c.nome, c]));
+      assert.deepEqual([stato.ELEVENLABS_API_KEY.presente, stato.ELEVENLABS_API_KEY.valore], [true, null]);
+      assert.equal(stato.ELEVENLABS_MODEL.valore, 'eleven_v4');
+      assert.equal(stato.HF_API_KEY_ID.presente, false);
+      assert.throws(() => chiavi.scriviChiave('ALTRA', 'x'), /non è una delle righe/);
+      assert.throws(() => chiavi.scriviChiave('ELEVENLABS_API_KEY', 'a\nB=1'), /una riga sola/);
+      chiavi.scriviChiave('ELEVENLABS_API_KEY', '');
+      assert.doesNotMatch(fs.readFileSync(process.env.FMLAB_ENV, 'utf8'), /ELEVENLABS_API_KEY/);
+      assert.match(fs.readFileSync(process.env.FMLAB_ENV, 'utf8'), /ALTRA=resta/);
+    });
+    prova('diario: la voce più nuova sta in cima; lo stesso reel rifatto nello stesso giorno ha una voce sola', () => {
+      r.scriviDiario('uno · 10 scene, 60 s', ['prima versione'], {chiave: 'uno'});
+      r.scriviDiario('due · 8 scene, 45 s', ['un altro reel'], {chiave: 'due'});
+      r.scriviDiario('uno · 11 scene, 62 s', ['seconda versione'], {chiave: 'uno'});
+      const voci = r.leggiDiario();
+      assert.deepEqual(voci.map((v) => v.titolo.replace(/^\S+ · /, '')), ['uno · 11 scene, 62 s', 'due · 8 scene, 45 s']);
+      assert.deepEqual(voci[0].righe, ['seconda versione']);
+    });
+  } finally {
+    for (const k of ['FMLAB_REGISTRO', 'FMLAB_ENV', 'FMLAB_DIARIO', 'ELEVENLABS_API_KEY', 'ELEVENLABS_MODEL']) {
+      if (prima[k] === undefined) delete process.env[k];
+      else process.env[k] = prima[k];
+    }
+    fs.rmSync(tmp, {recursive: true, force: true});
+  }
+}
+
 console.log(`\n${n} prove superate`);

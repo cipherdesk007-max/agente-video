@@ -1,5 +1,16 @@
 # Novità
 
+## 2.1 · la dashboard in diretta
+
+- **`npm run stato` accende la dashboard** e la apre nel browser: chi usa un agente nel terminale vede in diretta
+  cosa fa. Ogni comando del kit scrive in un registro (`.fmlab/registro.jsonl`).
+- **Pagina Adesso**: comando e tappa in corso, percentuale del render, le otto tappe, l'errore, i provini, i crediti
+  spesi e da spendere.
+- **Coda delle richieste**: dalla dashboard, con pulsanti o a parole; l'agente le legge a ogni `npm run stato` e le
+  chiude con `npm run richieste fatta <id>`.
+- **Pagine Riferimenti, Chiavi, Diario**; nel Catalogo i pezzi per nome e le frasi in banca.
+- **Il riuso parte da solo** alla fine di `npm run fai` e scrive una voce in `diario.md`.
+
 ## 2.0 · dal testo al reel con un comando
 
 - **Voce frase per frase** (ElevenLabs): ogni frase pagata resta in `voci/pagate/` e non si ripaga; cambiata una

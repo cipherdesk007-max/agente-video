@@ -50,9 +50,26 @@ Terminale senza finestra e con il permesso di lavorare da solo nella cartella (�
 Alcuni agenti vogliono che la cartella sia un repository Git: una volta sola, nel Terminale dentro la cartella,
 `git init`.
 
-## Il pannello
+## La dashboard
 
-È una pagina sola, fatta per il telefono.
+È il pannello: una pagina sola, fatta anche per il telefono. Non devi aprirla tu: quando l'agente lancia
+`npm run stato` (lo fa per prima cosa) la dashboard si accende e si apre nel browser sulla pagina **Adesso**.
+`npm run pannello ferma` la spegne; `FMLAB_DASHBOARD=no` nel file `.env` non la fa partire da sola.
+
+- **Adesso**: cosa sta girando (comando, tappa, percentuale), le otto tappe del reel con ✓ e ✖, l'errore se una si
+  è fermata, i provini, l'anteprima, i crediti spesi e quelli che costerebbe la voce. Sotto, **"Chiedi una cosa
+  all'agente"**: scegli il reel, tocca i pulsanti (con o senza dottore, formato, durata, regalo, voce) o scrivi con
+  parole tue, e metti in coda. L'agente legge la coda al prossimo `npm run stato`. La dashboard non scrive nella chat
+  dell'agente: se è fermo ad aspettarti, digli "guarda lo stato".
+- **Riferimenti**: i tuoi video di riferimento, da guardare lì, e il pulsante che apre la cartella.
+- **Chiavi**: per ogni chiave dice "c'è" o "manca" e la scrive nel file `.env`. Una chiave scritta non viene più
+  mostrata, e si scrive solo dal computer del kit, non dal telefono.
+- **Catalogo e prompt**: oltre al catalogo disegnato, i pezzi per nome (scene, soggetti, oggetti 3D, luoghi) e le
+  frasi in banca, da ascoltare.
+- **Diario**: una voce per ogni reel chiuso, scritta dal kit (`diario.md`): cosa è entrato in catalogo, cosa è da
+  sistemare, i crediti spesi.
+
+Le altre due pagine sono quelle di sempre.
 
 **Nuovo reel**
 
@@ -113,7 +130,8 @@ video: le scene si riallineano da sole alle parole.
 | Comando | Cosa fa |
 |---|---|
 | `npm run pannello` | il pannello nel browser (`rete` in fondo per aprirlo anche dal telefono) |
-| `npm run stato` | a che punto è ogni reel e qual è il prossimo passo |
+| `npm run stato` | a che punto è ogni reel e qual è il prossimo passo; accende la dashboard e mostra le richieste in coda |
+| `npm run richieste` | le richieste scritte dalla dashboard (`fatta <id>` ne chiude una) |
 | `npm run collaudo` | controlla che il kit funzioni su questo computer |
 | `npm run fai ginocchio testo=testo.txt "Titolo"` | dal testo al video in otto tappe; poi `npm run fai ginocchio` riparte da dove serve (`bozza` per fare prima) |
 | `npm run piano ginocchio` | controlla il piano di regia (`piano.json`) e dà il rischio cartelli da 0 a 100 |
@@ -291,6 +309,8 @@ Scritti qui perché chi fa i reel sappia cosa non è stato ancora provato.
   velocizzazione per stare nella durata e le misure dell'audio vanno guardate al primo reel vero.
 - **La voce frase per frase è provata solo con un ElevenLabs finto.** Al primo reel vero va ascoltato se le frasi
   legano tra loro e con quelle della banca; se non legano, `ELEVENLABS_FRASI=no`.
+- **La dashboard è provata nel browser su Linux**, non su un Mac: che si apra da sola nel browser e che "Apri la
+  cartella" apra il Finder va guardato lì una volta.
 - **Mai provato con un servizio di immagini vero**, e nemmeno il ritaglio dal fondo magenta su un'immagine vera.
 - **Mai provato sul Mac del 2017**: i tempi di render scritti qui (circa 14 minuti per un reel di 112 secondi) sono
   di un computer a due processori.
