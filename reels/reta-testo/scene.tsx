@@ -1,11 +1,10 @@
 // Scritto da `npm run monta` a partire da piano.json: non modificarlo a mano, cambia il piano e rimonta.
 // Una scena su misura si scrive in mano.tsx e nel piano si chiama con {"blocco": "mano", "dati": {"componente": "Nome"}}.
-import {bloccoDomanda, bloccoEbook, bloccoParole, bloccoSoggetti, definisciReel} from '../../libreria';
-import {FaUsers} from 'react-icons/fa6';
+import {bloccoEbook, bloccoSoggetti, definisciReel} from '../../libreria';
+import {FaMagnifyingGlass, FaQuestion, FaSyringe, FaUsers} from 'react-icons/fa6';
 
 export default definisciReel({
   titolo: "Reta e dolore al ginocchio: quanto è merito del farmaco?",
-  protagonista: {tipo: "peptide", colore: "#5CF2C8"},
   scene: {
     aggancio: {
       componente: bloccoSoggetti({
@@ -14,9 +13,10 @@ export default definisciReel({
             tipo: "ginocchio",
             etichetta: "Reta",
             colore: "#5CF2C8",
-            stato: {dolore: 1},
+            stato: {dolore: 0.6},
             cambia: [
-              {segno: "meno", stato: {dolore: 0.25}, durata: 1.2},
+              {segno: "reta", stato: {dolore: 1}, durata: 0.5},
+              {segno: "meno", stato: {dolore: 0.25}},
             ],
           },
           {
@@ -26,7 +26,8 @@ export default definisciReel({
             segno: "ginocchio",
             stato: {dolore: 1},
             cambia: [
-              {segno: "meno", stato: {dolore: 0.5}, durata: 1.2},
+              {segno: "placebo", stato: {dolore: 0.85}, durata: 0.5},
+              {segno: "meno", stato: {dolore: 0.5}},
             ],
           },
         ],
@@ -34,23 +35,19 @@ export default definisciReel({
       atmosfera: {luogo: "vuoto"},
       campo: "medio",
       camera: "spinta",
-      protagonista: [
-        {acceso: 0.7, carica: 0.4, onda: 0.6},
-        {segno: "reta", acceso: 1},
-        {segno: "placebo", colore: "#C9D4E0", onda: 1.2},
-        {segno: "meno", colore: "#5CF2C8", onda: 0.5, acceso: 1},
-      ],
     },
     domanda: {
-      componente: bloccoDomanda({domanda: "Quanto è merito della Reta?", sopra: "Il dolore cala anche con il placebo", segno: "quanto"}),
+      componente: bloccoSoggetti({
+        titolo: "Quanto è merito della Reta?",
+        soggetti: [
+          {tipo: "icona", icona: FaQuestion, etichetta: "Quanto?", colore: "#FFD23F", segno: "quanto"},
+          {tipo: "icona", icona: FaSyringe, etichetta: "Merito suo?", colore: "#5CF2C8", segno: "merito"},
+          {tipo: "icona", icona: FaMagnifyingGlass, etichetta: "Vediamo", colore: "#FFFFFF", segno: "vediamo"},
+        ],
+      }),
       atmosfera: {luogo: "vuoto"},
-      campo: "stretto",
+      campo: "largo",
       camera: "indietro",
-      protagonista: [
-        {acceso: 0.4, carica: 0.4, onda: 1},
-        {segno: "merito", acceso: 0.8, grandezza: 0.74},
-        {segno: "vediamo", acceso: 1, carica: 0.7, grandezza: 0.62},
-      ],
     },
     studi: {
       componente: bloccoSoggetti({
@@ -61,7 +58,9 @@ export default definisciReel({
             colore: "#5CF2C8",
             segno: "pubblicati",
             cambia: [
-              {segno: "riviste", stato: {evidenzia: 1}},
+              {segno: "due", stato: {evidenzia: 0.35}},
+              {segno: "riviste", stato: {evidenzia: 0.7}},
+              {segno: "mondo", stato: {evidenzia: 1}},
             ],
           },
           {
@@ -71,21 +70,19 @@ export default definisciReel({
             nota: "oltre un anno",
             colore: "#5AA8FF",
             segno: "mille",
+            stato: {acceso: 0.55},
+            cambia: [
+              {segno: "anno", stato: {acceso: 1}},
+            ],
           },
+          {tipo: "ginocchio", etichetta: "Artrosi", colore: "#FFD23F", segno: "artrosi", stato: {dolore: 0.9}},
         ],
         fonte: "NEJM, novembre 2026",
       }),
       atmosfera: {luogo: "vuoto"},
       entra: "destra",
-      campo: "stretto",
+      campo: "largo",
       camera: "destra",
-      protagonista: [
-        {acceso: 1, carica: 0.6, onda: 0.4},
-        {segno: "due", carica: 0.7},
-        {segno: "mondo", carica: 0.8, grandezza: 0.74},
-        {segno: "artrosi", onda: 1.2, grandezza: 0.62},
-        {segno: "anno", carica: 1, onda: 0.4},
-      ],
     },
     scala: {
       componente: bloccoSoggetti({
@@ -105,10 +102,6 @@ export default definisciReel({
       atmosfera: {luogo: "vuoto"},
       campo: "stretto",
       camera: "sale",
-      protagonista: [
-        {carica: 0.6, onda: 0.5},
-        {segno: "dieci", colore: "#FF4D5E", onda: 1.4},
-      ],
     },
     risultati: {
       componente: bloccoSoggetti({
@@ -131,6 +124,7 @@ export default definisciReel({
             segno: "anche",
             stato: {valore: 6, massimo: 10},
             cambia: [
+              {segno: "attivo", stato: {valore: 5.2}, durata: 0.8},
               {segno: "duepunti", stato: {valore: 3.88}, durata: 1.3},
             ],
           },
@@ -139,13 +133,8 @@ export default definisciReel({
       }),
       atmosfera: {luogo: "vuoto"},
       entra: "avanti",
-      campo: "stretto",
+      campo: "medio",
       camera: "spinta",
-      protagonista: [
-        {colore: "#5CF2C8", carica: 1, onda: 0.5},
-        {segno: "anche", colore: "#5AA8FF", carica: 0.5},
-        {segno: "attivo", acceso: 0.2, carica: 0.1},
-      ],
     },
     applauso: {
       componente: bloccoSoggetti({
@@ -166,9 +155,8 @@ export default definisciReel({
       }),
       atmosfera: {luogo: "vuoto"},
       entra: "basso",
-      campo: "medio",
+      campo: "largo",
       camera: "gira",
-      protagonista: {colore: "#5AA8FF", acceso: 0.3, onda: 0.3},
     },
     differenza: {
       componente: bloccoSoggetti({
@@ -182,6 +170,7 @@ export default definisciReel({
             stato: {livello: 0, accesa: 0.3},
             cambia: [
               {segno: "funziona", stato: {livello: 0.53}},
+              {segno: "rispetto", stato: {accesa: 0.08}},
             ],
           },
           {
@@ -192,6 +181,7 @@ export default definisciReel({
             segno: "differenza",
             stato: {livello: 0.53},
             cambia: [
+              {segno: "studi", stato: {livello: 0.76}},
               {segno: "unodue", stato: {livello: 0.99}, durata: 1.2},
             ],
           },
@@ -200,27 +190,37 @@ export default definisciReel({
       }),
       atmosfera: {luogo: "vuoto"},
       entra: "destra",
-      campo: "stretto",
+      campo: "medio",
       camera: "sinistra",
-      protagonista: [
-        {colore: "#5CF2C8", acceso: 1, carica: 0.5, onda: 0.5},
-        {segno: "funziona", onda: 1, grandezza: 0.74},
-        {segno: "studi", carica: 0.75, grandezza: 0.62},
-        {segno: "unodue", carica: 1, grandezza: 0.78},
-        {segno: "rispetto", grandezza: 0.62, onda: 0.4},
-      ],
     },
     misura: {
-      componente: bloccoParole({
-        parole: [
-          {testo: "Non è un miracolo", segno: "miracolo"},
-          {testo: "Non è un caso", segno: "caso", colore: "#7CF26B"},
+      componente: bloccoSoggetti({
+        titolo: "Non è un miracolo. Non è un caso.",
+        soggetti: [
+          {
+            tipo: "ginocchio",
+            etichetta: "Reta",
+            colore: "#5CF2C8",
+            stato: {dolore: 1},
+            cambia: [
+              {segno: "miracolo", stato: {dolore: 0.45}, durata: 1},
+            ],
+          },
+          {
+            tipo: "ginocchio",
+            etichetta: "Placebo",
+            colore: "#C9D4E0",
+            segno: "ma",
+            stato: {dolore: 1},
+            cambia: [
+              {segno: "caso", stato: {dolore: 0.72}, durata: 1},
+            ],
+          },
         ],
       }),
       atmosfera: {luogo: "vuoto"},
       campo: "stretto",
       camera: "indietro",
-      protagonista: {grandezza: 0.62, onda: 0.4},
     },
     rischi: {
       componente: bloccoSoggetti({
@@ -230,9 +230,10 @@ export default definisciReel({
             etichetta: "Effetti collaterali gravi",
             nota: "più frequenti con la Reta",
             colore: "#FF8FA0",
-            segno: "autori",
-            stato: {irritato: 0.1},
+            segno: "altro",
+            stato: {irritato: 0.05},
             cambia: [
+              {segno: "autori", stato: {irritato: 0.3}},
               {segno: "effetti", stato: {irritato: 0.55}},
               {segno: "frequenti", stato: {irritato: 0.8}},
               {segno: "gastro", stato: {irritato: 1}},
@@ -243,12 +244,8 @@ export default definisciReel({
       }),
       atmosfera: {luogo: "vuoto", tinta: "#E8455A"},
       entra: "avanti",
-      campo: "medio",
+      campo: "stretto",
       camera: "scende",
-      protagonista: [
-        {onda: 0.6},
-        {segno: "altro", colore: "#FF4D5E", onda: 1.6, acceso: 1},
-      ],
       dottore: {posa: "conserte"},
     },
     conclusione: {
@@ -278,9 +275,8 @@ export default definisciReel({
       }),
       atmosfera: {luogo: "vuoto"},
       entra: "sinistra",
-      campo: "stretto",
+      campo: "medio",
       camera: "destra",
-      protagonista: {colore: "#5CF2C8", onda: 0.5, acceso: 1, carica: 1, grandezza: 0.62},
     },
     azienda: {
       componente: bloccoSoggetti({
@@ -292,21 +288,18 @@ export default definisciReel({
             colore: "#FFD23F",
             stato: {evidenzia: 0},
             cambia: [
-              {segno: "azienda", stato: {evidenzia: 0.6}},
-              {segno: "dettagli", stato: {evidenzia: 1}},
+              {segno: "condotti", stato: {evidenzia: 0.3}},
+              {segno: "azienda", stato: {evidenzia: 0.65}},
+              {segno: "risultati", stato: {evidenzia: 1}},
             ],
           },
+          {tipo: "icona", icona: FaMagnifyingGlass, etichetta: "I dettagli", colore: "#FFFFFF", segno: "dettagli"},
         ],
       }),
       atmosfera: {luogo: "vuoto"},
       entra: "avanti",
-      campo: "medio",
+      campo: "largo",
       camera: "spinta",
-      protagonista: [
-        {colore: "#FFD23F", acceso: 0.5, onda: 0.9},
-        {segno: "condotti", acceso: 0.8},
-        {segno: "risultati", colore: "#5CF2C8", acceso: 1, onda: 0.5},
-      ],
     },
     amico: {
       componente: bloccoSoggetti({
@@ -318,6 +311,7 @@ export default definisciReel({
             segno: "manda",
             stato: {dolore: 0.1},
             cambia: [
+              {segno: "amico", stato: {dolore: 0.4}, durata: 0.5},
               {segno: "scricchiolano", stato: {dolore: 0.95}, durata: 0.6},
             ],
           },
@@ -335,12 +329,8 @@ export default definisciReel({
       }),
       atmosfera: {luogo: "vuoto"},
       entra: "basso",
-      campo: "stretto",
+      campo: "medio",
       camera: "sale",
-      protagonista: [
-        {acceso: 0.6, onda: 0.9},
-        {segno: "amico", acceso: 1, grandezza: 0.74},
-      ],
     },
     chiusura: {
       componente: bloccoEbook({
@@ -357,7 +347,6 @@ export default definisciReel({
       entra: "avanti",
       campo: "medio",
       camera: "spinta",
-      protagonista: false,
     },
   },
 });

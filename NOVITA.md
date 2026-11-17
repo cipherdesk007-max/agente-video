@@ -9,6 +9,11 @@
 - **Lingue scritte senza spazi** (giapponese, cinese, tailandese…): il testo si divide in parole da solo, i
   sottotitoli le riattaccano.
 - **Narratore**: l'invito finale si prepara partendo dalla fine, così non resta fermo sull'ultima frase.
+  Mai due pose quasi uguali di fila: a guardarle erano una posa sola.
+- **Soggetti con volume**: ginocchio (radiografia di vetro che svanisce lontano dall'articolazione), batteria (vetro
+  e blocchi pieni), stomaco (tubo al neon con spessore), palco (coni di luce nel fumo, pubblico in controluce).
+- **`reta-testo` senza protagonista**: ogni segno fa cambiare un soggetto grande, e la scena di sole scritte è
+  diventata due ginocchia a confronto. Il rischio cartelli conta "niente che resta e cambia" solo se mancano tutti e due.
 
 - **Il piano di regia** (`reels/<reel>/piano.json`): chi fa la regia scrive un file solo. Scene, cosa si vede, su
   quale parola compare ogni cosa, luogo, inquadratura, movimento di camera, protagonista, suoni. `npm run monta` ne

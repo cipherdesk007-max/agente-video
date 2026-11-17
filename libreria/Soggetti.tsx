@@ -8,6 +8,7 @@
 //     {tipo: 'ginocchio', etichetta: 'Reta', stato: {dolore: 1}, cambia: [{segno: 'meno', stato: {dolore: 0.2}}]},
 //     {tipo: 'ginocchio', etichetta: 'Placebo', colore: '#C9D4E0', stato: {dolore: 1}, segno: 'placebo'},
 //   ]})
+import {useId} from 'react';
 import type {ComponentType, ReactNode} from 'react';
 import {stile} from '../stile/stile';
 import {limita, mix, molla, rampa} from './anim';
@@ -63,35 +64,84 @@ function Ginocchio({p, t, colore, nudo}: Disegno) {
   const dolore = limita(p.dolore ?? 0);
   const giunto = miscela(C.positivo, C.negativo, dolore);
   const batte = 0.5 + 0.5 * Math.sin(t * (3 + 4 * dolore));
+  const id = useId().replace(/[^a-zA-Z0-9]/g, '');
+  // Una radiografia di vetro: le due teste dell'osso sono piene e luminose vicino all'articolazione e svaniscono
+  // allontanandosi, il bordo è una luce morbida più un filo netto. Il contorno uniforme di prima era un'icona.
+  const FEMORE = 'M-30 -106 C-31 -74 -38 -54 -60 -42 C-80 -31 -83 -9 -67 -4 C-50 1 -31 -3 -17 -9 C-9 -13 -7 -19 0 -19 C7 -19 9 -13 17 -9 C31 -3 50 1 67 -4 C83 -9 80 -31 60 -42 C38 -54 31 -74 30 -106';
+  const TIBIA = 'M-28 106 C-30 86 -33 70 -41 57 C-53 41 -75 29 -69 11 C-66 5 -40 6 -15 7 C-9 7 -7 1 0 1 C7 1 9 7 15 7 C40 6 66 5 69 11 C75 29 53 41 41 57 C33 70 30 86 28 106';
+  const PERONE = 'M47 106 C47 90 49 77 47 67 C45 58 47 52 54 50 C63 47 71 55 67 67 C63 79 61 91 61 106';
   return (
     <>
       <defs>
-        <linearGradient id="osso" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#FFFFFF" stopOpacity="0.62" />
-          <stop offset="0.55" stopColor="#E9E2D2" stopOpacity="0.34" />
-          <stop offset="1" stopColor="#B9B09C" stopOpacity="0.2" />
+        <linearGradient id={`${id}su`} gradientUnits="userSpaceOnUse" x1="0" y1="-106" x2="0" y2="-4">
+          <stop offset="0" stopColor="#FFFFFF" stopOpacity="0" />
+          <stop offset="0.4" stopColor="#FFFFFF" stopOpacity="0.1" />
+          <stop offset="1" stopColor="#F4F1E8" stopOpacity="0.5" />
         </linearGradient>
-        <radialGradient id="male">
-          <stop offset="0" stopColor={giunto} stopOpacity={0.85} />
+        <linearGradient id={`${id}giu`} gradientUnits="userSpaceOnUse" x1="0" y1="4" x2="0" y2="106">
+          <stop offset="0" stopColor="#F4F1E8" stopOpacity="0.5" />
+          <stop offset="0.6" stopColor="#FFFFFF" stopOpacity="0.1" />
+          <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id={`${id}bsu`} gradientUnits="userSpaceOnUse" x1="0" y1="-106" x2="0" y2="-4">
+          <stop offset="0" stopColor={colore} stopOpacity="0" />
+          <stop offset="0.35" stopColor={colore} stopOpacity="0.75" />
+          <stop offset="1" stopColor="#FFFFFF" stopOpacity="1" />
+        </linearGradient>
+        <linearGradient id={`${id}bgiu`} gradientUnits="userSpaceOnUse" x1="0" y1="4" x2="0" y2="106">
+          <stop offset="0" stopColor="#FFFFFF" stopOpacity="1" />
+          <stop offset="0.65" stopColor={colore} stopOpacity="0.75" />
+          <stop offset="1" stopColor={colore} stopOpacity="0" />
+        </linearGradient>
+        <radialGradient id={`${id}male`}>
+          <stop offset="0" stopColor={giunto} stopOpacity={0.9} />
+          <stop offset="0.55" stopColor={giunto} stopOpacity={0.35} />
           <stop offset="1" stopColor={giunto} stopOpacity="0" />
         </radialGradient>
+        <radialGradient id={`${id}testa`} cx="0.5" cy="0.9" r="0.7">
+          <stop offset="0" stopColor="#FFFFFF" stopOpacity="0.5" />
+          <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
+        </radialGradient>
       </defs>
-      {/* visto di fronte e largo: le due teste dell'osso riempiono la scatola, come nei riferimenti */}
-      <g transform="scale(1.42 1.06)">
-      {nudo ? null : <circle cx="0" cy="-2" r={46 + 22 * dolore + 10 * batte * dolore} fill="url(#male)" opacity={0.35 + 0.55 * dolore} />}
+      <g transform="scale(1.04)">
+      {/* il calore dentro l'articolazione: più fa male, più è largo e batte */}
+      {nudo ? null : <ellipse cx="0" cy="-2" rx={70 + 16 * dolore + 8 * batte * dolore} ry={44 + 18 * dolore + 6 * batte * dolore} fill={`url(#${id}male)`} opacity={0.3 + 0.6 * dolore} />}
       {nudo
         ? null
         : [0, 1, 2].map((k) => {
             const giro = (t * (0.5 + 0.6 * dolore) + k / 3) % 1;
-            return <circle key={k} cx="0" cy="-2" r={30 + 62 * giro} fill="none" stroke={giunto} strokeWidth={2.4} opacity={(1 - giro) * (0.25 + 0.6 * dolore)} />;
+            return <ellipse key={k} cx="0" cy="-2" rx={52 + 60 * giro} ry={34 + 44 * giro} fill="none" stroke={giunto} strokeWidth={2} opacity={(1 - giro) * (0.05 + 0.3 * dolore)} />;
           })}
-      <g style={luceDi(colore, 1.4)} stroke={colore} strokeWidth="2.8" strokeLinejoin="round" fill="url(#osso)">
-        <path d="M-19 -100 L19 -100 L23 -47 C50 -47 55 -9 31 -7 C19 -6 9 -13 0 -13 C-9 -13 -19 -6 -31 -7 C-55 -9 -50 -47 -23 -47 Z" />
-        <path d="M-45 8 C-44 3 44 3 45 8 C47 27 27 35 21 46 L17 100 L-17 100 L-21 46 C-27 35 -47 27 -45 8 Z" />
-        <path d="M33 42 C41 42 41 52 37 58 L35 100 L27 100 L29 58 C27 50 27 42 33 42 Z" opacity="0.8" />
-        <ellipse cx="0" cy="-22" rx="15" ry="17" fill="#FFFFFF" fillOpacity="0.28" />
+      {/* le due parentesi rosse ai lati, come un gonfiore: ci sono solo se fa male */}
+      {nudo || dolore < 0.05
+        ? null
+        : [-1, 1].map((lato) => (
+            <path key={lato} d={`M${lato * 78} -38 C${lato * (89 + 3 * batte)} -15 ${lato * (89 + 3 * batte)} 13 ${lato * 78} 36`} fill="none" stroke={C.negativo} strokeWidth={3.2} strokeLinecap="round" opacity={dolore * (0.55 + 0.4 * batte)} style={luceDi(C.negativo, 1.2)} />
+          ))}
+      {/* il vetro: il pieno che svanisce */}
+      <path d={FEMORE} fill={`url(#${id}su)`} />
+      <path d={`${TIBIA} Z`} fill={`url(#${id}giu)`} />
+      <path d={PERONE} fill={`url(#${id}giu)`} opacity="0.7" />
+      {/* il volume: le due teste del femore e il piatto della tibia prendono luce dal centro */}
+      <ellipse cx="-40" cy="-22" rx="30" ry="22" fill={`url(#${id}testa)`} />
+      <ellipse cx="40" cy="-22" rx="30" ry="22" fill={`url(#${id}testa)`} />
+      <ellipse cx="0" cy="22" rx="58" ry="18" fill={`url(#${id}testa)`} opacity="0.7" />
+      {/* il bordo: una luce larga e morbida, poi il filo netto */}
+      <g fill="none" strokeLinejoin="round" strokeLinecap="round">
+        <g style={{filter: 'blur(3.5px)'}} strokeWidth="9" opacity="0.75">
+          <path d={FEMORE} stroke={`url(#${id}bsu)`} />
+          <path d={TIBIA} stroke={`url(#${id}bgiu)`} />
+        </g>
+        <g strokeWidth="2.4" style={luceDi(colore, 1.2)}>
+          <path d={FEMORE} stroke={`url(#${id}bsu)`} />
+          <path d={TIBIA} stroke={`url(#${id}bgiu)`} />
+          <path d={PERONE} stroke={`url(#${id}bgiu)`} opacity="0.6" strokeWidth="1.8" />
+        </g>
       </g>
-      <path d={`M-44 ${1 + 2 * batte * dolore} C-20 -8 20 -8 44 ${1 - 2 * batte * dolore}`} fill="none" stroke={giunto} strokeWidth={5 + 3 * batte} strokeLinecap="round" style={luceDi(giunto, 1.3)} />
+      {/* la rima dell'articolazione: la cosa che si guarda. Verde e ferma se sta bene, rossa e che batte se fa male */}
+      <path d={`M-66 ${1.5 + 2 * batte * dolore} C-30 -3 30 -3 66 ${1.5 - 2 * batte * dolore}`} fill="none" stroke={giunto} strokeWidth={9 + 4 * batte} strokeLinecap="round" opacity="0.55" style={{filter: 'blur(4px)'}} />
+      <path d={`M-66 ${1.5 + 2 * batte * dolore} C-30 -3 30 -3 66 ${1.5 - 2 * batte * dolore}`} fill="none" stroke={giunto} strokeWidth={4.4 + 1.6 * batte} strokeLinecap="round" style={luceDi(giunto, 1.3)} />
+      <path d={`M-58 ${1.2 + 2 * batte * dolore} C-28 -2.6 28 -2.6 58 ${1.2 - 2 * batte * dolore}`} fill="none" stroke="#FFFFFF" strokeWidth="1.4" strokeLinecap="round" opacity="0.85" />
       </g>
     </>
   );
@@ -139,41 +189,76 @@ function Batteria({p, t, colore}: Disegno) {
   const TACCHE = 4;
   const alta = 36;
   const passa = ((t * 0.55) % 1) * 190 - 95;
+  const id = useId().replace(/[^a-zA-Z0-9]/g, '');
+  // Un oggetto di vetro, non un contorno: il corpo è scuro e lucido, le tacche sono blocchi pieni con la luce in
+  // alto a sinistra, un riflesso corre lungo il fianco.
   return (
     <>
-      <rect x="-15" y="-96" width="30" height="13" rx="4" fill={alfa(tinta, 0.5)} stroke={tinta} strokeWidth="2" />
-      <rect x="-42" y="-84" width="84" height="172" rx="13" fill="#0A1016" fillOpacity="0.55" stroke={tinta} strokeWidth="2.6" style={luceDi(tinta, 0.5 + 0.5 * accesa)} />
+      <defs>
+        <linearGradient id={`${id}corpo`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#FFFFFF" stopOpacity="0.2" />
+          <stop offset="0.18" stopColor="#0A1016" stopOpacity="0.5" />
+          <stop offset="0.8" stopColor="#0A1016" stopOpacity="0.62" />
+          <stop offset="1" stopColor={tinta} stopOpacity="0.28" />
+        </linearGradient>
+        <linearGradient id={`${id}tacca`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor={miscela(tinta, '#FFFFFF', 0.62)} />
+          <stop offset="0.45" stopColor={miscela(tinta, '#FFFFFF', 0.16)} />
+          <stop offset="1" stopColor={miscela(tinta, '#04121A', 0.3)} />
+        </linearGradient>
+        <clipPath id={`${id}dentro`}>
+          <rect x="-42" y="-84" width="84" height="172" rx="13" />
+        </clipPath>
+      </defs>
+      <rect x="-15" y="-97" width="30" height="14" rx="4" fill={`url(#${id}tacca)`} opacity={0.55 + 0.45 * accesa} />
+      <rect x="-42" y="-84" width="84" height="172" rx="13" fill="none" stroke={tinta} strokeWidth="9" opacity={0.3 + 0.35 * accesa} style={{filter: 'blur(4px)'}} />
+      <rect x="-42" y="-84" width="84" height="172" rx="13" fill={`url(#${id}corpo)`} stroke={tinta} strokeWidth="2.6" style={luceDi(tinta, 0.5 + 0.5 * accesa)} />
       {Array.from({length: TACCHE}, (_, i) => {
         const piena = limita(livello * TACCHE - i);
         const y = 78 - (i + 1) * (alta + 5) + 5;
-        if (piena <= 0) return <rect key={i} x="-33" y={y} width="66" height={alta} rx="6" fill="none" stroke={alfa(tinta, 0.25)} strokeWidth="1.5" />;
+        if (piena <= 0) return <rect key={i} x="-33" y={y} width="66" height={alta} rx="6" fill={alfa(tinta, 0.06)} stroke={alfa(tinta, 0.28)} strokeWidth="1.5" />;
         const h = alta * piena;
-        return <rect key={i} x="-33" y={y + alta - h} width="66" height={h} rx="6" fill={miscela(tinta, '#FFFFFF', 0.25)} opacity={0.88 + 0.12 * Math.sin(t * 3.1 + i)} style={luceDi(tinta, accesa)} />;
+        return (
+          <g key={i} opacity={0.9 + 0.1 * Math.sin(t * 3.1 + i)}>
+            <rect x="-33" y={y + alta - h} width="66" height={h} rx="6" fill={`url(#${id}tacca)`} style={luceDi(tinta, accesa)} />
+            {h > 12 ? <rect x="-28" y={y + alta - h + 4} width="56" height="5" rx="2.5" fill="#FFFFFF" opacity="0.42" /> : null}
+          </g>
+        );
       })}
-      <clipPath id={`corpo-${Math.round(livello * 100)}`}>
-        <rect x="-42" y="-84" width="84" height="172" rx="13" />
-      </clipPath>
-      <rect x="-42" y={passa} width="84" height="16" fill="#FFFFFF" opacity={0.2 * accesa} clipPath={`url(#corpo-${Math.round(livello * 100)})`} />
+      <g clipPath={`url(#${id}dentro)`}>
+        <rect x="-36" y="-78" width="7" height="160" rx="3.5" fill="#FFFFFF" opacity="0.2" />
+        <rect x="-42" y={passa} width="84" height="16" fill="#FFFFFF" opacity={0.22 * accesa} />
+      </g>
     </>
   );
 }
-
 function Stomaco({p, t, colore, nudo}: Disegno) {
   const irritato = limita(p.irritato ?? 0);
   const tinta = miscela(colore, C.negativo, irritato);
   const onda = (k: number) => 3 * Math.sin(t * (2 + 3 * irritato) + k);
+  const id = useId().replace(/[^a-zA-Z0-9]/g, '');
+  const SACCA = 'M-34 -96 L-34 -60 C-70 -50 -86 -10 -76 30 C-64 76 -10 92 34 74 C58 64 70 44 72 26 L96 26 L96 6 L60 6 C52 6 50 16 48 26 C44 44 20 54 0 46 C-24 36 -22 2 -4 -22 C8 -38 6 -50 -8 -58 L-8 -96 Z';
+  const piega = (k: number) => `M${-62 + k * 5} ${-22 + k * 22 + onda(k)} C${-48 + k * 8} ${-8 + k * 22 - onda(k)} ${-36 + k * 12} ${2 + k * 20 + onda(k + 1)} ${-22 + k * 16} ${10 + k * 17 - onda(k)}`;
+  // Un tubo al neon ha spessore: un alone largo, il tubo colorato, il filo bianco al centro. E dentro la sacca è
+  // piena, più chiara verso il bordo: è un organo, non un'icona.
   return (
     <g fill="none" strokeLinecap="round" strokeLinejoin="round">
-      <path
-        d="M-34 -96 L-34 -60 C-70 -50 -86 -10 -76 30 C-64 76 -10 92 34 74 C58 64 70 44 72 26 L96 26 L96 6 L60 6 C52 6 50 16 48 26 C44 44 20 54 0 46 C-24 36 -22 2 -4 -22 C8 -38 6 -50 -8 -58 L-8 -96 Z"
-        stroke={tinta}
-        strokeWidth="5.5"
-        fill={alfa(tinta, 0.16 + 0.12 * irritato)}
-        style={luceDi(tinta, 1.3)}
-      />
+      <defs>
+        <radialGradient id={`${id}carne`} cx="0.42" cy="0.55" r="0.62">
+          <stop offset="0" stopColor={miscela(tinta, '#1A0508', 0.6)} stopOpacity="0.55" />
+          <stop offset="0.7" stopColor={tinta} stopOpacity={0.2 + 0.14 * irritato} />
+          <stop offset="1" stopColor={tinta} stopOpacity={0.42 + 0.2 * irritato} />
+        </radialGradient>
+      </defs>
+      <path d={SACCA} stroke={tinta} strokeWidth="16" opacity="0.5" style={{filter: 'blur(6px)'}} />
+      <path d={SACCA} stroke={tinta} strokeWidth="6.5" fill={`url(#${id}carne)`} style={luceDi(tinta, 1.3)} />
       {[0, 1, 2, 3].map((k) => (
-        <path key={k} d={`M${-62 + k * 5} ${-22 + k * 22 + onda(k)} C${-48 + k * 8} ${-8 + k * 22 - onda(k)} ${-36 + k * 12} ${2 + k * 20 + onda(k + 1)} ${-22 + k * 16} ${10 + k * 17 - onda(k)}`} stroke={tinta} strokeWidth="3.4" opacity={0.55 + 0.4 * irritato} />
+        <g key={k} opacity={0.6 + 0.4 * irritato}>
+          <path d={piega(k)} stroke={tinta} strokeWidth="9" opacity="0.4" style={{filter: 'blur(3px)'}} />
+          <path d={piega(k)} stroke={miscela(tinta, '#FFFFFF', 0.25)} strokeWidth="3.6" />
+        </g>
       ))}
+      <path d={SACCA} stroke="#FFFFFF" strokeWidth="1.5" opacity="0.8" />
       {(nudo ? [] : [0, 1, 2]).map((k) => {
         const giro = (t * (0.4 + 0.7 * irritato) + k / 3) % 1;
         return <circle key={k} cx="-20" cy="34" r={20 + 70 * giro} stroke={tinta} strokeWidth="2.2" opacity={(1 - giro) * irritato * 0.7} />;
@@ -181,38 +266,69 @@ function Stomaco({p, t, colore, nudo}: Disegno) {
     </g>
   );
 }
-
 function Riflettori({p, t, colore, nudo}: Disegno) {
   const luci = nudo ? 0 : limita(p.luci ?? 1);
+  const id = useId().replace(/[^a-zA-Z0-9]/g, '');
+  // Un concerto visto dalla platea: i coni di luce sono pieni vicino al faro e si perdono nel fumo, il palco ha
+  // un bordo che brilla, il pubblico è una fila di teste e spalle in controluce che ondeggia.
+  const testa = (x: number, y: number, r: number, k: number) => {
+    const su = 3 * Math.sin(t * 5 + k * 1.3) * luci;
+    return (
+      <g key={k} transform={`translate(${x} ${y + su})`}>
+        <path d={`M${-r * 1.9} ${r * 3} C${-r * 1.9} ${r * 1.3} ${-r * 0.9} ${r * 1.05} 0 ${r * 1.05} C${r * 0.9} ${r * 1.05} ${r * 1.9} ${r * 1.3} ${r * 1.9} ${r * 3} Z`} fill="#05090D" stroke={alfa(colore, 0.35)} strokeWidth="1.2" />
+        <circle r={r} fill="#05090D" stroke={alfa('#FFFFFF', 0.4)} strokeWidth="1.2" />
+        <path d={`M${-r * 0.75} ${-r * 0.62} A${r} ${r} 0 0 1 ${r * 0.75} ${-r * 0.62}`} fill="none" stroke={alfa(colore, 0.8 * luci)} strokeWidth="1.6" strokeLinecap="round" />
+      </g>
+    );
+  };
   return (
     <>
-      <path d="M-98 -78 L98 -78" stroke="#C9D4E0" strokeWidth="3" />
+      <defs>
+        {[0, 1].map((k) => (
+          <linearGradient key={k} id={`${id}cono${k}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor={k ? '#FFFFFF' : colore} stopOpacity="0.85" />
+            <stop offset="0.5" stopColor={k ? '#FFFFFF' : colore} stopOpacity="0.28" />
+            <stop offset="1" stopColor={k ? '#FFFFFF' : colore} stopOpacity="0" />
+          </linearGradient>
+        ))}
+        <linearGradient id={`${id}palco`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={colore} stopOpacity="0.55" />
+          <stop offset="0.25" stopColor="#0A1016" stopOpacity="0.9" />
+          <stop offset="1" stopColor="#05090D" stopOpacity="0.95" />
+        </linearGradient>
+      </defs>
+      <g transform="translate(0 -12) scale(0.96)">
+      <path d="M-98 -80 L98 -80" stroke="#C9D4E0" strokeWidth="3.4" strokeLinecap="round" />
       {[-66, -22, 22, 66].map((x, i) => {
         const gira = 16 * Math.sin(t * 0.9 + i * 1.7);
+        const forza = (0.5 + 0.22 * Math.sin(t * 2 + i)) * luci;
         return (
           <g key={i}>
-            <path d={`M${x} -76 L${x + gira - 30} 60 L${x + gira + 30} 60 Z`} fill={i % 2 ? '#FFFFFF' : colore} opacity={(0.16 + 0.1 * Math.sin(t * 2 + i)) * luci} />
-            <circle cx={x} cy="-78" r="6" fill="#fff" style={luceDi(colore)} />
+            <path d={`M${x - 4} -76 L${x + 4} -76 L${x + gira + 34} 62 L${x + gira - 34} 62 Z`} fill={`url(#${id}cono${i % 2})`} opacity={forza} style={{filter: 'blur(2.5px)'}} />
+            <path d={`M${x - 7} -84 L${x + 7} -84 L${x + 5} -72 L${x - 5} -72 Z`} fill="#1B2630" stroke="#C9D4E0" strokeWidth="1.4" />
+            <circle cx={x} cy="-72" r={4 + 2 * luci} fill="#fff" opacity={0.5 + 0.5 * luci} style={luceDi(i % 2 ? '#FFFFFF' : colore, 1.4)} />
           </g>
         );
       })}
-      <path d="M-98 62 L98 62 L98 74 L-98 74 Z" fill="#0A1016" stroke={alfa(colore, 0.7)} strokeWidth="2" />
-      <g stroke="#fff" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.9">
+      <ellipse cx="0" cy="62" rx="92" ry="9" fill={colore} opacity={0.3 * luci} style={{filter: 'blur(6px)'}} />
+      <path d="M-98 60 L98 60 L98 76 L-98 76 Z" fill={`url(#${id}palco)`} stroke={alfa(colore, 0.75)} strokeWidth="1.8" />
+      <g stroke="#fff" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.92" style={luceDi('#FFFFFF', 0.6)}>
         <path d="M0 60 L0 -4" />
-        <circle cx="0" cy="-12" r="8" fill="#fff" fillOpacity="0.9" />
         <path d="M-10 60 L10 60" />
+        <rect x="-5" y="-22" width="10" height="18" rx="5" fill="#fff" fillOpacity="0.9" />
       </g>
-      <g transform="translate(-50 30) rotate(-18)" fill={alfa(colore, 0.85)} stroke="#fff" strokeWidth="1.6">
-        <ellipse cx="0" cy="14" rx="13" ry="16" />
-        <rect x="-2.5" y="-34" width="5" height="36" />
+      <g transform="translate(-50 28) rotate(-18)" stroke="#fff" strokeWidth="1.6" style={luceDi(colore, 0.8)}>
+        <path d="M0 -4 C10 -4 12 4 9 9 C16 12 17 28 0 30 C-17 28 -16 12 -9 9 C-12 4 -10 -4 0 -4 Z" fill={alfa(colore, 0.85)} />
+        <circle cx="0" cy="14" r="4" fill="#05090D" />
+        <rect x="-2.4" y="-40" width="4.8" height="37" fill={alfa(colore, 0.6)} />
+        <rect x="-4" y="-47" width="8" height="8" rx="1.5" fill="#fff" />
       </g>
-      {Array.from({length: 9}, (_, i) => (
-        <circle key={i} cx={-88 + i * 22} cy={92 + 3 * Math.sin(t * 5 + i * 1.3) * luci} r="12" fill="#0A1016" stroke={alfa('#FFFFFF', 0.35)} strokeWidth="1.5" />
-      ))}
+      {Array.from({length: 8}, (_, i) => testa(-84 + i * 24, 84, 7, i + 9))}
+      {Array.from({length: 7}, (_, i) => testa(-78 + i * 26, 92, 9, i))}
+      </g>
     </>
   );
 }
-
 function Foglio({p, t, colore}: Disegno) {
   const evidenzia = limita(p.evidenzia ?? 0);
   const piega = 4 * Math.sin(t * 0.8);

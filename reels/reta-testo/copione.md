@@ -29,7 +29,7 @@ Quindi, per [capire]capire quanto funziona davvero la [funziona]Reta, bisogna gu
 In entrambi gli [studi]studi, il dolore è diminuito da [unodue]uno a due punti in più [rispetto]rispetto al placebo.
 
 [scena:misura]
-Non è un [miracolo]*miracolo*, ma non è nemmeno un risultato dovuto al [caso]caso.
+Non è un [miracolo]*miracolo*, [ma]ma non è nemmeno un risultato dovuto al [caso]caso.
 
 [scena:rischi]
 C'è però un [altro]altro aspetto da considerare.

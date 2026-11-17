@@ -1,10 +1,6 @@
 {
   "versione": 1,
   "titolo": "Reta e dolore al ginocchio: quanto è merito del farmaco?",
-  "protagonista": {
-    "tipo": "peptide",
-    "colore": "#5CF2C8"
-  },
   "scene": [
     {
       "nome": "aggancio",
@@ -17,15 +13,21 @@
             "etichetta": "Reta",
             "colore": "#5CF2C8",
             "stato": {
-              "dolore": 1
+              "dolore": 0.6
             },
             "cambia": [
+              {
+                "segno": "reta",
+                "stato": {
+                  "dolore": 1
+                },
+                "durata": 0.5
+              },
               {
                 "segno": "meno",
                 "stato": {
                   "dolore": 0.25
-                },
-                "durata": 1.2
+                }
               }
             ]
           },
@@ -39,11 +41,17 @@
             },
             "cambia": [
               {
+                "segno": "placebo",
+                "stato": {
+                  "dolore": 0.85
+                },
+                "durata": 0.5
+              },
+              {
                 "segno": "meno",
                 "stato": {
                   "dolore": 0.5
-                },
-                "durata": 1.2
+                }
               }
             ]
           }
@@ -61,39 +69,38 @@
       ],
       "luogo": "vuoto",
       "campo": "medio",
-      "camera": "spinta",
-      "protagonista": [
-        {
-          "acceso": 0.7,
-          "carica": 0.4,
-          "onda": 0.6
-        },
-        {
-          "segno": "reta",
-          "acceso": 1
-        },
-        {
-          "segno": "placebo",
-          "colore": "#C9D4E0",
-          "onda": 1.2
-        },
-        {
-          "segno": "meno",
-          "colore": "#5CF2C8",
-          "onda": 0.5,
-          "acceso": 1
-        }
-      ]
+      "camera": "spinta"
     },
     {
       "nome": "domanda",
       "da": "Quindi, quanto di questo",
       "perche": "fissare la domanda a cui il reel risponde",
-      "blocco": "domanda",
+      "blocco": "soggetti",
       "dati": {
-        "domanda": "Quanto è merito della Reta?",
-        "sopra": "Il dolore cala anche con il placebo",
-        "segno": "quanto"
+        "titolo": "Quanto è merito della Reta?",
+        "soggetti": [
+          {
+            "tipo": "icona",
+            "icona": "FaQuestion",
+            "etichetta": "Quanto?",
+            "colore": "#FFD23F",
+            "segno": "quanto"
+          },
+          {
+            "tipo": "icona",
+            "icona": "FaSyringe",
+            "etichetta": "Merito suo?",
+            "colore": "#5CF2C8",
+            "segno": "merito"
+          },
+          {
+            "tipo": "icona",
+            "icona": "FaMagnifyingGlass",
+            "etichetta": "Vediamo",
+            "colore": "#FFFFFF",
+            "segno": "vediamo"
+          }
+        ]
       },
       "segni": {
         "quanto": "quanto",
@@ -104,26 +111,8 @@
         "merito"
       ],
       "luogo": "vuoto",
-      "campo": "stretto",
-      "camera": "indietro",
-      "protagonista": [
-        {
-          "acceso": 0.4,
-          "carica": 0.4,
-          "onda": 1
-        },
-        {
-          "segno": "merito",
-          "acceso": 0.8,
-          "grandezza": 0.74
-        },
-        {
-          "segno": "vediamo",
-          "acceso": 1,
-          "carica": 0.7,
-          "grandezza": 0.62
-        }
-      ]
+      "campo": "largo",
+      "camera": "indietro"
     },
     {
       "nome": "studi",
@@ -139,7 +128,19 @@
             "segno": "pubblicati",
             "cambia": [
               {
+                "segno": "due",
+                "stato": {
+                  "evidenzia": 0.35
+                }
+              },
+              {
                 "segno": "riviste",
+                "stato": {
+                  "evidenzia": 0.7
+                }
+              },
+              {
+                "segno": "mondo",
                 "stato": {
                   "evidenzia": 1
                 }
@@ -152,7 +153,27 @@
             "etichetta": "1.019 adulti",
             "nota": "oltre un anno",
             "colore": "#5AA8FF",
-            "segno": "mille"
+            "segno": "mille",
+            "stato": {
+              "acceso": 0.55
+            },
+            "cambia": [
+              {
+                "segno": "anno",
+                "stato": {
+                  "acceso": 1
+                }
+              }
+            ]
+          },
+          {
+            "tipo": "ginocchio",
+            "etichetta": "Artrosi",
+            "colore": "#FFD23F",
+            "segno": "artrosi",
+            "stato": {
+              "dolore": 0.9
+            }
           }
         ],
         "fonte": "NEJM, novembre 2026"
@@ -178,34 +199,8 @@
       ],
       "luogo": "vuoto",
       "entra": "destra",
-      "campo": "stretto",
-      "camera": "destra",
-      "protagonista": [
-        {
-          "acceso": 1,
-          "carica": 0.6,
-          "onda": 0.4
-        },
-        {
-          "segno": "due",
-          "carica": 0.7
-        },
-        {
-          "segno": "mondo",
-          "carica": 0.8,
-          "grandezza": 0.74
-        },
-        {
-          "segno": "artrosi",
-          "onda": 1.2,
-          "grandezza": 0.62
-        },
-        {
-          "segno": "anno",
-          "carica": 1,
-          "onda": 0.4
-        }
-      ]
+      "campo": "largo",
+      "camera": "destra"
     },
     {
       "nome": "scala",
@@ -253,18 +248,7 @@
       ],
       "luogo": "vuoto",
       "campo": "stretto",
-      "camera": "sale",
-      "protagonista": [
-        {
-          "carica": 0.6,
-          "onda": 0.5
-        },
-        {
-          "segno": "dieci",
-          "colore": "#FF4D5E",
-          "onda": 1.4
-        }
-      ]
+      "camera": "sale"
     },
     {
       "nome": "risultati",
@@ -304,6 +288,13 @@
             },
             "cambia": [
               {
+                "segno": "attivo",
+                "stato": {
+                  "valore": 5.2
+                },
+                "durata": 0.8
+              },
+              {
                 "segno": "duepunti",
                 "stato": {
                   "valore": 3.88
@@ -337,25 +328,8 @@
       ],
       "luogo": "vuoto",
       "entra": "avanti",
-      "campo": "stretto",
-      "camera": "spinta",
-      "protagonista": [
-        {
-          "colore": "#5CF2C8",
-          "carica": 1,
-          "onda": 0.5
-        },
-        {
-          "segno": "anche",
-          "colore": "#5AA8FF",
-          "carica": 0.5
-        },
-        {
-          "segno": "attivo",
-          "acceso": 0.2,
-          "carica": 0.1
-        }
-      ]
+      "campo": "medio",
+      "camera": "spinta"
     },
     {
       "nome": "applauso",
@@ -412,13 +386,8 @@
       ],
       "luogo": "vuoto",
       "entra": "basso",
-      "campo": "medio",
-      "camera": "gira",
-      "protagonista": {
-        "colore": "#5AA8FF",
-        "acceso": 0.3,
-        "onda": 0.3
-      }
+      "campo": "largo",
+      "camera": "gira"
     },
     {
       "nome": "differenza",
@@ -443,6 +412,12 @@
                 "stato": {
                   "livello": 0.53
                 }
+              },
+              {
+                "segno": "rispetto",
+                "stato": {
+                  "accesa": 0.08
+                }
               }
             ]
           },
@@ -456,6 +431,12 @@
               "livello": 0.53
             },
             "cambia": [
+              {
+                "segno": "studi",
+                "stato": {
+                  "livello": 0.76
+                }
+              },
               {
                 "segno": "unodue",
                 "stato": {
@@ -481,57 +462,57 @@
       ],
       "luogo": "vuoto",
       "entra": "destra",
-      "campo": "stretto",
-      "camera": "sinistra",
-      "protagonista": [
-        {
-          "colore": "#5CF2C8",
-          "acceso": 1,
-          "carica": 0.5,
-          "onda": 0.5
-        },
-        {
-          "segno": "funziona",
-          "onda": 1,
-          "grandezza": 0.74
-        },
-        {
-          "segno": "studi",
-          "carica": 0.75,
-          "grandezza": 0.62
-        },
-        {
-          "segno": "unodue",
-          "carica": 1,
-          "grandezza": 0.78
-        },
-        {
-          "segno": "rispetto",
-          "grandezza": 0.62,
-          "onda": 0.4
-        }
-      ]
+      "campo": "medio",
+      "camera": "sinistra"
     },
     {
       "nome": "misura",
       "da": "Non è un miracolo,",
-      "perche": "dare la misura giusta: né miracolo né caso",
-      "blocco": "parole",
+      "perche": "dare la misura giusta: le due ginocchia accanto, quella con la Reta fa meno male ma non è guarita",
+      "blocco": "soggetti",
       "dati": {
-        "parole": [
+        "titolo": "Non è un miracolo. Non è un caso.",
+        "soggetti": [
           {
-            "testo": "Non è un miracolo",
-            "segno": "miracolo"
+            "tipo": "ginocchio",
+            "etichetta": "Reta",
+            "colore": "#5CF2C8",
+            "stato": {
+              "dolore": 1
+            },
+            "cambia": [
+              {
+                "segno": "miracolo",
+                "stato": {
+                  "dolore": 0.45
+                },
+                "durata": 1.0
+              }
+            ]
           },
           {
-            "testo": "Non è un caso",
-            "segno": "caso",
-            "colore": "#7CF26B"
+            "tipo": "ginocchio",
+            "etichetta": "Placebo",
+            "colore": "#C9D4E0",
+            "segno": "ma",
+            "stato": {
+              "dolore": 1
+            },
+            "cambia": [
+              {
+                "segno": "caso",
+                "stato": {
+                  "dolore": 0.72
+                },
+                "durata": 1.0
+              }
+            ]
           }
         ]
       },
       "segni": {
         "miracolo": "miracolo",
+        "ma": "ma",
         "caso": "caso"
       },
       "enfasi": [
@@ -539,11 +520,7 @@
       ],
       "luogo": "vuoto",
       "campo": "stretto",
-      "camera": "indietro",
-      "protagonista": {
-        "grandezza": 0.62,
-        "onda": 0.4
-      }
+      "camera": "indietro"
     },
     {
       "nome": "rischi",
@@ -557,11 +534,17 @@
             "etichetta": "Effetti collaterali gravi",
             "nota": "più frequenti con la Reta",
             "colore": "#FF8FA0",
-            "segno": "autori",
+            "segno": "altro",
             "stato": {
-              "irritato": 0.1
+              "irritato": 0.05
             },
             "cambia": [
+              {
+                "segno": "autori",
+                "stato": {
+                  "irritato": 0.3
+                }
+              },
               {
                 "segno": "effetti",
                 "stato": {
@@ -604,19 +587,8 @@
       "luogo": "vuoto",
       "tinta": "#E8455A",
       "entra": "avanti",
-      "campo": "medio",
+      "campo": "stretto",
       "camera": "scende",
-      "protagonista": [
-        {
-          "onda": 0.6
-        },
-        {
-          "segno": "altro",
-          "colore": "#FF4D5E",
-          "onda": 1.6,
-          "acceso": 1
-        }
-      ],
       "narratore": {
         "posa": "conserte"
       }
@@ -683,15 +655,8 @@
       ],
       "luogo": "vuoto",
       "entra": "sinistra",
-      "campo": "stretto",
-      "camera": "destra",
-      "protagonista": {
-        "colore": "#5CF2C8",
-        "onda": 0.5,
-        "acceso": 1,
-        "carica": 1,
-        "grandezza": 0.62
-      }
+      "campo": "medio",
+      "camera": "destra"
     },
     {
       "nome": "azienda",
@@ -710,18 +675,31 @@
             },
             "cambia": [
               {
-                "segno": "azienda",
+                "segno": "condotti",
                 "stato": {
-                  "evidenzia": 0.6
+                  "evidenzia": 0.3
                 }
               },
               {
-                "segno": "dettagli",
+                "segno": "azienda",
+                "stato": {
+                  "evidenzia": 0.65
+                }
+              },
+              {
+                "segno": "risultati",
                 "stato": {
                   "evidenzia": 1
                 }
               }
             ]
+          },
+          {
+            "tipo": "icona",
+            "icona": "FaMagnifyingGlass",
+            "etichetta": "I dettagli",
+            "colore": "#FFFFFF",
+            "segno": "dettagli"
           }
         ]
       },
@@ -736,25 +714,8 @@
       ],
       "luogo": "vuoto",
       "entra": "avanti",
-      "campo": "medio",
-      "camera": "spinta",
-      "protagonista": [
-        {
-          "colore": "#FFD23F",
-          "acceso": 0.5,
-          "onda": 0.9
-        },
-        {
-          "segno": "condotti",
-          "acceso": 0.8
-        },
-        {
-          "segno": "risultati",
-          "colore": "#5CF2C8",
-          "acceso": 1,
-          "onda": 0.5
-        }
-      ]
+      "campo": "largo",
+      "camera": "spinta"
     },
     {
       "nome": "amico",
@@ -772,6 +733,13 @@
               "dolore": 0.1
             },
             "cambia": [
+              {
+                "segno": "amico",
+                "stato": {
+                  "dolore": 0.4
+                },
+                "durata": 0.5
+              },
               {
                 "segno": "scricchiolano",
                 "stato": {
@@ -810,19 +778,8 @@
       },
       "luogo": "vuoto",
       "entra": "basso",
-      "campo": "stretto",
-      "camera": "sale",
-      "protagonista": [
-        {
-          "acceso": 0.6,
-          "onda": 0.9
-        },
-        {
-          "segno": "amico",
-          "acceso": 1,
-          "grandezza": 0.74
-        }
-      ]
+      "campo": "medio",
+      "camera": "sale"
     },
     {
       "nome": "chiusura",
@@ -854,8 +811,7 @@
       "luogo": "vuoto",
       "entra": "avanti",
       "campo": "medio",
-      "camera": "spinta",
-      "protagonista": false
+      "camera": "spinta"
     }
   ]
 }

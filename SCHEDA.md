@@ -30,14 +30,18 @@ Il piano, una scena (l'esempio intero è `prove/sostegno/piano-reta.json`; `npm 
 
 ```json
 {"nome": "risultati", "da": "Con la Reta, il",
- "perche": "i due numeri uno accanto all'altro: quasi quattro contro circa due",
- "blocco": "confronto",
- "dati": {"sinistra": {"titolo": "Reta", "valore": 3.96, "decimali": 2, "segno": "quattro"},
-          "destra": {"titolo": "Placebo", "valore": 2.12, "decimali": 2, "segno": "duepunti"}, "fonte": "NEJM 2026"},
- "segni": {"quattro": "quattro", "anche": "placebo", "duepunti": "due"},
+ "perche": "i due quadranti uno accanto all'altro: quasi quattro punti contro circa due",
+ "blocco": "soggetti",
+ "dati": {"soggetti": [
+   {"tipo": "quadrante", "etichetta": "Reta", "nota": "−3,96 punti", "colore": "#5CF2C8",
+    "stato": {"valore": 6, "massimo": 10}, "cambia": [{"segno": "quattro", "stato": {"valore": 2.04}}]},
+   {"tipo": "quadrante", "etichetta": "Placebo", "nota": "−2,12 punti", "colore": "#C9D4E0", "segno": "anche",
+    "stato": {"valore": 6, "massimo": 10},
+    "cambia": [{"segno": "attivo", "stato": {"valore": 5.2}}, {"segno": "duepunti", "stato": {"valore": 3.88}}]}],
+   "fonte": "NEJM 2026, studio TRIUMPH-4"},
+ "segni": {"quattro": "quattro", "anche": "placebo", "attivo": "attivo", "duepunti": "due"},
  "enfasi": ["quattro", "due"], "suoni": [{"suono": "ding", "su": "quattro"}],
- "luogo": "bilancia", "entra": "avanti", "campo": "stretto", "camera": "spinta",
- "protagonista": [{"carica": 1}, {"segno": "anche", "colore": "#5AA8FF", "carica": 0.5}]}
+ "luogo": "vuoto", "campo": "medio", "camera": "spinta"}
 ```
 
 `da` = le prime parole della scena come sono nel testo · `segni` = nome → parola del testo su cui cade (se la parola
@@ -49,11 +53,12 @@ torna nella scena: `{"su": "dieci", "volta": 2}`) · un segno conta solo se fa c
 2. **un soggetto grande che si può mostrare** e che torna: prima scelta il blocco `soggetti` (uno o due soggetti che
    riempiono il palco, lo stesso soggetto in più scene con uno stato diverso), poi numero, grafico, oggetto 3D. Sul
    palco solo etichette a pillola: elenchi e righe da leggere sono l'ultima scelta;
-3. **un'azione**: qualcosa che *cambia* su una parola (un valore che sale, un oggetto che cambia stato con `cambia`,
-   il protagonista che si accende), almeno ogni 3 secondi. Descrivi verbi, non aspetti;
+3. **un'azione**: qualcosa che *cambia* su una parola (un valore che sale, un soggetto che cambia stato con
+   `cambia`), almeno ogni 3 secondi. **Ogni segno fa cambiare un soggetto grande**: un segno che non muove niente
+   si toglie. Descrivi verbi, non aspetti;
 4. **un'inquadratura** (`campo`: largo → medio → stretto, mai due scene uguali di fila) e **un movimento di camera con
    un nome** (`camera`: spinta, indietro, destra, sinistra, sale, scende, gira);
-5. **continuità**: lo stesso protagonista, lo stesso colore per lo stesso soggetto in tutto il reel (es. Reta verde,
+5. **continuità**: lo stesso soggetto che torna, lo stesso colore per lo stesso soggetto in tutto il reel (es. Reta verde,
    placebo azzurro, dolore rosso), lo stesso suono per lo stesso tipo di cosa, una luce sola per scena (`tinta`).
 
 Mai più di tre scene dello stesso blocco di fila; almeno tre blocchi diversi nel reel; da 4 a 6 suoni.
@@ -206,7 +211,8 @@ export default definisciReel({
   mentre la scena dura (`spinta` · `indietro` · `destra` · `sinistra` · `sale` · `scende` · `gira` · `ferma`).
 - **`entra`**: da che parte la camera arriva nella scena. `avanti` (di serie: attraversa la scena prima, che si
   ingrandisce e si sfoca) · `sinistra` · `destra` · `alto` · `basso` (carrellata). Mai un taglio, mai una dissolvenza semplice.
-- **`protagonista`**: un oggetto solo per tutto il reel, che resta mentre le scene cambiano. Ogni scena ne dice lo
+- **`protagonista`** (facoltativo: nei reel di riferimento non c'è, e accanto ai soggetti grandi sembra un di più;
+  usalo solo nei reel senza soggetti): un oggetto solo per tutto il reel, che resta mentre le scene cambiano. Ogni scena ne dice lo
   stato: `x`, `y`, `grandezza`, `acceso` (0-1), `carica` (0-1, da vuoto a pieno), `colore`, `onda` (0-2, da calmo ad
   agitato), `presenza`. Più stati nella stessa scena: il primo all'ingresso, gli altri ognuno al suo `segno`.
   `false` = esce di scena. Quello che non scrivi resta com'era: **è lo stesso oggetto che cambia stato, non uno nuovo.**

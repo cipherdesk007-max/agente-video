@@ -524,7 +524,11 @@ export function controllaPiano(piano, testo, {cartella = null, fonti = null, tem
   // il "tipo" di una scena, per la varietà: il blocco; per i soggetti, quali soggetti (due ginocchia non sono un quadrante)
   const genere = (s) => (s.definizione.blocco === 'soggetti' ? `soggetti:${(s.definizione.dati?.soggetti ?? []).map((x) => x.tipo).join('+')}` : s.definizione.blocco);
   const diversi = new Set(scene.map(genere)).size;
-  const cambia = piano.protagonista && scene.some((s) => s.definizione.protagonista !== undefined);
+  // Qualcosa deve restare da una scena all'altra e cambiare stato. Può essere il protagonista (la figura piccola in
+  // basso), oppure i soggetti grandi: se in più di metà delle scene un soggetto cambia stato su una parola, il filo
+  // c'è già, e nei reel di riferimento il protagonista in un angolo non c'è.
+  const soggettiVivi = scene.filter((s) => (s.definizione.dati?.soggetti ?? []).some((x) => (x.cambia ?? []).length)).length;
+  const cambia = piano.protagonista ? scene.some((s) => s.definizione.protagonista !== undefined) : soggettiVivi > scene.length / 2;
   const conta = (cosa) => {
     const quante = new Map();
     for (const s of scene) quante.set(cosa(s), (quante.get(cosa(s)) ?? 0) + 1);
@@ -540,7 +544,7 @@ export function controllaPiano(piano, testo, {cartella = null, fonti = null, tem
     ['scene con pause lunghe', 15, buchi, 'fai comparire qualcosa almeno ogni tre secondi'],
     ['stessa inquadratura', 10, unCampo > 0.6 ? 1 : 0, 'alterna largo, medio e stretto'],
     ['scene senza un perché', 10, quota((s) => !s.definizione.perche), 'scrivi in "perche" cosa deve far capire ogni scena: se non lo sai dire, la scena decora e basta'],
-    ['protagonista che non cambia', 10, cambia ? 0 : 1, 'dai al protagonista uno stato diverso nelle scene che contano'],
+    ['niente che resta e cambia', 10, cambia ? 0 : 1, 'fai cambiare stato a un soggetto su una parola in più di metà delle scene, oppure dai al protagonista uno stato diverso nelle scene che contano'],
   ];
   const punti = Math.round(voci.reduce((t, [, peso, q]) => t + peso * q, 0));
   const rischio = {punti, livello: punti >= 60 ? 'alto' : punti >= 35 ? 'medio' : 'basso', voci: voci.filter(([, peso, q]) => peso * q >= 5).map(([nome, peso, q, cura]) => ({nome, punti: Math.round(peso * q), cura}))};
