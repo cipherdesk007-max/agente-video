@@ -746,6 +746,16 @@ await prova('soggetti: grandi, vivi, con uno stato che cambia su una parola; il 
   assert.match(controllaPiano(piano, TESTO_RETA).errori.join('\n'), /"ginocchio" non ha "febbre"\. Il suo stato: dolore/);
 });
 
+await prova('B19 · una parola più larga della riga dei sottotitoli si rimpicciolisce finché entra; le parole normali restano a 60', async () => {
+  const {corpoSottotitoli} = await ts('prove/sostegno/sottotitoli.tsx');
+  assert.equal(corpoSottotitoli([{testo: 'Il'}, {testo: 'placebo,'}], 60, 920), 60);
+  assert.equal(corpoSottotitoli([{testo: 'gastrointestinali.'}], 60, 920), 60);
+  const lunga = 'Rindfleischetikettierungsüberwachungsaufgabenübertragung'; // 56 lettere
+  const corpo = corpoSottotitoli([{testo: lunga}], 60, 920);
+  assert.ok(corpo < 60 && corpo >= 24, `corpo ${corpo}`);
+  assert.ok(lunga.length * 0.58 * corpo <= 920, 'la parola deve stare nella riga');
+});
+
 await prova('B20 · un segno che apre, scritto da solo, va con la parola dopo; quello che chiude e il trattino con la parola prima', async () => {
   const {leggiCopione, confrontaTesto} = await carica('motore/copione.mjs');
   const {paroleDelTesto} = await carica('motore/piano.mjs');

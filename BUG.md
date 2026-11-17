@@ -175,10 +175,11 @@ il difetto com'era; in fondo a ognuna, come è stato chiuso.
 - **Cosa si perde:** `.env.esempio` non ha più i due comandi pronti da copiare. Chi li ha già nel suo `.env` non
   deve fare niente.
 
-## B19 · Parola più larga dei sottotitoli (bassa) — aperto
+## B19 · Parola più larga dei sottotitoli (bassa) — chiuso il 17/11
 
-- Una parola di 50 lettere a 60 px esce dai 920 px. La verifica lo segnala come scritta fuori zona. In italiano non
-  capita; in tedesco sì.
+- Era: una parola di 50 lettere a 60 px usciva dai 920 px. Ora la pagina che contiene una parola più larga della
+  riga si scrive più piccola, quanto basta perché entri (le parole fino a 26 lettere restano a 60 px). Prova: `B19`
+  in `prove/difetti.mjs`. **Non guardato su un video vero in tedesco**: la prova è sul calcolo, non sul fotogramma.
 
 ## B20 · Punteggiatura isolata attaccata alla parola prima (bassa) — chiuso il 17/11
 

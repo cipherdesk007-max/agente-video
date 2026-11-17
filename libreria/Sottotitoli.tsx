@@ -26,6 +26,16 @@ function Maniglia({x, y, colore}: {x: 'sinistra' | 'destra'; y: 'alto' | 'basso'
   );
 }
 
+/**
+ * Il corpo dei sottotitoli per una pagina: quello dello stile, ma più piccolo se una parola da sola è più larga della
+ * riga (in tedesco capita: una parola di 50 lettere a 60 pixel esce dallo schermo). Una lettera è larga in media
+ * 0,58 volte il corpo.
+ */
+export function corpoSottotitoli(parole: {testo: string}[], dimensione: number, larghezzaMax: number): number {
+  const piuLunga = Math.max(1, ...parole.map((p) => p.testo.length));
+  return Math.min(dimensione, Math.floor(larghezzaMax / (piuLunga * 0.58)));
+}
+
 export function Sottotitoli() {
   const tempo = useTempo();
   const cfg = stile.sottotitoli;
@@ -51,7 +61,8 @@ export function Sottotitoli() {
         opacity: rampa(eta, 0.08),
         textAlign: 'center',
         fontFamily: stile.font.titoli,
-        fontSize: cfg.dimensione,
+        fontSize: corpoSottotitoli(pagina.parole, cfg.dimensione, cfg.larghezzaMax),
+        overflowWrap: 'anywhere',
         lineHeight: 1.32,
         letterSpacing: '-0.012em',
         textShadow: '0 3px 18px rgba(0,0,0,0.85), 0 1px 3px rgba(0,0,0,0.7)',
