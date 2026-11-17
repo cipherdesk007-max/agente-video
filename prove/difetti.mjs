@@ -384,9 +384,17 @@ await prova('B16 · verifica: l\'audio viene descritto per quello che contiene',
 
 // ───────────────────────── B17 · B18 ─────────────────────────
 
-await prova('B17 · package-lock.json è salvato nel repository', () => {
-  // conta quello salvato in git: `npm install` ne crea uno sul momento, ma senza salvarlo ogni installazione fa da sé
-  assert.equal(spawnSync('git', ['ls-files', 'package-lock.json'], {cwd: K, encoding: 'utf8'}).stdout.trim(), 'package-lock.json');
+await prova('B17 · package-lock.json: se è salvato nel repository è uno vero, non la fotografia del computer che lo ha fatto', () => {
+  // Va creato su un computer con la rete (`npm install --package-lock-only`) e poi salvato. Fatto dove node_modules è
+  // un collegamento a un'altra cartella, esce pieno di "link": true e di percorsi di quel computer: altrove
+  // `npm install` non installa più niente. È successo: questa prova c'è perché non succeda di nuovo.
+  if (spawnSync('git', ['ls-files', 'package-lock.json'], {cwd: K, encoding: 'utf8'}).stdout.trim() !== 'package-lock.json') return;
+  const lock = JSON.parse(fs.readFileSync(path.join(K, 'package-lock.json'), 'utf8'));
+  const voci = Object.entries(lock.packages ?? {});
+  assert.deepEqual(voci.filter(([dove, v]) => v.link || dove.startsWith('..')).map(([dove]) => dove).slice(0, 5), []);
+  for (const nome of Object.keys(JSON.parse(fs.readFileSync(path.join(K, 'package.json'), 'utf8')).dependencies)) {
+    assert.match(lock.packages[`node_modules/${nome}`]?.resolved ?? '', /^https:\/\/registry\.npmjs\.org\//, `${nome} non viene dal registro pubblico`);
+  }
 });
 await prova('B18 · nessun nome di assistente nei file del kit (resta solo il nome del file di istruzioni che un agente pretende)', () => {
   const nomi = new RegExp(['clau' + 'de', 'cod' + 'ex', 'chat' + 'gpt', 'open' + 'ai', 'gem' + 'ini', 'copi' + 'lot'].join('|'), 'i');

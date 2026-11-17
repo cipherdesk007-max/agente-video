@@ -293,6 +293,9 @@ Scritti qui perché chi fa i reel sappia cosa non è stato ancora provato.
   scritte lì non vengono controllati dalla verifica: guarda i provini.
 - **Lingue**: giapponese provato sul testo e sui sottotitoli, non con la voce. Arabo ed ebraico (da destra a
   sinistra) non provati. Il corpo che si stringe sulle parole lunghe è provato sul calcolo, non su un video tedesco.
+- **`package-lock.json` non c'è**: qui non si poteva creare (serve la rete). Le versioni in `package.json` sono
+  esatte, ma per avere installazioni identiche ovunque va fatto una volta sul tuo computer:
+  `npm install --package-lock-only`, poi `git add package-lock.json`, commit e push.
 - **Il regista di serie** (`npm run regia`) fa un piano valido ma semplice: il reel bello viene dal piano
   migliorato a mano, scena per scena.
 
