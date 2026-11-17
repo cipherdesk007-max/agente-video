@@ -18,6 +18,30 @@ const COMANDI = '[]*#><\\';
 const DA_PARTE = (c) => String.fromCharCode(0xe000 + COMANDI.indexOf(c));
 const RIMETTI = (t) => t.replace(/[\ue000-\ue006]/g, (c) => COMANDI[c.charCodeAt(0) - 0xe000]);
 
+/** Le scritture che non mettono spazi tra le parole: cinese, giapponese, tailandese, lao, khmer, birmano. */
+const SENZA_SPAZI = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Thai}\p{Script=Lao}\p{Script=Khmer}\p{Script=Myanmar}]/u;
+
+/**
+ * Divide in parole un pezzo di testo scritto senza spazi ("今日はいい天気です。" → 今日 · は · いい · 天気 · です。).
+ * La punteggiatura resta con la parola prima; un segno che apre, con quella dopo. Un pezzo in una scrittura con gli
+ * spazi torna com'è, in un elenco di uno. Nessun carattere si perde: i pezzi riattaccati danno il testo di partenza.
+ */
+export function spezzaSenzaSpazi(pezzo) {
+  if (!SENZA_SPAZI.test(pezzo) || typeof Intl === 'undefined' || !Intl.Segmenter) return [pezzo];
+  const parole = [];
+  let apre = '';
+  for (const {segment, isWordLike} of new Intl.Segmenter(undefined, {granularity: 'word'}).segment(pezzo)) {
+    if (isWordLike) {
+      parole.push(apre + segment);
+      apre = '';
+    } else if (/^[(\[«“‘「『（【〈《¿¡]+$/u.test(segment)) apre += segment;
+    else if (parole.length) parole[parole.length - 1] += segment;
+    else apre += segment;
+  }
+  if (apre) parole.length ? (parole[parole.length - 1] += apre) : parole.push(apre);
+  return parole.length ? parole : [pezzo];
+}
+
 /** I segni che aprono: scritti da soli tra due spazi vanno con la parola dopo, non con quella prima. */
 const APRE = /^[(\[«“‘¿¡]+$/u;
 
@@ -40,8 +64,22 @@ export function leggiCopione(testo) {
   let enfasi = false;
   let attaccato = false; // true se l'ultimo pezzo di testo non è stato seguito da spazi
 
-  const pezzi = pulito.matchAll(/\[([^\]\n]*)\]|(\*)|(\s+)|([^\s[*]+)/g);
+  // un pezzo scritto senza spazi (giapponese, cinese…) si divide in parole: dalla seconda in poi sono "unite" alla
+  // prima, cioè nei sottotitoli si scrivono attaccate, come nell'originale
+  const pezzi = [];
+  for (const m of pulito.matchAll(/\[([^\]\n]*)\]|(\*)|(\s+)|([^\s[*]+)/g)) {
+    if (m[4] === undefined) pezzi.push(m);
+    else spezzaSenzaSpazi(m[4]).forEach((parte, k) => pezzi.push(Object.assign([m[0], undefined, undefined, undefined, parte], {unita: k > 0})));
+  }
+  let unitaDopo = false; // il pezzo arriva subito dopo un segno o un asterisco messi in mezzo a un testo senza spazi
+  let ultimoFuSpazio = true;
   for (const m of pezzi) {
+    const eraSpazio = ultimoFuSpazio;
+    ultimoFuSpazio = m[3] !== undefined;
+    if (m[4] !== undefined) {
+      m.unita = m.unita || (!eraSpazio && unitaDopo);
+      unitaDopo = SENZA_SPAZI.test(m[4]);
+    }
     if (m[1] !== undefined) {
       const nome = m[1].trim();
       if (nome.toLowerCase().startsWith('scena:')) {
@@ -67,7 +105,7 @@ export function leggiCopione(testo) {
       attaccato = false;
     } else {
       const testoPezzo = m[4];
-      if (attaccato && parole.length) {
+      if (attaccato && parole.length && !(m.unita && /[\p{L}\p{N}]/u.test(testoPezzo))) {
         // prosegue la parola precedente (es. punteggiatura dopo un asterisco di chiusura)
         const ultima = parole[parole.length - 1];
         const lettere = /[\p{L}\p{N}]/u.test(testoPezzo);
@@ -90,7 +128,7 @@ export function leggiCopione(testo) {
         // ai tempi della voce, che contano le parole dagli spazi.
         parole[parole.length - 1].testo += testoPezzo;
       } else {
-        parole.push({testo: daAprire + testoPezzo, enfasi});
+        parole.push({testo: daAprire + testoPezzo, enfasi, ...(m.unita && parole.length ? {unita: true} : {})});
         daAprire = '';
         const indice = parole.length - 1;
         for (const a of inAttesa.splice(0)) {
@@ -127,6 +165,10 @@ export function leggiCopione(testo) {
 /** Sillabe (approssimate) di una parola italiana: servono per stimare quanto dura. */
 export function sillabe(testo) {
   const t = String(testo).toLowerCase();
+  // scritture senza alfabeto latino: una sillaba per segno sillabico, un po' di più per ogni ideogramma
+  const kana = (t.match(/[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Thai}\p{Script=Lao}\p{Script=Khmer}\p{Script=Myanmar}\p{Script=Hangul}]/gu) ?? []).length;
+  const ideogrammi = (t.match(/\p{Script=Han}/gu) ?? []).length;
+  if (kana + ideogrammi) return Math.max(1, Math.round(kana + ideogrammi * 1.6));
   const gruppi = t.match(/[aeiouyàèéìíòóùú]+/g);
   if (gruppi) return gruppi.length;
   const lettere = t.replace(/[^a-z0-9]/g, '').length;
@@ -173,7 +215,7 @@ export function componiDati(copione, tempi, {motore, precisione, voce = null, du
     const inizio = Math.max(precedente, tempi[i].inizio);
     const fine = Math.max(inizio + 0.04, tempi[i].fine);
     precedente = inizio;
-    return {testo: p.testo, inizio: arrotonda(inizio), fine: arrotonda(fine), frase: p.frase, ...(p.enfasi ? {enfasi: true} : {})};
+    return {testo: p.testo, inizio: arrotonda(inizio), fine: arrotonda(fine), frase: p.frase, ...(p.enfasi ? {enfasi: true} : {}), ...(p.unita ? {unita: true} : {})};
   });
   // una parola non può finire dopo l'inizio della successiva
   for (let i = 0; i < parole.length - 1; i++) {

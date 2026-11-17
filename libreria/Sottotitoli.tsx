@@ -47,6 +47,8 @@ export function Sottotitoli() {
   const pagina = pagine.find((p) => tempo.ora >= p.mostraDa && tempo.ora < p.mostraA);
   if (!pagina) return null;
 
+  // "unita" = nelle lingue scritte senza spazi, la parola si scrive attaccata a quella prima (lo dice parole.json)
+  const unita = (p: {indice: number}): boolean => !!(tempo.dati.parole[p.indice] as {unita?: boolean} | undefined)?.unita;
   const blu = stile.colori.riquadro;
   const eta = tempo.ora - pagina.mostraDa;
   return (
@@ -85,7 +87,7 @@ export function Sottotitoli() {
               style={{
                 position: 'relative',
                 display: 'inline-block',
-                padding: '0 0.05em',
+                padding: unita(p) || (prossima && unita(prossima)) ? 0 : '0 0.05em',
                 opacity: apparsa ? rampa(dentro, 0.07) : 0,
                 transform: apparsa ? `translateY(${((1 - arrivo) * 10).toFixed(2)}px)` : undefined,
               }}
@@ -115,7 +117,9 @@ export function Sottotitoli() {
               <span style={{position: 'absolute', left: 0, right: 0, top: 0, textAlign: 'center', fontWeight: forte ? 700 : 500, color: colore}}>
                 {p.testo}
               </span>
-            </span>{' '}
+            </span>
+            {/* una parola "unita" alla precedente (lingue scritte senza spazi) non ha lo spazio davanti */}
+            {prossima && unita(prossima) ? null : ' '}
           </span>
         );
       })}

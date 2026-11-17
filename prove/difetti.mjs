@@ -312,8 +312,32 @@ await prova('B11 · fonti: ogni numero a schermo si cerca in fonti.md, per valor
 
 // ───────────────────────── B12 · lingue senza spazi ─────────────────────────
 
-await rimandata('B12 · copione: una frase in giapponese viene divisa in più parole', 'fase 3', () => {
-  assert.ok(copioni.leggiCopione('コーヒーはエネルギーを与えません。貸してくれるだけです。').parole.length > 2);
+await prova('B12 · lingue senza spazi: il giapponese si divide in parole, i sottotitoli le riattaccano, il piano e il regista ci lavorano', async () => {
+  const testo = 'コーヒーはエネルギーを与えません。貸してくれるだけです。\n\n朝の一杯は気分を上げます。でも夜は眠れなくなります。';
+  const c = copioni.leggiCopione(copioni.copioneDaTesto(testo, {lingua: 'ja'}));
+  assert.ok(c.parole.length >= 12, `solo ${c.parole.length} parole`);
+  assert.equal(copioni.confrontaTesto(testo, c.testoParlato), null, 'nessun carattere perso');
+  // dentro una frase le parole sono "unite" (niente spazio nei sottotitoli); la prima dopo un a capo no
+  assert.equal(c.parole[0].unita, undefined);
+  assert.equal(c.parole[1].unita, true);
+  assert.ok(c.parole.every((p) => !/\s/.test(p.testo)));
+  // la stima non è più "una parola sola, due secondi": conta le sillabe dei segni
+  assert.ok(copioni.sillabe('エネルギー') >= 4);
+  const tempi = copioni.stimaTempi(c.parole);
+  assert.ok(tempi[tempi.length - 1].fine > 5, `quattro frasi in giapponese durano più di cinque secondi (stimati ${tempi[tempi.length - 1].fine})`);
+  // un segno in mezzo a un testo senza spazi cade sulla parola giusta e non spezza i sottotitoli
+  const conSegno = copioni.leggiCopione('[scena:a]\n今日はいい[x]天気です。');
+  assert.equal(conSegno.parole[conSegno.segni.x].testo, '天気');
+  assert.equal(conSegno.parole[conSegno.segni.x].unita, true);
+  // il regista di serie e il montaggio: piano valido, testo intatto, parole riattaccate nel copione
+  const {regia} = await carica('motore/regista.mjs');
+  const {controllaPiano, montaCopione} = await carica('motore/piano.mjs');
+  const {piano} = regia(testo, {titolo: 'コーヒー'});
+  const esito = controllaPiano(piano, testo);
+  assert.deepEqual(esito.errori, []);
+  const montato = montaCopione(piano, esito, {lingua: 'ja'});
+  assert.equal(copioni.confrontaTesto(testo, copioni.leggiCopione(montato).testoParlato), null);
+  assert.doesNotMatch(montato.split('\n').filter((r) => !r.startsWith('#') && !r.startsWith('>') && !r.startsWith('<')).join('\n'), /[ぁ-んァ-ヶ一-龠] [ぁ-んァ-ヶ一-龠]/u, 'nel copione le parole giapponesi restano attaccate');
 });
 
 // ───────────────────────── B13 · B14 · B15 · B16 ─────────────────────────

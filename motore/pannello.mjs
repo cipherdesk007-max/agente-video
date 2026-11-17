@@ -28,7 +28,7 @@ import {comandoVoce} from './voce.mjs';
 import {CACHE} from './percorsi.mjs';
 
 const BISCOTTO = 'fmlab_chiave';
-const LINGUE = {it: 'italiano', en: 'inglese', es: 'spagnolo', fr: 'francese', de: 'tedesco', pt: 'portoghese'};
+const LINGUE = {it: 'italiano', en: 'inglese', es: 'spagnolo', fr: 'francese', de: 'tedesco', pt: 'portoghese', nl: 'olandese', pl: 'polacco', tr: 'turco', ru: 'russo', ja: 'giapponese', zh: 'cinese', ko: 'coreano'};
 
 function nuovaChiave() {
   const alfabeto = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';

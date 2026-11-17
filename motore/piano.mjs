@@ -31,7 +31,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {ErroreFmlab, RADICE, cartellaReel, leggiJson, rel} from './percorsi.mjs';
-import {leggiCopione, confrontaTesto, proteggi, testoDaDire} from './copione.mjs';
+import {leggiCopione, confrontaTesto, proteggi, spezzaSenzaSpazi, testoDaDire} from './copione.mjs';
 import {elencoSuoni} from './suoni.mjs';
 import {RACCOLTE, cartellaIcone, nomiRaccolta} from './icone.mjs';
 import {numeriSenzaFonte} from './fonti.mjs';
@@ -142,14 +142,17 @@ export function paroleDelTesto(testo) {
   let k = 0;
   let daAprire = '';
   for (const blocco of pulito.split(/\n\s*\n/)) {
-    for (const p of blocco.split(/\s+/).filter(Boolean)) {
+    for (const intero of blocco.split(/\s+/).filter(Boolean)) {
+     // un pezzo scritto senza spazi (giapponese, cinese…) vale più parole: dalla seconda in poi sono "unite" alla prima
+     for (const [n, p] of spezzaSenzaSpazi(intero).entries()) {
       // la punteggiatura isolata (un trattino tra due spazi) fa parte della parola prima, come nel copione
       if (!/[\p{L}\p{N}]/u.test(p) && /^[(\[«“‘¿¡]+$/u.test(p)) daAprire += p; // un segno che apre, da solo: va con la parola dopo
       else if (!/[\p{L}\p{N}]/u.test(p) && parole.length) parole[parole.length - 1].testo += ' ' + p;
       else {
-        parole.push({testo: daAprire + p, chiave: soloLettere(p), capoverso, enfasi: enfasi.has(k)});
+        parole.push({testo: daAprire + p, chiave: soloLettere(p), capoverso, enfasi: enfasi.has(k), ...(n > 0 ? {unita: true} : {})});
         daAprire = '';
       }
+     }
       k++;
     }
     capoverso++;
@@ -592,7 +595,10 @@ export function montaCopione(piano, esito, {lingua = 'it'} = {}) {
         // un segno dentro la parola (dell'[azienda]azienda): vale per quella parola
         corpo = proteggi(m[1].slice(0, d.dentro.dove)) + d.dentro.cosa + proteggi(m[1].slice(d.dentro.dove));
       } else corpo = proteggi(corpo);
-      riga.push(`${segni}${apre ? '*' : ''}${corpo}${chiude ? '*' : ''}${proteggi(m[2])}`);
+      const scritta = `${segni}${apre ? '*' : ''}${corpo}${chiude ? '*' : ''}${proteggi(m[2])}`;
+      // una parola "unita" (lingue senza spazi) torna attaccata a quella prima, com'era nel testo dato
+      if (p.unita && riga.length) riga[riga.length - 1] += scritta;
+      else riga.push(scritta);
     }
     righe.push(riga.join(' '), '');
   }

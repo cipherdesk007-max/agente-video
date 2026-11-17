@@ -132,11 +132,16 @@ il difetto com'era; in fondo a ognuna, come è stato chiuso.
 - **Chiuso:** `motore/fonti.mjs` e un controllo nuovo nella verifica. Ha trovato quattro numeri arrotondati senza
   spiegazione nei due reel del kit: aggiunti sotto "Calcoli" nei loro `fonti.md`.
 
-## B12 · Lingue senza spazi tra le parole (media) — rimandato alla fase 3
+## B12 · Lingue senza spazi tra le parole (media) — chiuso il 17/11
 
-- **Passi:** copione in giapponese di due frasi.
-- **Successo:** una sola "parola", durata stimata 1,9 s, un sottotitolo solo con tutto il testo. Il pannello offre sei
-  lingue. "Qualsiasi lingua" chiede di dividere il testo in un altro modo: va insieme al regista.
+- Era: un copione in giapponese diventava una parola sola, 1,9 secondi, un sottotitolo solo.
+- Ora un testo scritto senza spazi (cinese, giapponese, tailandese, lao, khmer, birmano) si divide in parole con
+  il dizionario del sistema (`Intl.Segmenter`); nei sottotitoli le parole tornano attaccate; la stima conta le
+  sillabe dei segni; piano, regista e montaggio lavorano sulle stesse parole. Il pannello offre tredici lingue.
+  Prova: `B12`. Guardato su due fotogrammi di un reel in giapponese.
+- **Non provato:** la voce vera. Al servizio della voce il testo arriva con uno spazio tra le parole, perché è dagli
+  spazi che si ricavano i tempi parola per parola: in giapponese potrebbe dare piccole pause. Va ascoltato.
+- Le lingue che si scrivono da destra a sinistra (arabo, ebraico) non sono state provate.
 
 ## B13 · `npm run nuovo … oggetto` non imposta lo stile 3D (bassa)
 
