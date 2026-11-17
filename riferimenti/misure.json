@@ -1,6 +1,6 @@
 {
   "cosa": "Misure dei video di riferimento e soglie che ne derivano. Si rifà con: npm run confronta riferimenti",
-  "metro": 1,
+  "metro": 2,
   "zone": {
     "sottotitoli": {
       "x0": 0.04,
@@ -90,16 +90,16 @@
       "max": -0.02
     },
     "narratore.poseDiverse": {
-      "min": 4.25
+      "min": 5.1
     },
     "narratore.cambiAlMinuto": {
-      "min": 34
+      "min": 34.935
     },
     "narratore.stessaPosaMediana": {
       "max": 1.61
     },
     "narratore.stessaPosaMassimo": {
-      "max": 3.795
+      "max": 3.335
     },
     "audio.lufs": {
       "min": -16.79,
@@ -117,7 +117,7 @@
   },
   "riferimenti": {
     "rif1": {
-      "metro": 1,
+      "metro": 2,
       "formato": {
         "larghezza": 576,
         "altezza": 1024,
@@ -218,12 +218,12 @@
       },
       "narratore": {
         "presente": true,
-        "contorni": 0.418,
-        "poseDiverse": 8,
-        "cambi": 36,
-        "cambiAlMinuto": 40,
+        "contorni": 0.441,
+        "poseDiverse": 6,
+        "cambi": 37,
+        "cambiAlMinuto": 41.1,
         "stessaPosaMediana": 1.4,
-        "stessaPosaMassimo": 3.3
+        "stessaPosaMassimo": 2.9
       },
       "audio": {
         "presente": true,
@@ -243,7 +243,7 @@
       }
     },
     "rif2": {
-      "metro": 1,
+      "metro": 2,
       "formato": {
         "larghezza": 576,
         "altezza": 1024,
@@ -343,12 +343,12 @@
       },
       "narratore": {
         "presente": true,
-        "contorni": 0.428,
-        "poseDiverse": 12,
-        "cambi": 46,
-        "cambiAlMinuto": 53.2,
+        "contorni": 0.447,
+        "poseDiverse": 10,
+        "cambi": 47,
+        "cambiAlMinuto": 54.3,
         "stessaPosaMediana": 1,
-        "stessaPosaMassimo": 3.2
+        "stessaPosaMassimo": 2.6
       },
       "audio": {
         "presente": true,
@@ -368,7 +368,7 @@
       }
     },
     "rif3": {
-      "metro": 1,
+      "metro": 2,
       "formato": {
         "larghezza": 576,
         "altezza": 1024,
@@ -483,11 +483,11 @@
       },
       "narratore": {
         "presente": true,
-        "contorni": 0.413,
-        "poseDiverse": 5,
-        "cambi": 37,
-        "cambiAlMinuto": 40.1,
-        "stessaPosaMediana": 1.35,
+        "contorni": 0.444,
+        "poseDiverse": 6,
+        "cambi": 44,
+        "cambiAlMinuto": 47.7,
+        "stessaPosaMediana": 1.1,
         "stessaPosaMassimo": 2.8
       },
       "audio": {

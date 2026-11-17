@@ -48,17 +48,20 @@ await prova('gesti: scaletta sempre uguale, in ordine, con una pausa tra un gest
   assert.equal(a.filter((e) => e.gesto === 'saluta').length, 1);
   assert.ok(a.every((e) => gesti.GESTI.includes(e.gesto)));
 });
-await prova('pose: una nuova a ogni frase, mai due uguali di fila, tenute almeno due secondi', () => {
+await prova('pose: una nuova a ogni frase, inciso e segno; mai due uguali di fila; tenute almeno un secondo e un quarto', () => {
   const pose = gesti.scalettaAssetti(dati, () => undefined);
   assert.ok(pose.length >= 8, `solo ${pose.length} pose`);
   for (let i = 1; i < pose.length; i++) {
     assert.notEqual(pose[i].posa, pose[i - 1].posa);
-    assert.ok(pose[i].t - pose[i - 1].t >= 2, `pose troppo vicine a ${pose[i].t}`);
+    assert.ok(pose[i].t - pose[i - 1].t >= gesti.TENUTA - 0.26, `pose troppo vicine a ${pose[i].t}`);
   }
   assert.ok(new Set(pose.map((p) => p.posa)).size >= 3);
   assert.equal(pose[pose.length - 1].posa, 'alto'); // sull'invito finale il dito va in alto
   const fissa = gesti.scalettaAssetti(dati, () => ({posa: 'lato'}));
-  assert.ok(fissa.every((p) => p.posa === 'lato'));
+  // una posa chiesta per nome è la posa di casa: la scena comincia così e ci torna, ma non resta ferma
+  assert.equal(fissa[0].posa, 'lato');
+  assert.ok(fissa.filter((p) => p.posa === 'lato').length >= fissa.length * 0.4, 'la posa di casa torna spesso');
+  for (let i = 1; i < fissa.length; i++) assert.ok(fissa[i].posa === 'lato' || fissa[i - 1].posa === 'lato', 'tra due pose diverse da quella di casa si torna a casa');
   const tradotta = gesti.scalettaAssetti(dati, (nome) => (nome === 'aggancio' ? {posa: [['nonsa', 'spalle']]} : {posa: 'dito'}));
   assert.equal(tradotta[0].posa, 'aperto'); // i nomi delle pose del Dottore disegnato valgono anche qui
   assert.throws(() => gesti.scalettaAssetti(dati, () => ({posa: 'verticale'})), /non esiste\. Pose/);

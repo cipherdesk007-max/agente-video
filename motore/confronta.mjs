@@ -17,7 +17,7 @@ import {spawn, spawnSync} from 'node:child_process';
 import {CARTELLA_REELS, ErroreFmlab, RADICE, elencoReel, leggiJson, rel, scriviJson} from './percorsi.mjs';
 import {infoMedia, trovaFfmpeg} from './ffmpeg.mjs';
 
-export const VERSIONE_METRO = 1;
+export const VERSIONE_METRO = 2;
 export const FILE_MISURE = path.join(RADICE, 'riferimenti', 'misure.json');
 
 /** Dove guardare: frazioni di larghezza e altezza del fotogramma. */
@@ -514,12 +514,18 @@ async function misuraSottotitoli(ff, file, fps, larghezza, altezza) {
 const NL = 40;
 const NA = 48;
 const NFPS = 10;
+/** Sotto questa luce (0-255) un punto della zona del narratore è fondo e non figura. */
+const FONDO_SCURO = 78;
 
 async function misuraNarratore(ff, file) {
   const z = ZONE.narratore;
   const firme = [];
   const densita = [];
   await grezzo(ff, ['-i', file, '-map', '0:v:0', '-vf', `fps=${NFPS},${ritaglio(z)},scale=${NL}:${NA}:flags=area`, '-f', 'rawvideo', '-pix_fmt', 'gray'], NL * NA, (Y) => {
+    // Solo la figura: il narratore è chiaro (camice, pelle), il fondo è scuro. Tutto quello che sta sotto una certa
+    // luce si spegne prima di cercare i contorni: così i fili e la polvere che si muovono dietro non cambiano la
+    // firma, e non nascondono un cambio di posa vero. (Versione 1 del metro: i contorni del fondo contavano.)
+    for (let i = 0; i < Y.length; i++) Y[i] = Y[i] <= FONDO_SCURO ? 0 : Y[i] >= FONDO_SCURO + 50 ? Y[i] : Math.round((Y[i] * (Y[i] - FONDO_SCURO)) / 50);
     // i contorni della figura: resistono al cambio di colore dello sfondo
     const bordi = new Float32Array(NL * NA);
     let forti = 0;

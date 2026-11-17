@@ -265,7 +265,7 @@ const DISEGNI: Record<TipoSoggetto, (d: Disegno) => ReactNode> = {
 // ───────────────────────── il soggetto vivo ─────────────────────────
 
 /** Un soggetto grande e vivo: bagliore che respira, scintille in orbita, galleggia. `lato` è il lato della sua scatola in pixel. */
-export function SoggettoVivo({soggetto, x, y, lato, p, da, indice = 0}: {soggetto: Soggetto; x: number; y: number; lato: number; p: Record<string, number>; da: number; indice?: number}) {
+export function SoggettoVivo({soggetto, x, y, lato, p, da, indice = 0, colpo = 0}: {soggetto: Soggetto; x: number; y: number; lato: number; p: Record<string, number>; da: number; indice?: number; /** Da 1 a 0 nel mezzo secondo dopo un cambio di stato: il soggetto dà un colpo, così il cambio si vede. */ colpo?: number}) {
   const tempo = useTempo();
   const t = tempo.ora + indice * 1.37;
   if (da <= 0) return null;
@@ -283,7 +283,9 @@ export function SoggettoVivo({soggetto, x, y, lato, p, da, indice = 0}: {soggett
   const Disegno = DISEGNI[soggetto.tipo];
   const SCINTILLE = 12;
   return (
-    <div style={{position: 'absolute', left: x - lato / 2, top: y - lato / 2, width: lato, height: lato, opacity: rampa(da, 0.25), transform: `translate(${deriva.toFixed(2)}px, ${((1 - entra) * 90 + galleggia).toFixed(2)}px) rotate(${dondola.toFixed(3)}deg) scale(${(mix(0.7, 1, entra) * respira).toFixed(4)})`}}>
+    <div style={{position: 'absolute', left: x - lato / 2, top: y - lato / 2, width: lato, height: lato, opacity: rampa(da, 0.25), transform: `translate(${deriva.toFixed(2)}px, ${((1 - entra) * 90 + galleggia).toFixed(2)}px) rotate(${dondola.toFixed(3)}deg) scale(${(mix(0.7, 1, entra) * respira * (1 + 0.09 * colpo)).toFixed(4)})`}}>
+      {/* il colpo: un anello di luce che si allarga dal soggetto quando cambia stato */}
+      {colpo > 0.02 ? <div style={{position: 'absolute', inset: `${(-lato * 0.32 * (1 - colpo)).toFixed(1)}px`, borderRadius: '50%', border: `${(3 + 9 * colpo).toFixed(1)}px solid ${alfa(colore, 0.85 * colpo)}`, boxShadow: `0 0 ${Math.round(50 * colpo)}px ${alfa(colore, 0.7 * colpo)}`}} /> : null}
       {/* il bagliore dietro, che respira */}
       <div style={{position: 'absolute', inset: -lato * 0.18, borderRadius: '50%', background: `radial-gradient(circle, ${alfa(colore, 0.3 + 0.22 * battito)} 0%, ${alfa(colore, 0.1 + 0.08 * battito)} 38%, transparent 68%)`}} />
       {soggetto.tipo === 'immagine' && soggetto.file ? (
@@ -328,6 +330,16 @@ export function SoggettoVivo({soggetto, x, y, lato, p, da, indice = 0}: {soggett
   );
 }
 
+/** Il colpo di un soggetto: 1 nell'istante di un cambio di stato, poi giù a 0 in mezzo secondo. */
+export function colpoSoggetto(soggetto: Soggetto, dopo: (q: Quando) => number): number {
+  let colpo = 0;
+  for (const c of soggetto.cambia ?? []) {
+    const t = dopo(c.segno);
+    if (t > 0 && t < 0.5) colpo = Math.max(colpo, 1 - t / 0.5);
+  }
+  return colpo;
+}
+
 /** Lo stato di un soggetto in questo momento: i numeri di partenza, portati verso ogni cambio con il suo segno. */
 export function statoSoggetto(soggetto: Soggetto, dopo: (q: Quando) => number): Record<string, number> {
   const p: Record<string, number> = {...SOGGETTI[soggetto.tipo].stato, ...(soggetto.stato ?? {})};
@@ -369,7 +381,7 @@ export function bloccoSoggetti({soggetti, titolo, fonte}: {soggetti: Soggetto[];
           const nota = dice(sg.nota);
           return (
             <div key={i}>
-              <SoggettoVivo soggetto={sg} x={x} y={yCentro} lato={lato} p={statoSoggetto(sg, dopo)} da={da} indice={i} />
+              <SoggettoVivo soggetto={sg} x={x} y={yCentro} lato={lato} p={statoSoggetto(sg, dopo)} da={da} indice={i} colpo={colpoSoggetto(sg, dopo)} />
               {etichetta && da > 0 ? (
                 <div data-fmlab-zona="testo" style={{position: 'absolute', left: x, top: yCentro + lato / 2 + (n === 1 ? 14 : n === 2 ? 30 : 44), transform: `translate(-50%, -50%) scale(${mix(0.7, 1, molla(da - 0.15, {rigidita: 200, smorzamento: 16})).toFixed(3)})`, opacity: rampa(da - 0.15, 0.2), padding: '10px 26px', borderRadius: 999, border: `3px solid ${colore}`, background: alfa('#06090D', 0.82), boxShadow: `0 0 22px ${alfa(colore, 0.55)}`, whiteSpace: 'nowrap', fontFamily: stile.font.titoli, fontWeight: 900, fontSize: n === 3 ? 28 : 36, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#fff'}}>
                   {etichetta}
