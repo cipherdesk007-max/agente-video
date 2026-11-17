@@ -45,7 +45,11 @@ async function preventivoVoce(slug, dir) {
   } catch {
     // nessuna voce ancora
   }
-  return {motore, caratteri: copione.testoParlato.length, paga: motore === 'elevenlabs' && !giaFatta};
+  if (motore !== 'elevenlabs') return {motore, caratteri: copione.testoParlato.length, paga: false};
+  // frase per frase: si pagano solo le frasi che non sono né in banca né già generate
+  const {preventivoElevenLabs} = await import('./voce.mjs');
+  const conto = preventivoElevenLabs(copione, 'it', scelte);
+  return {motore, caratteri: conto.caratteri, pronte: conto.pronte, paga: !giaFatta && conto.caratteri > 0};
 }
 
 export async function comandoFai(slug, argomenti = []) {
@@ -105,7 +109,7 @@ export async function comandoFai(slug, argomenti = []) {
       const p = await preventivoVoce(slug, dir);
       if (p.motore === 'stima') return 'nessuna voce disponibile su questo computer: il video esce con i tempi stimati e senza voce';
       if (p.paga && !voceSi) {
-        throw new ErroreFmlab(`La voce ElevenLabs di questo testo costa circa ${p.caratteri} crediti (uno per carattere). Composizione e provini sono già fatti e controllati.\nPer generarla: npm run fai ${slug} voce=si`);
+        throw new ErroreFmlab(`La voce ElevenLabs di questo testo costa circa ${p.caratteri} crediti (uno per carattere${p.pronte ? `; ${p.pronte} frasi sono già pronte e non si pagano` : ''}). Composizione e provini sono già fatti e controllati.\nPer generarla: npm run fai ${slug} voce=si`);
       }
       const {comandoVoce} = await import('./voce.mjs');
       await comandoVoce(slug, []);

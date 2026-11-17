@@ -8,6 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {CACHE, ErroreFmlab, RADICE, leggiEnv, leggiJson, rel, scriviJson, sec} from './percorsi.mjs';
+import {cercaFrase, leggiBanca, ritmoMisurato} from './frasi.mjs';
 import {leggiImpostazioni} from './impostazioni.mjs';
 import {apriReel, estraiVariante} from './reel.mjs';
 import {componiDati, confrontaTesto, leggiCopione, testoDaDire, pausaDopo, pesoParola, stimaTempi, tempiDaCaratteri} from './copione.mjs';
@@ -52,22 +53,14 @@ export async function elencoVociElevenLabs() {
   }));
 }
 
-async function voceElevenLabs(copione, reel, scelte = {}, {nuova = false} = {}) {
-  const chiave = process.env.ELEVENLABS_API_KEY;
-  // la voce: quella scelta per questo reel e questa lingua, altrimenti quella del file .env
-  // (una diversa per lingua, se indicata: ELEVENLABS_VOICE_ID_EN, ELEVENLABS_VOICE_ID_ES…)
-  const voce = scelte.elevenlabs?.[reel.lingua] || process.env[`ELEVENLABS_VOICE_ID_${reel.lingua.toUpperCase().replace('-', '_')}`] || process.env.ELEVENLABS_VOICE_ID;
-  if (!chiave || !voce) {
-    throw new ErroreFmlab(
-      'Per usare ElevenLabs servono due righe nel file .env (copia .env.esempio in .env):\n' +
-        '  ELEVENLABS_API_KEY=la-tua-chiave\n  ELEVENLABS_VOICE_ID=id-della-voce'
-    );
-  }
-  const base = baseElevenLabs();
-  const corpo = {
-    text: copione.testoParlato,
-    model_id: process.env.ELEVENLABS_MODEL || 'eleven_multilingual_v2',
-  };
+/** La voce ElevenLabs di un reel in una lingua: quella scelta per il reel, poi quella della lingua, poi quella del file .env. */
+const voceElevenLabsDi = (scelte, lingua) => scelte.elevenlabs?.[lingua] || process.env[`ELEVENLABS_VOICE_ID_${lingua.toUpperCase().replace('-', '_')}`] || process.env.ELEVENLABS_VOICE_ID;
+const voceDiSerie = (lingua) => process.env[`ELEVENLABS_VOICE_ID_${lingua.toUpperCase().replace('-', '_')}`] || process.env.ELEVENLABS_VOICE_ID;
+const aFrasi = () => !/^(no|0|false)$/i.test(process.env.ELEVENLABS_FRASI ?? 'si');
+
+/** Modello e regolazioni presi dal file .env: fanno parte di "com'è detta" una frase. */
+function regoleElevenLabs() {
+  const corpo = {model_id: process.env.ELEVENLABS_MODEL || 'eleven_multilingual_v2'};
   const impostazioni = {
     stability: numeroEnv('ELEVENLABS_STABILITY'),
     similarity_boost: numeroEnv('ELEVENLABS_SIMILARITY'),
@@ -77,22 +70,46 @@ async function voceElevenLabs(copione, reel, scelte = {}, {nuova = false} = {}) 
   const regolazioni = Object.fromEntries(Object.entries(impostazioni).filter(([, v]) => v !== undefined));
   if (Object.keys(regolazioni).length) corpo.voice_settings = regolazioni;
   if (process.env.ELEVENLABS_LANGUAGE) corpo.language_code = process.env.ELEVENLABS_LANGUAGE;
+  return corpo;
+}
 
-  // stesso testo, stessa voce, stesse impostazioni di una voce già generata? Si riusa: nessun credito speso.
-  const file = `${reel.nomeVoce}.mp3`;
-  const fileTempi = path.join(reel.dir, `${reel.nomeVoce}.tempi.json`);
-  const firma = impronta({voce, ...corpo});
-  if (!nuova && fs.existsSync(fileTempi) && fs.existsSync(path.join(reel.dir, file))) {
-    try {
-      const salvati = leggiJson(fileTempi);
-      if (salvati.firma === firma && salvati.allineamento) {
-        return {tempi: tempiDaCaratteri(copione.testoParlato, salvati.allineamento), voce: file, precisione: 'carattere', riusata: true, caratteri: 0, nomeVoce: voce};
-      }
-    } catch {
-      // file dei tempi rovinato: si rigenera
-    }
-  }
+// Le frasi pagate non stanno tra i file di servizio (.fmlab/ si può buttare): stanno in voci/pagate/, che Git ignora.
+const DEPOSITO_ELEVENLABS = process.env.FMLAB_FRASI_PAGATE ? path.resolve(process.env.FMLAB_FRASI_PAGATE) : path.join(RADICE, 'voci', 'pagate');
+const frasiDi = (copione) => {
+  const gruppi = [];
+  copione.parole.forEach((p) => (gruppi[p.frase] ??= []).push(p.testo));
+  return gruppi.filter(Boolean).map((g) => g.join(' '));
+};
 
+/**
+ * Da dove viene ogni frase di un copione, senza generare niente: dalla banca (voci/frasi/, solo con la voce di
+ * serie), dal deposito delle frasi già pagate, o da ElevenLabs. Serve a dire il costo prima di spendere.
+ */
+export function pianoFrasiElevenLabs(copione, lingua, voce, {nuova = false} = {}) {
+  const regole = regoleElevenLabs();
+  const banca = leggiBanca();
+  const conBanca = voce && voce === voceDiSerie(lingua);
+  return frasiDi(copione).map((testo) => {
+    const inBanca = conBanca ? cercaFrase(testo, lingua, banca) : null;
+    if (inBanca) return {testo, origine: 'banca', file: path.join(RADICE, inBanca.file)};
+    const chiave = impronta({voce, ...regole, text: testo});
+    const mp3 = path.join(DEPOSITO_ELEVENLABS, `${chiave}.mp3`);
+    const tempi = path.join(DEPOSITO_ELEVENLABS, `${chiave}.json`);
+    if (!nuova && fs.existsSync(mp3) && fs.existsSync(tempi)) return {testo, origine: 'deposito', file: mp3, tempi};
+    return {testo, origine: 'elevenlabs', file: mp3, tempi};
+  });
+}
+
+/** Quanti caratteri si pagherebbero adesso per la voce ElevenLabs di questo copione. */
+export function preventivoElevenLabs(copione, lingua, scelte = {}) {
+  const voce = voceElevenLabsDi(scelte, lingua);
+  if (!aFrasi()) return {caratteri: copione.testoParlato.length, daFare: null, pronte: 0};
+  const piano = pianoFrasiElevenLabs(copione, lingua, voce);
+  const daFare = piano.filter((f) => f.origine === 'elevenlabs');
+  return {caratteri: daFare.reduce((s, f) => s + f.testo.length, 0), daFare: daFare.length, pronte: piano.length - daFare.length};
+}
+
+async function chiediElevenLabs(base, voce, chiave, corpo) {
   let risposta;
   try {
     risposta = await fetch(`${base}/v1/text-to-speech/${encodeURIComponent(voce)}/with-timestamps?output_format=mp3_44100_128`, {
@@ -112,10 +129,110 @@ async function voceElevenLabs(copione, reel, scelte = {}, {nuova = false} = {}) 
       422: 'richiesta non accettata: controlla modello e impostazioni nel file .env',
       429: 'troppe richieste o crediti finiti: aspetta un momento e riprova',
     };
-    throw new ErroreFmlab(`ElevenLabs ha risposto ${risposta.status}: ${motivi[risposta.status] ?? 'errore'}.\n${testo}`);
+    const errore = new ErroreFmlab(`ElevenLabs ha risposto ${risposta.status}: ${motivi[risposta.status] ?? 'errore'}.\n${testo}`);
+    errore.stato = risposta.status;
+    throw errore;
   }
   const dati = await risposta.json();
   if (!dati.audio_base64) throw new ErroreFmlab('La risposta di ElevenLabs non contiene l\'audio.');
+  return dati;
+}
+
+/**
+ * ElevenLabs frase per frase. Ogni frase pagata resta nel deposito (voci/pagate/): se cambi una frase
+ * del testo paghi solo quella, e una frase che torna uguale in un altro reel non si paga più. Le frasi della banca
+ * (voci/frasi/) non si pagano mai. A ogni richiesta si dice a ElevenLabs cosa viene prima e cosa viene dopo, perché
+ * l'intonazione leghi; se il modello non lo accetta, si rifà la richiesta senza.
+ */
+async function voceElevenLabsAFrasi(copione, reel, voce, chiave, {nuova = false} = {}) {
+  const ff = await trovaFfmpeg();
+  const base = baseElevenLabs();
+  const regole = regoleElevenLabs();
+  fs.mkdirSync(DEPOSITO_ELEVENLABS, {recursive: true});
+  const piano = pianoFrasiElevenLabs(copione, reel.lingua, voce, {nuova});
+  let conContesto = true;
+  let caratteri = 0;
+  for (const [i, f] of piano.entries()) {
+    if (f.origine !== 'elevenlabs') continue;
+    const corpo = {text: f.testo, ...regole};
+    const contesto = {...(piano[i - 1] ? {previous_text: piano[i - 1].testo} : {}), ...(piano[i + 1] ? {next_text: piano[i + 1].testo} : {})};
+    let dati;
+    try {
+      dati = await chiediElevenLabs(base, voce, chiave, conContesto ? {...corpo, ...contesto} : corpo);
+    } catch (e) {
+      if (!conContesto || ![400, 422].includes(e.stato) || !Object.keys(contesto).length) throw e;
+      conContesto = false; // questo modello non accetta il testo vicino: da qui in poi senza (una richiesta rifiutata non costa)
+      dati = await chiediElevenLabs(base, voce, chiave, corpo);
+    }
+    fs.writeFileSync(f.file, Buffer.from(dati.audio_base64, 'base64'));
+    scriviJson(f.tempi, {testo: f.testo, voce, creata: new Date().toISOString(), allineamento: dati.alignment ?? dati.normalized_alignment});
+    caratteri += f.testo.length;
+  }
+  const inWav = (file) => {
+    const r = spawnSync(ff.percorso, ['-hide_banner', '-nostdin', '-v', 'error', '-i', file, '-ac', '1', '-ar', '44100', '-c:a', 'pcm_s16le', '-f', 'wav', '-'], {maxBuffer: 256 * 1024 * 1024});
+    if (r.status !== 0 || !r.stdout?.length) throw new ErroreFmlab(`Non riesco a leggere l'audio ${rel(file)}: ${String(r.stderr || '').trim().slice(0, 200)}`);
+    return r.stdout;
+  };
+  const pronte = new Map();
+  for (const f of piano) {
+    let parole = null;
+    if (f.tempi) {
+      try {
+        parole = tempiDaCaratteri(f.testo, leggiJson(f.tempi).allineamento);
+      } catch {
+        parole = null; // senza tempi dei caratteri le parole si distribuiscono sui tratti di voce
+      }
+    }
+    pronte.set(f.testo, {wav: inWav(f.file), parole});
+  }
+  const {audio, tempi, durata} = montaFrasi(copione, (testo) => pronte.get(testo), {pausaTraFrasi: numeroEnv('ELEVENLABS_PAUSA') ?? 0.32});
+  const fileAudio = `${reel.nomeVoce}.wav`;
+  fs.writeFileSync(path.join(reel.dir, fileAudio), audio);
+  const conta = (origine) => piano.filter((f) => f.origine === origine).length;
+  return {
+    tempi,
+    voce: fileAudio,
+    precisione: [...pronte.values()].every((f) => f.parole) ? 'carattere' : 'frase',
+    durataAudio: durata,
+    caratteri,
+    nomeVoce: voce,
+    riusata: caratteri === 0,
+    frasi: {elevenlabs: conta('elevenlabs'), deposito: conta('deposito'), banca: conta('banca'), senzaContesto: !conContesto},
+  };
+}
+
+async function voceElevenLabs(copione, reel, scelte = {}, {nuova = false} = {}) {
+  const chiave = process.env.ELEVENLABS_API_KEY;
+  // la voce: quella scelta per questo reel e questa lingua, altrimenti quella del file .env
+  // (una diversa per lingua, se indicata: ELEVENLABS_VOICE_ID_EN, ELEVENLABS_VOICE_ID_ES…)
+  const voce = voceElevenLabsDi(scelte, reel.lingua);
+  if (!chiave || !voce) {
+    throw new ErroreFmlab(
+      'Per usare ElevenLabs servono due righe nel file .env (copia .env.esempio in .env):\n' +
+        '  ELEVENLABS_API_KEY=la-tua-chiave\n  ELEVENLABS_VOICE_ID=id-della-voce'
+    );
+  }
+  if (aFrasi()) return voceElevenLabsAFrasi(copione, reel, voce, chiave, {nuova});
+  // ELEVENLABS_FRASI=no: tutto il testo in una richiesta sola, come prima (ogni modifica ripaga tutto il testo)
+  const base = baseElevenLabs();
+  const corpo = {text: copione.testoParlato, ...regoleElevenLabs()};
+
+  // stesso testo, stessa voce, stesse impostazioni di una voce già generata? Si riusa: nessun credito speso.
+  const file = `${reel.nomeVoce}.mp3`;
+  const fileTempi = path.join(reel.dir, `${reel.nomeVoce}.tempi.json`);
+  const firma = impronta({voce, ...corpo});
+  if (!nuova && fs.existsSync(fileTempi) && fs.existsSync(path.join(reel.dir, file))) {
+    try {
+      const salvati = leggiJson(fileTempi);
+      if (salvati.firma === firma && salvati.allineamento) {
+        return {tempi: tempiDaCaratteri(copione.testoParlato, salvati.allineamento), voce: file, precisione: 'carattere', riusata: true, caratteri: 0, nomeVoce: voce};
+      }
+    } catch {
+      // file dei tempi rovinato: si rigenera
+    }
+  }
+
+  const dati = await chiediElevenLabs(base, voce, chiave, corpo);
   const allineamento = dati.alignment ?? dati.normalized_alignment;
   const tempi = tempiDaCaratteri(copione.testoParlato, allineamento);
   fs.writeFileSync(path.join(reel.dir, file), Buffer.from(dati.audio_base64, 'base64'));
@@ -245,7 +362,10 @@ export function montaFrasi(copione, sintetizza, {pausaTraFrasi = 0.3, attesaIniz
   let primo = true;
   for (const indici of frasi.filter(Boolean)) {
     const testi = indici.map((i) => copione.parole[i].testo);
-    const wav = leggiWav(sintetizza(testi.join(' ')));
+    // chi sintetizza può dare solo l'audio, oppure {wav, parole}: i tempi esatti di ogni parola dentro la frase
+    const reso = sintetizza(testi.join(' '));
+    const wav = leggiWav(Buffer.isBuffer(reso) ? reso : reso.wav);
+    const esatti = !Buffer.isBuffer(reso) && Array.isArray(reso.parole) && reso.parole.length === testi.length ? reso.parole : null;
     if (frequenza === null) {
       frequenza = wav.frequenza;
       canali = wav.canali;
@@ -264,11 +384,14 @@ export function montaFrasi(copione, sintetizza, {pausaTraFrasi = 0.3, attesaIniz
     const pezzo = taglia(wav, da, a);
     blocchi.push(pezzo);
     const durataPezzo = pezzo.length / (2 * canali) / frequenza;
-    const locali = distribuisciFrase(
-      testi,
-      tratti.map(([x, y]) => [x - da, y - da]),
-      durataPezzo
-    );
+    const dentro = (x) => Math.min(durataPezzo, Math.max(0, x - da));
+    const locali = esatti
+      ? esatti.map((p) => ({inizio: dentro(p.inizio), fine: dentro(p.fine)}))
+      : distribuisciFrase(
+          testi,
+          tratti.map(([x, y]) => [x - da, y - da]),
+          durataPezzo
+        );
     indici.forEach((i, k) => {
       tempi[i] = {inizio: t + locali[k].inizio, fine: t + locali[k].fine};
     });
@@ -474,7 +597,7 @@ export async function comandoVoce(slug, argomenti = []) {
   if (motore === 'elevenlabs') esito = await voceElevenLabs(copione, reel, scelte, {nuova});
   else if (motore === 'mac') esito = await voceMac(copione, reel, scelte);
   else if (motore === 'comando') esito = await voceComando(copione, reel, scelte, {nuova});
-  else esito = {tempi: stimaTempi(copione.parole, {ritmo: numeroEnv('FMLAB_RITMO_STIMA') ?? 1}), voce: null, precisione: 'stimata'};
+  else esito = {tempi: stimaTempi(copione.parole, {ritmo: numeroEnv('FMLAB_RITMO_STIMA') ?? ritmoMisurato(reel.lingua) ?? 1}), voce: null, precisione: 'stimata'};
 
   // un solo file voce per versione: via quello dell'altro formato, se c'era
   if (esito.voce) {
@@ -516,8 +639,12 @@ export async function comandoVoce(slug, argomenti = []) {
     }
   }
   // quanto è costata: così si vede subito se si stanno spendendo crediti
-  if (esito.riusata) console.log(`  crediti: 0 — testo, voce e impostazioni non sono cambiati, ho riusato la voce già generata.  (Per rifarla comunque: npm run voce ${slug}${reel.variante ? ' ' + reel.variante : ''} nuova)`);
-  else if (motore === 'elevenlabs') console.log(`  crediti: ${esito.caratteri} caratteri inviati a ElevenLabs. Finché non cambi il testo, rilanciare questo comando non ne consuma altri.`);
+  if (esito.riusata && esito.frasi) console.log(`  crediti: 0 — tutte le ${esito.frasi.deposito + esito.frasi.banca} frasi erano già pronte (${esito.frasi.banca} dalla banca).`);
+  else if (esito.riusata) console.log(`  crediti: 0 — testo, voce e impostazioni non sono cambiati, ho riusato la voce già generata.  (Per rifarla comunque: npm run voce ${slug}${reel.variante ? ' ' + reel.variante : ''} nuova)`);
+  else if (motore === 'elevenlabs' && esito.frasi) {
+    console.log(`  crediti: ${esito.caratteri} caratteri inviati a ElevenLabs per ${esito.frasi.elevenlabs} frasi; ${esito.frasi.deposito} già pagate e riusate, ${esito.frasi.banca} dalla banca (voci/frasi/). Se cambi una frase, paghi solo quella.`);
+    if (esito.frasi.senzaContesto) console.log('  Nota: questo modello non accetta il testo vicino, le frasi sono state generate una per una: ascolta se legano.');
+  } else if (motore === 'elevenlabs') console.log(`  crediti: ${esito.caratteri} caratteri inviati a ElevenLabs. Finché non cambi il testo, rilanciare questo comando non ne consuma altri.`);
   else if (motore === 'comando') console.log(`  frasi: ${esito.frasiFatte} generate (${esito.caratteri} caratteri), ${esito.frasiRiusate} riusate senza rigenerarle.`);
   else if (motore === 'mac') console.log('  crediti: 0 — la voce del Mac è gratuita.');
   console.log('  scene:');

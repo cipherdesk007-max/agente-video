@@ -257,8 +257,10 @@ Gli effetti sonori stanno in `suoni/` e si chiamano dal copione con `[suono:nome
   `CATALOGO.md`; poi `npm run catalogo` e `npm test`. Il prossimo reel lo trova già fatto. Una riga in
   `stile/appunti.md` su cosa hai imparato.
 - `npm run stato <reel>` invece di riaprire i file. Un foglio di provini invece di tante foto.
-- Tempi stimati fino alla fine; la voce a pagamento una volta sola. Rilanciare `npm run voce` con lo stesso
-  testo non costa (riusa l'audio): spostare segni ed enfasi è gratis.
+- Tempi stimati fino alla fine; la voce a pagamento una volta sola. ElevenLabs lavora frase per frase: le frasi
+  già pagate (`voci/pagate/`) e quelle della banca (`voci/frasi/`, `npm run frasi` le elenca) non si ripagano, una
+  frase cambiata costa solo i suoi caratteri. Spostare segni ed enfasi è gratis. Se nel testo c'è una frase fissa
+  quasi uguale a una della banca, **non toccarla**: dillo a chi ha scritto il testo, decide lui.
 - `render bozza` al massimo una volta, il render finale una volta: i dettagli si controllano con `foto`.
 
 ## Regole fisse

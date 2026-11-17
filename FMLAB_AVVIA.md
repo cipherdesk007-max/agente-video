@@ -559,10 +559,13 @@ La verifica controlla che lo stile scelto sia quello che si vede: con `3d` almen
 altrimenti il servizio di `FMLAB_VOCE_COMANDO`, altrimenti la voce del Mac, altrimenti la stima.
 Per forzare una volta: `npm run voce <reel> mac`.
 
-**La voce a pagamento si paga una volta.** Se testo, voce e impostazioni sono gli stessi dell'ultima volta,
-`npm run voce` riusa l'audio che c'è già e scrive `crediti: 0`. Spostare o aggiungere `[segni]` ed `*enfasi*`
-non cambia il testo: non costa niente e non serve nemmeno rilanciare la voce, il kit riallinea da solo. Con il
-motore `comando` il riuso è frase per frase. Per rifarla comunque: `npm run voce <reel> nuova`.
+**La voce a pagamento si paga una volta, frase per frase.** Con ElevenLabs e con il motore `comando` ogni frase
+è una richiesta a sé: quelle già pagate (`voci/pagate/`) si riusano, se cambi una frase paghi solo quella, e
+`npm run voce` scrive quante ne ha pagate e quante ne ha riusate. Le frasi della **banca** (`voci/frasi/`, tagliate
+da una registrazione con `npm run frasi audio.mp3 testo.txt`) non si pagano mai, purché nel testo siano scritte
+uguali e il reel usi la voce del file `.env`. Spostare o aggiungere `[segni]` ed `*enfasi*` non cambia il testo:
+non costa niente e non serve nemmeno rilanciare la voce, il kit riallinea da solo. Per rifarla comunque:
+`npm run voce <reel> nuova` (le frasi della banca restano quelle). `ELEVENLABS_FRASI=no` torna a una richiesta sola.
 
 **Effetti sonori.** Nella cartella `suoni/` ci sono otto effetti di serie, generati dal kit (nessun diritto da
 chiedere): `pop` (una cosa che compare), `clic` (un passo di una lista), `ding` (un numero importante), `whoosh`

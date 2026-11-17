@@ -118,6 +118,7 @@ video: le scene si riallineano da sole alle parole.
 | `npm run fai ginocchio testo=testo.txt "Titolo"` | dal testo al video in otto tappe; poi `npm run fai ginocchio` riparte da dove serve (`bozza` per fare prima) |
 | `npm run piano ginocchio` | controlla il piano di regia (`piano.json`) e dà il rischio cartelli da 0 a 100 |
 | `npm run regalo` | cosa si può regalare in chiusura (ebook, mappa, PDF) e come aggiungerne uno |
+| `npm run frasi audio.mp3 testo.txt` | taglia una registrazione della voce nelle sue frasi e le mette in banca: nei reel non costano (senza niente: elenco) |
 | `npm run affianca ginocchio` | dodici fotogrammi del reel accanto a dodici del video di riferimento: si guarda prima di misurare |
 | `npm run prova-cieca` | dieci spezzoni mescolati, kit e riferimenti, da far guardare a tre persone |
 | `npm run confronta ginocchio` | misura il video (novità, movimento, sottotitoli, narratore) e lo mette accanto ai riferimenti |
@@ -152,8 +153,15 @@ tempo esatto di ogni lettera, quindi bocca, sottotitoli, gesti e animazioni sono
 voce del Mac (gratuita) la sincronia è esatta sulle frasi e sulle pause.
 
 - La voce si sceglie reel per reel, dal pannello, ascoltandola prima.
-- **I crediti si spendono una volta sola**: se il testo non cambia, rigenerare la voce riusa l'audio che c'è
-  già. Spostare i punti in cui compaiono le cose non costa niente.
+- **I crediti si spendono una volta sola, frase per frase**: ogni frase generata resta in `voci/pagate/`. Se
+  cambi una frase paghi solo quella; una frase che torna uguale in un altro reel non si paga più. Spostare i punti
+  in cui compaiono le cose non costa niente. (`ELEVENLABS_FRASI=no` nel file `.env` torna a una richiesta sola per
+  tutto il testo.)
+- **La banca delle frasi** (`voci/frasi/`): le frasi fisse dei tuoi reel ("Vediamo cosa è successo.", "Commenta
+  MAPPA per…") dette una volta dalla voce dei reel. Fai leggere alla voce un testo con una frase per riga, scarica
+  l'mp3 e lancia `npm run frasi audio.mp3 testo.txt`: il kit lo taglia frase per frase. Da lì, scritte uguali, non
+  costano mai. Dalla stessa registrazione il kit misura il passo della voce e lo usa per i tempi stimati.
+  Una banca non fa dire parole nuove: per quelle serve la voce.
 - Qualsiasi altro servizio di voce si collega con un piccolo programma: `voci/COME-FARE.md`.
 
 **Musica di sottofondo.** Metti un file `musica.mp3` nella cartella del reel (un brano tuo, o di cui hai i
@@ -281,6 +289,8 @@ Scritti qui perché chi fa i reel sappia cosa non è stato ancora provato.
 
 - **Mai provato con la voce vera.** Il kit è stato finito su un computer senza chiavi: voce ElevenLabs, voce del Mac,
   velocizzazione per stare nella durata e le misure dell'audio vanno guardate al primo reel vero.
+- **La voce frase per frase è provata solo con un ElevenLabs finto.** Al primo reel vero va ascoltato se le frasi
+  legano tra loro e con quelle della banca; se non legano, `ELEVENLABS_FRASI=no`.
 - **Mai provato con un servizio di immagini vero**, e nemmeno il ritaglio dal fondo magenta su un'immagine vera.
 - **Mai provato sul Mac del 2017**: i tempi di render scritti qui (circa 14 minuti per un reel di 112 secondi) sono
   di un computer a due processori.

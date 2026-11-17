@@ -21,3 +21,5 @@ prova-cieca/
 riferimenti/*.mp4
 riferimenti/*.MP4
 riferimenti/*.mov
+# le frasi già pagate a ElevenLabs: restano sul computer che le ha generate
+voci/pagate/

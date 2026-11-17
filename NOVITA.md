@@ -2,6 +2,9 @@
 
 ## 2.0 · dal testo al reel con un comando
 
+- **Voce frase per frase** (ElevenLabs): ogni frase pagata resta in `voci/pagate/` e non si ripaga; cambiata una
+  frase si paga solo quella. **Banca delle frasi** (`npm run frasi audio.mp3 testo.txt`): le frasi fisse dei reel,
+  tagliate da una registrazione della voce, non costano mai; dalla stessa registrazione si misura il passo della voce.
 - **Pannello: un pulsante solo**, "Fai il reel" (o "Fai una bozza"): le otto tappe di `fai` una dopo l'altra, con il
   sì prima della spesa per la voce e la ripresa dalla tappa che si è fermata.
 - **Formati**: verticale 9:16, quadrato 1:1, orizzontale 16:9 (`npm run imposta <reel> formato=1:1`, o dal pannello).

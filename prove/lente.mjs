@@ -4,6 +4,7 @@
 // Si lanciano a fine fase, sul computer di lavoro. Le prove veloci sono in  npm test.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import {spawn, spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
@@ -317,6 +318,90 @@ for (const [formato, larga, alta] of [['1:1', 540, 540], ['16:9', 960, 540]]) {
     assert.match(fs.readFileSync(path.join(REELS, slug, 'verifica.md'), 'utf8'), new RegExp(`Formato ${formato}: zone sicure e narratore non controllati`));
   });
 }
+
+await prova('voce a frasi: ElevenLabs (finto) genera frase per frase; la banca e le frasi già pagate non si ripagano; cambiata una frase si paga solo quella', async () => {
+  const {spawn} = await import('node:child_process');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fmlab-frasi-'));
+  const registro = path.join(tmp, 'registro.jsonl');
+  const porta = 41000 + (process.pid % 2000);
+  const letto = () => (fs.existsSync(registro) ? fs.readFileSync(registro, 'utf8').trim().split('\n').filter(Boolean).map((r) => JSON.parse(r)) : []);
+  const avvia = (...altro) =>
+    new Promise((ok, no) => {
+      const p = spawn(process.execPath, [path.join(K, 'prove', 'sostegno', 'elevenlabs-finto.mjs'), String(porta), registro, ...altro], {stdio: ['ignore', 'pipe', 'inherit']});
+      p.stdout.once('data', () => ok(p));
+      p.once('error', no);
+    });
+  const env = {FMLAB_ELEVENLABS_URL: `http://127.0.0.1:${porta}`, ELEVENLABS_API_KEY: 'finta', ELEVENLABS_VOICE_ID: 'voce-finta', FMLAB_FRASI: path.join(tmp, 'banca'), FMLAB_FRASI_PAGATE: path.join(tmp, 'pagate'), FMLAB_VOCE_COMANDO: ''};
+  const slug = `zz-lente-frasi-${process.pid}`;
+  daCancellare.add(slug);
+  const frasi = ['Il sonno conta più di quanto pensi.', 'Vediamo cosa è successo.', 'Chi dorme poco, ricorda meno: lo dicono i numeri.', 'Commenta MAPPA per ricevere la guida.'];
+  const testo = path.join(tmp, 'testo.txt');
+  fs.writeFileSync(testo, frasi.join('\n\n'));
+  let server = await avvia();
+  try {
+    // la banca: una registrazione (finta) con due frasi, tagliata dal kit
+    const {spawnSync: lancia} = await import('node:child_process');
+    const inBanca = [frasi[1], frasi[3]];
+    fs.writeFileSync(path.join(tmp, 'banca.txt'), inBanca.join('\n\n'));
+    const pezzi = inBanca.map((f, i) => {
+      const file = path.join(tmp, `b${i}.txt`);
+      fs.writeFileSync(file, f);
+      const wav = path.join(tmp, `b${i}.wav`);
+      assert.equal(lancia(process.execPath, [path.join(K, 'prove', 'sostegno', 'voce-finta.mjs'), file, wav]).status, 0);
+      return wav;
+    });
+    const unito = path.join(tmp, 'banca.wav');
+    assert.equal(ffmpeg(['-v', 'error', '-i', pezzi[0], '-f', 'lavfi', '-t', '0.7', '-i', 'anullsrc=r=22050:cl=mono', '-i', pezzi[1], '-filter_complex', '[0][1][2]concat=n=3:v=0:a=1', '-y', unito]).status, 0);
+    const b = kit(['frasi', unito, path.join(tmp, 'banca.txt')], {env});
+    assert.equal(b.codice, 0, b.testo);
+    assert.match(b.testo, /In banca: 2 frasi/);
+    assert.match(kit(['frasi'], {env}).testo, /Vediamo cosa è successo\./);
+
+    assert.equal(kit(['nuovo', slug, 'Prova frasi', `testo=${testo}`, 'narratore=nessuno'], {env}).codice, 0);
+    const r0 = kit(['regia', slug], {env});
+    assert.equal(r0.codice, 0, r0.testo);
+    const m0 = kit(['monta', slug], {env});
+    assert.equal(m0.codice, 0, m0.testo);
+    // prima voce: due frasi da ElevenLabs, due dalla banca; a ognuna si dice cosa viene prima e dopo
+    const v1 = kit(['voce', slug, 'elevenlabs'], {env});
+    assert.equal(v1.codice, 0, v1.testo);
+    assert.match(v1.testo, /per 2 frasi; 0 già pagate e riusate, 2 dalla banca/);
+    let richieste = letto();
+    assert.deepEqual(richieste.map((x) => x.testo), [frasi[0], frasi[2]]);
+    assert.equal(richieste[0].dopo, frasi[1]);
+    assert.equal(richieste[1].prima, frasi[1]);
+    const dati = JSON.parse(fs.readFileSync(path.join(REELS, slug, 'parole.json'), 'utf8'));
+    assert.equal(dati.parole.length, frasi.join(' ').split(' ').length);
+    dati.parole.forEach((p, i) => assert.ok(p.fine > p.inizio && (i === 0 || p.inizio >= dati.parole[i - 1].inizio), `tempi in disordine alla parola ${i}`));
+    assert.ok(fs.existsSync(path.join(REELS, slug, dati.voce)), 'manca il file della voce');
+    // seconda volta: niente da pagare
+    const v2 = kit(['voce', slug, 'elevenlabs'], {env});
+    assert.match(v2.testo, /crediti: 0 — tutte le 4 frasi erano già pronte \(2 dalla banca\)/);
+    assert.equal(letto().length, 2);
+    // cambia una frase sola: si paga solo quella
+    const copione = path.join(REELS, slug, 'copione.md');
+    assert.match(fs.readFileSync(copione, 'utf8'), /pensi\./);
+    fs.writeFileSync(copione, fs.readFileSync(copione, 'utf8').replace(/pensi\./, 'credi.'));
+    fs.writeFileSync(path.join(REELS, slug, 'testo.txt'), fs.readFileSync(path.join(REELS, slug, 'testo.txt'), 'utf8').replace('più di quanto pensi', 'più di quanto credi'));
+    const v3 = kit(['voce', slug, 'elevenlabs'], {env});
+    assert.equal(v3.codice, 0, v3.testo);
+    assert.match(v3.testo, /per 1 frasi; 1 già pagate e riusate, 2 dalla banca/);
+    richieste = letto();
+    assert.equal(richieste.length, 3);
+    assert.equal(richieste[2].testo, 'Il sonno conta più di quanto credi.');
+    // un modello che non accetta il testo vicino: la richiesta si rifà senza, e lo si dice
+    server.kill();
+    fs.rmSync(registro, {force: true});
+    server = await avvia('rifiuta');
+    const v4 = kit(['voce', slug, 'elevenlabs', 'nuova'], {env});
+    assert.equal(v4.codice, 0, v4.testo);
+    assert.match(v4.testo, /non accetta il testo vicino/);
+    assert.deepEqual(letto().map((x) => x.accettata), [false, true, true]);
+  } finally {
+    server.kill();
+    fs.rmSync(tmp, {recursive: true, force: true});
+  }
+});
 
 cancella();
 const falliti = esiti.filter((e) => !e.ok);
