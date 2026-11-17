@@ -1289,6 +1289,41 @@ await prova('B34 · docs/ESEMPIO-PIANO.md: tutte le scene di reta-testo, in ordi
   assert.ok(guida.includes(`La prima frase ha ${prima} parole`), 'la guida dichiara l\'aggancio lungo');
 });
 
+// ───────────────────────── B35 · contro i riferimenti (docs/TARGETS.md) ─────────────────────────
+
+await prova('B35 · docs/TARGETS.md: una riga per ogni misura del metro; riferimenti e soglie sono quelli di riferimenti/misure.json; ogni riga dice perché; il riassunto torna con la tabella', async () => {
+  const {VOCI} = await carica('motore/confronta.mjs');
+  const misure = JSON.parse(fs.readFileSync(path.join(K, 'riferimenti/misure.json'), 'utf8'));
+  const guida = fs.readFileSync(path.join(K, 'docs/TARGETS.md'), 'utf8');
+  const righe = new Map(guida.split('\n').filter((r) => r.startsWith('| ') && !r.startsWith('| Misura')).map((r) => { const c = r.split('|').map((x) => x.trim()); return [c[1], c.slice(2, 7)]; }));
+  const prendi = (o, c) => c.split('.').reduce((a, b) => (a == null ? undefined : a[b]), o);
+  const s = (v) => String(v).replace('.', ',');
+  const numero = (t) => (t === 'non misurata' ? null : Number(t.replace(',', '.')));
+  assert.equal(righe.size, VOCI.length, 'una riga per ogni misura del metro');
+  const conto = {'reta-testo': [0, 0, 0], 'mots-c': [0, 0, 0]};
+  for (const [chiave, etichetta, unita] of VOCI) {
+    const riga = righe.get(etichetta);
+    assert.ok(riga, `manca la misura "${etichetta}"`);
+    const [riferimenti, soglia, reta, mots, perche] = riga;
+    const valori = Object.values(misure.riferimenti).map((r) => prendi(r, chiave));
+    const [basso, alto] = [Math.min(...valori), Math.max(...valori)];
+    const un = unita && unita !== '0-1' ? ` ${unita}` : '';
+    assert.equal(riferimenti, `${basso === alto ? s(basso) : `da ${s(basso)} a ${s(alto)}`}${un}`, `${etichetta}: i riferimenti`);
+    const sg = misure.soglie[chiave];
+    assert.equal(soglia, sg.min !== undefined && sg.max !== undefined ? `da ${s(sg.min)} a ${s(sg.max)}` : sg.min !== undefined ? `almeno ${s(sg.min)}` : `al massimo ${s(sg.max)}`, `${etichetta}: la soglia`);
+    assert.ok(perche.length >= 20, `${etichetta}: manca il perché`);
+    for (const [reel, testo] of [['reta-testo', reta], ['mots-c', mots]]) {
+      const v = numero(testo);
+      assert.ok(v === null || Number.isFinite(v), `${etichetta}: "${testo}" non è un valore`);
+      conto[reel][v === null ? 2 : (sg.min === undefined || v >= sg.min) && (sg.max === undefined || v <= sg.max) ? 0 : 1] += 1;
+    }
+  }
+  for (const [reel, [dentro, fuori, senza]] of Object.entries(conto)) {
+    assert.match(guida, new RegExp(`\`${reel}\`: ${dentro}( misure)? dentro( le soglie)?, ${fuori} fuori[^\n]*, ${senza} non misurabili`), `${reel}: il riassunto non torna con la tabella (${dentro} dentro, ${fuori} fuori, ${senza} non misurabili)`);
+  }
+  assert.doesNotMatch(guida, /\bvoto\b|\/10\b|ottimo|eccellente/i, 'niente voti: fatti');
+});
+
 if (pannello) await pannello.server.chiudi();
 cancella();
 const falliti = esiti.filter((e) => !e.ok);
