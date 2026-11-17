@@ -15,6 +15,7 @@ FMLAB Reel Kit — comandi
   npm run fai <reel> [testo=file "Titolo"]  DAL TESTO AL VIDEO, a tappe: regia, monta, tempi, provini | voce, render, verifica,
                                            confronta. Riparte dalla tappa fallita; si ferma prima di spendere (voce=si per dire sì).
                                            Con testo=<file.txt> crea il reel; scelte: durata=60 narratore=nessuno regalo=mappa · bozza
+  npm run affianca <reel> [rif1|rif2|rif3]  IL GIUDICE: 12 fotogrammi del reel accanto a 12 del riferimento, stessi momenti
   npm run regia <reel> [nuova]             scrive il piano di regia di serie (piano.json) dal testo: una base da migliorare
   npm run piano [reel]                     controlla il piano e il suo "rischio cartelli" (senza reel: blocchi, luoghi, camere)
   npm run monta <reel>                     piano.json → copione.md + scene.tsx (il testo resta parola per parola)
@@ -126,6 +127,10 @@ async function principale() {
     case 'confronta': {
       const {comandoConfronta} = await import('./confronta.mjs');
       return comandoConfronta(argomenti);
+    }
+    case 'affianca': {
+      const {comandoAffianca} = await import('./affianca.mjs');
+      return comandoAffianca(argomenti);
     }
     case 'piano': {
       const {comandoPiano} = await import('./piano.mjs');

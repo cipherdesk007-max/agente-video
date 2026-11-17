@@ -710,6 +710,19 @@ await prova('rischio cartelli: una fila di scritte con la camera ferma non arriv
   assert.ok(esito.rischio.voci.some((v) => v.nome === 'camera ferma') && esito.rischio.voci.some((v) => v.nome === 'scene di sole scritte'));
 });
 
+// ───────────────────────── il giudice è l'occhio: il foglio affiancato ─────────────────────────
+
+await prova('affianca: stessi momenti = stessa frazione della durata; senza il video di riferimento lo dice e dice dove metterlo', async () => {
+  const {momenti, trovaRiferimento, paginaAffianca} = await carica('motore/affianca.mjs');
+  assert.deepEqual(momenti(120, 12).map((t) => Math.round(t)), [5, 15, 25, 35, 45, 55, 65, 75, 85, 95, 105, 115]);
+  assert.deepEqual(momenti(60, 12).map((t) => t * 2), momenti(120, 12));
+  assert.throws(() => trovaRiferimento('rif-che-non-esiste'), /Non trovo il video di riferimento "rif-che-non-esiste"/);
+  const html = paginaAffianca({titolo: 'T', sotto: 'S', coppie: [{kit: 'data:a', rif: 'data:b', tKit: 4.72, tRif: 2.3}]});
+  assert.match(html, /KIT 4,7 s/);
+  assert.match(html, /RIF 2,3 s/);
+  assert.ok(html.indexOf('data:a') < html.indexOf('data:b'), 'il kit sta a sinistra');
+});
+
 if (pannello) await pannello.server.chiudi();
 cancella();
 const falliti = esiti.filter((e) => !e.ok);

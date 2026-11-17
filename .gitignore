@@ -7,6 +7,7 @@ node_modules/
 reels/*/provini/
 reels/*/provini.jpg
 reels/*/provini.*.jpg
+reels/*/affianca*.jpg
 reels/*/*.mp4
 reels/*/verifica.md
 reels/*/verifica.*.md
