@@ -624,16 +624,18 @@ function Chiusura() {
 export default definisciReel({
   titolo: 'Reta e dolore al ginocchio: quanto è merito del farmaco?',
   atmosfera: {tinta: '#19C7A4'},
+  // il protagonista: la catena della Reta. Resta in scena dall'inizio alla fine e cambia stato con il racconto.
+  protagonista: {tipo: 'peptide', colore: RETA},
   scene: {
-    aggancio: {componente: Aggancio, atmosfera: {tinta: '#E8455A'}},
-    studi: {componente: Studi, atmosfera: {tinta: '#2A78E8'}},
-    scala: {componente: Scala, atmosfera: {tinta: '#C99A2E'}},
-    risultati: {componente: Risultati, atmosfera: {tinta: '#19C7A4'}},
-    applauso: {componente: Applauso, atmosfera: {tinta: '#7A62F0', raggi: 0.7}},
-    differenza: {componente: Differenza, atmosfera: {tinta: '#19C7A4'}},
-    rischi: {componente: Rischi, atmosfera: {tinta: '#E8455A'}},
-    conclusione: {componente: Conclusione, atmosfera: {tinta: '#19C7A4', raggi: 0.6}},
-    amico: {componente: Amico, atmosfera: {tinta: '#2A78E8'}},
-    chiusura: {componente: Chiusura, atmosfera: {tinta: '#19C7A4', raggi: 0.8}},
+    aggancio: {componente: Aggancio, atmosfera: {tinta: '#E8455A', luogo: 'corpo'}, protagonista: {x: 250, y: 1392, grandezza: 0.62, acceso: 1, carica: 1, onda: 0.6}},
+    studi: {componente: Studi, atmosfera: {tinta: '#2A78E8', luogo: 'studio'}, entra: 'destra', protagonista: {onda: 0.3}},
+    scala: {componente: Scala, atmosfera: {tinta: '#C99A2E', luogo: 'laboratorio'}, protagonista: {carica: 0.45, acceso: 0.75}},
+    risultati: {componente: Risultati, atmosfera: {tinta: '#19C7A4', luogo: 'bilancia'}, protagonista: {carica: 1, acceso: 1, onda: 0.7}},
+    applauso: {componente: Applauso, atmosfera: {tinta: '#7A62F0', raggi: 0.7, luogo: 'palco'}, entra: 'basso', protagonista: {acceso: 0.12, onda: 0.2}},
+    differenza: {componente: Differenza, atmosfera: {tinta: '#19C7A4', luogo: 'bilancia'}, protagonista: {acceso: 1, carica: 0.5, onda: 0.5}},
+    rischi: {componente: Rischi, atmosfera: {tinta: '#E8455A', luogo: 'vaso'}, protagonista: {colore: DOLORE, onda: 1.6, acceso: 1}},
+    conclusione: {componente: Conclusione, atmosfera: {tinta: '#19C7A4', raggi: 0.6, luogo: 'membrana'}, protagonista: {colore: RETA, onda: 0.5, carica: 1}},
+    amico: {componente: Amico, atmosfera: {tinta: '#2A78E8', luogo: 'stadio'}, entra: 'sinistra', protagonista: {grandezza: 0.52}},
+    chiusura: {componente: Chiusura, atmosfera: {tinta: '#19C7A4', raggi: 0.8, luogo: 'vuoto'}, protagonista: {grandezza: 0.62, onda: 0.9}},
   },
 });
