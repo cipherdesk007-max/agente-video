@@ -1,13 +1,13 @@
 # Stato dei lavori
 
-Incarico: `BRIEF_AGENTE.md`. Difetti: `BUG.md`. Aggiornato il 17/11/2026.
+Incarico: `BRIEF_AGENTE.md`. Difetti: `BUG.md`. Aggiornato il 17/11/2026 (fase 3 in corso).
 
 | Fase | Stato | Controllo |
 |---|---|---|
 | 0 · Diagnosi | **chiusa** (un punto da confermare sul Mac, vedi sotto) | prove veloci, collaudo e prove lente verdi; nessun difetto grave aperto |
 | 1 · Il metro | **chiusa** | `npm run confronta` dà gli stessi numeri due volte; le soglie stanno in `riferimenti/misure.json` |
 | 2 · Motore delle scene | **chiusa** (controllo superato; tre punti aperti, vedi sotto) | `reta-ginocchio` rifatto: tagli, novità e palco dentro le soglie; render misurato |
-| 3 · Il regista | da fare | — |
+| 3 · Il regista | **in corso**: il percorso dal testo al video c'è ed è provato; restano formati, lingue senza spazi, pannello | tre testi di prova (salute, tecnologia, economia) dal testo al video con un comando: passa (`npm run prove:lente regista`, 3 minuti), in bozza, senza narratore e senza voce |
 | 4 · Rifinitura | da fare | — |
 
 ## Fase 0 · cosa è chiuso
@@ -217,6 +217,114 @@ soglie dei riferimenti, numeri e fonti, pannello dal telefono).
   cambiato (cambi di posa al minuto 15,7 → 14,1), perché nel suo riquadro ora passa il fondo. Da sistemare nel metro
   prima di giudicare il narratore in fase 4.
 
+## Fase 3 · il regista (17/11/2026, in corso)
+
+**Decisione di Francesco (17/11):** il regista è sempre l'agente che lavora sul kit, non un modello chiamato dal
+kit. Quindi niente fornitore di linguaggio in `.env`: l'incarico lo prevedeva, la scelta lo toglie. Il kit dà
+all'agente un solo file da scrivere e tutti i controlli per sapere se l'ha scritto bene.
+
+Cosa c'è:
+
+- **`piano.json`**, il piano di regia: per ogni scena le prime parole (`da`), il blocco e i suoi dati, i segni come
+  "nome → parola del testo", enfasi, suoni, luogo, ingresso, inquadratura, movimento di camera, stato del
+  protagonista, posa del narratore, e il perché della scena. `npm run monta` scrive `copione.md` e `scene.tsx`.
+  26 blocchi, 18 oggetti 3D che cambiano stato su un segno, scene a mano in `mano.tsx`.
+- **Il testo non si tocca**, e lo garantisce il montaggio: dopo aver scritto il copione lo rilegge e lo confronta
+  con `testo.txt` parola per parola.
+- **`npm run piano`**: errori che dicono scena, campo e cosa fare; consigli (pause oltre 3,5 secondi, segni che non
+  fanno comparire niente, quattro scene uguali di fila, camera ferma, numeri senza fonte); **rischio cartelli** da
+  0 a 100 su sette voci. Con i tempi veri della voce i consigli si ricalcolano su quelli.
+- **`npm run regia`**, il regista di serie: regole, niente rete, niente spesa. Dà un piano valido da cui partire.
+- **`npm run fai`**: otto tappe salvate, in due tempi (composizione gratis, poi voce e video). Riparte dalla tappa
+  fallita. Si ferma prima della voce a pagamento con il costo. Dice "fatto" solo se la verifica passa.
+- **Scelte della persona**: `durata=`, `narratore=dottore|nessuno`, `regalo=auto|nessuno|<nome>`, in coda a `fai` o
+  con `imposta`. I regali (ebook, mappe, PDF) si aggiungono con `npm run regalo`, anche da un PDF.
+- **Ogni scena è una ripresa**: `campo` e `camera` per scena, il fondo che segue la camera.
+
+### Il controllo dell'incarico: tre testi lontani, un comando ciascuno
+
+`npm run prove:lente regista`: un testo di salute, uno di tecnologia, uno di economia (in `prove/sostegno/testi/`),
+ognuno con `npm run fai <reel> testo=<file> … bozza`. Per ciascuno: otto tappe riuscite, verifica senza errori, le
+parole dette uguali al testo dato, e rilanciando il comando nessuna tappa viene rifatta. Circa un minuto a testo.
+**Limiti di questa prova:** è una bozza a metà risoluzione, senza narratore e senza voce (tempi stimati), e il
+piano è quello di serie, che usa quasi solo scritte in movimento. Dimostra che il percorso regge da solo, non che
+il risultato sia al livello dei riferimenti: quello lo fa il piano scritto da chi fa la regia (tabella qui sotto).
+
+### Il testo di Francesco, dal testo al video (`reels/reta-testo`)
+
+Il testo incollato il 17/11 (284 parole), prima con il piano di serie, poi con il piano scritto da chi fa la regia
+(dodici scene, due giri di correzione guardando i provini). Tempi stimati, senza voce, narratore dottore.
+
+| Misura (`npm run confronta`) | `reta-ginocchio` fase 2 | piano di serie | piano di regia | soglia |
+|---|---|---|---|---|
+| Tagli | 0 | 0 | 0 | 0 |
+| Secondi tra due novità (mediana) | 1,95 | 2,10 | **1,93** | al massimo 2,01 |
+| Secondi tra due novità (9 su 10) | 3,15 | 3,88 | **2,83** | al massimo 4,16 |
+| Movimento sul palco | 1,49% | 2,33% | **1,74%** (fuori) | almeno 2,98% |
+| Tempo con il palco fermo | 0,1% | 0,1% | 0,1% | al massimo 7,4% |
+| Palco occupato (media) | 0,54 | 0,52 | 0,50 | almeno 0,36 |
+| Misure dentro le soglie | 19 su 23 | 17 su 23 | 18 su 23 | — |
+| Rischio cartelli del piano | — | medio | 8 su 100 (basso) | sotto 35 |
+
+Render: 11 minuti 49 secondi su questo computer (due processori), 3.371 fotogrammi. Verifica: passata, 5 avvisi (tempi stimati, durata oltre 90 secondi, prima frase di 20 parole, una scritta fuori zona a 54,5 s, stile 2D con oggetti 3D).
+
+Letta la tabella:
+
+- **Novità**: l'attesa più lunga senza niente di nuovo scende da 8,1 secondi (piano di serie) a 3,6. È l'effetto
+  del controllo sulle pause, ricalcolato sui tempi veri.
+- **Movimento sul palco: ancora fuori, 1,74% contro almeno 2,98%.** Il 2,33% del piano di serie non è un risultato
+  da tenere: era misurato con movimenti di camera più ampi, che spingevano le scritte fuori dalle zone sicure
+  (cinque avvisi), e sono stati ridotti. Inquadratura e camera da sole non bastano: nei riferimenti si muovono
+  oggetti grandi e illustrati. Servono scene con più cose in moto (oggetti 3D che girano sempre, grafici che non
+  si fermano dopo essere comparsi) oppure materiale filmato.
+- **Sottotitoli con altro nella loro fascia: 52,4% contro al massimo 51,75%.** Appena fuori: è il fondo che ora
+  segue la camera e porta i suoi fili dentro la fascia. Da abbassare insieme al punto sopra.
+- **Narratore**: tre misure fuori, come prima. Non è stato toccato (fase 4).
+
+**Dubbi sui fatti del testo** (il testo non è stato toccato; sono scritti in `reels/reta-testo/fonti.md`):
+"diminuito di quasi quattro punti" vale per un solo gruppo (3,96; gli altri da 3,22 a 3,74); "effetti collaterali
+gravi… soprattutto gastrointestinali" unisce due cose che le fonti tengono distinte.
+
+### Da dove viene cosa (licenze)
+
+- **LTX-2.5**: studiato il modo di descrivere una ripresa, niente codice, niente modello nel kit. Non può girare sul
+  MacBook del 2017 (pesi di circa 66 GB, schede NVIDIA). Francesco ha chiarito che va studiato, non integrato.
+- **OpenMontage** (licenza AGPL-3.0): letti `lib/slideshow_risk.py`, `skills/pipelines/explainer/scene-director.md`
+  e `skills/meta/reviewer.md`. Nel kit **non c'è nessun file loro e nessuna riga copiata**: il rischio cartelli e le
+  regole di varietà sono riscritti qui, in un altro linguaggio, su dati diversi (il piano del kit). Francesco ha
+  detto che il kit è privato e che si può prendere anche il codice: finora non è servito. Se un giorno si copia un
+  loro file, va scritto qui con il percorso, perché da quel momento chi riceve il kit ha diritto al sorgente.
+- La tabella di cosa è diventato cosa è in `riferimenti/ANALISI.md`.
+
+### Scelte della fase 3, e perché
+
+- **Il piano è un file di dati, le scene si scrivono da sole.** Un agente che scrive codice sbaglia in mille modi e
+  ogni errore si scopre al render; un piano sbagliato si scopre in mezzo secondo, con il nome della scena.
+- **Il regista di serie non mette cifre a schermo.** Una cifra è un dato e vuole la sua riga in `fonti.md`; lui la
+  fonte non ce l'ha. Scrive i numeri come li dice il testo. Le cifre le mette chi fa la regia, con la fonte.
+- **Testo dato senza indirizzi in `fonti.md`: avviso, non errore.** I fatti di un testo già scritto sono di chi l'ha
+  scritto. I numeri messi a schermo restano obbligati alla loro riga: quello è ancora un errore.
+- **Il `**grassetto**` incollato diventa enfasi.** Gli asterischi non sono parole. `testo.txt` resta com'è stato dato.
+- **Le pause si contano a voce lenta** (2,6 parole al secondo) finché non ci sono i tempi veri: chi rispetta la
+  pausa sul piano la rispetta anche dopo la voce.
+- **La camera di scena non ingrandisce mai oltre il disegno.** Alla prima prova allargava le scene e le scritte
+  uscivano dalle zone sicure (cinque avvisi della verifica): ora la scala è al più 1.
+- **"Si corregge da solo" è diventato "dice esattamente cosa correggere".** Con l'agente come regista, il giro di
+  correzione lo fa lui: `piano` e `verifica` gli dicono scena e motivo, `SCHEDA.md` fissa due giri al massimo.
+
+### Non fatto nella fase 3, e non provato
+
+- **Formati 1:1 e 16:9**: non iniziati. Tutto il kit ragiona in 1080×1920.
+- **Lingue senza spazi** (B12): aperto. Il piano cerca le parole dividendo sugli spazi.
+- **Pannello**: scrive la richiesta giusta per l'agente, ma non ha il pulsante unico con le tappe di `fai`.
+- **Preventivo di spesa**: `fai` si ferma solo prima della voce ElevenLabs. Le immagini generate restano spente di serie.
+- **Nessun agente diverso da chi ha scritto il kit ha ancora fatto un reel seguendo solo `SCHEDA.md`.** È la prova
+  che conta e va fatta sul Mac: dare a Codex un testo e guardare se arriva in fondo senza aiuto.
+- Il metro conta peggio le parole dei sottotitoli con il fondo in movimento (punto aperto dalla fase 2): i numeri
+  dei sottotitoli e del narratore nella tabella sopra non sono affidabili.
+- Voce vera e riconoscimento della voce: non provati (servono sul Mac). Strada gratuita vista in OpenMontage:
+  Piper per la voce, WhisperX per il controllo "detto = scritto".
+
 ## Da decidere (Francesco)
 
 1. **Voce vera per misurare un reel del kit** (volume, musica, anticipo dei sottotitoli, parole al minuto): serve
@@ -228,11 +336,11 @@ soglie dei riferimenti, numeri e fonti, pannello dal telefono).
 3. **Chiavi per le immagini** (Higgsfield, che hai già): per provare `npm run immagine` con il servizio vero
    servono `HF_API_KEY_ID` e `HF_API_KEY_SECRET` nel file `.env` del Mac, e il permesso di spendere i crediti di
    qualche immagine di prova.
-4. **Chi scrive il piano di regia nella fase 3**: un modello che gira sul Mac (gratis, ma sul MacBook del 2017 è
-   lento e va installato) oppure un servizio a pagamento con la chiave in `.env` (pochi centesimi a reel).
+4. ~~Chi scrive il piano di regia~~: deciso il 17/11, lo scrive l'agente.
+5. **La prova con un altro agente sul Mac**: dare a Codex un testo e la frase "fai il reel" e guardare se arriva al
+   video seguendo solo `SCHEDA.md`. Costa tempo, non crediti (con la voce del Mac o senza voce).
 
 ## Prossimo passo
 
-Fase 3, il regista: dal testo incollato al piano di regia (`piano.json`) e alle scene, senza un agente esterno.
-Prima scelta da fare lì: quale modello scrive il piano (uno locale sul Mac, o uno a pagamento con la chiave in
-`.env`). È una spesa o un'installazione: va chiesta.
+Chiudere la fase 3: formati 1:1 e 16:9, lingue senza spazi (B12), pulsante unico nel pannello con le tappe di
+`fai`. Prima di tutto, però, il numero che resta fuori: il movimento sul palco (vedi tabella della fase 3).

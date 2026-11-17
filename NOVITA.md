@@ -1,5 +1,23 @@
 # Novità
 
+## Verso la 2.0 · fase 3: il regista (in corso)
+
+- **Il piano di regia** (`reels/<reel>/piano.json`): chi fa la regia scrive un file solo. Scene, cosa si vede, su
+  quale parola compare ogni cosa, luogo, inquadratura, movimento di camera, protagonista, suoni. `npm run monta` ne
+  ricava `copione.md` (il testo dato, parola per parola) e `scene.tsx`: nessuno scrive codice. `npm run piano` lo
+  controlla e dà il **rischio cartelli** da 0 a 100: se è alto il render non parte.
+- **`npm run fai <reel>`**: dal testo al video in otto tappe salvate (regia, monta, tempi, provini | voce, render,
+  verifica, confronta). Riparte dalla tappa fallita, si ferma prima della voce a pagamento e dice quanto costa, e
+  dice "fatto" solo se la verifica passa. Con `testo=<file.txt>` crea anche il reel.
+- **Il regista di serie** (`npm run regia`): da un testo scrive un primo piano valido, con regole, senza rete e senza
+  spesa. È la base che poi si migliora.
+- **Ogni scena è una ripresa**: `campo` (largo, medio, stretto) e `camera` (spinta, indietro, destra, sinistra, sale,
+  scende, gira). Il fondo segue la camera più forte della scena (parallasse); niente esce dalle zone sicure.
+- **Regali a scelta in chiusura** (`npm run regalo`, impostazione `regalo=`): ebook, mappe, PDF, ognuno con la sua
+  copertina sul tablet 3D; il tablet può fare un giro su una parola.
+- **`bloccoParole`**: le parole che contano una alla volta, ognuna sulla sua parola.
+- Il **grassetto** di un testo incollato (`**parola**`) diventa enfasi nei sottotitoli e non viene letto.
+
 ## Verso la 2.0 · fase 2: il motore delle scene illustrate (in corso)
 
 - **Il mondo a livelli** dietro ogni scena (`libreria/Mondo.tsx`): trama lontana e vicina, luogo disegnato, luce,
