@@ -1,6 +1,6 @@
 # Stato dei lavori
 
-Incarico: `BRIEF_AGENTE.md`. Difetti: `BUG.md`. Aggiornato il 17/11/2026 (fase 3 in corso).
+Incarico: `BRIEF_AGENTE.md`. Difetti: `BUG.md`. Aggiornato il 17/11/2026 (fase 3 in corso; il giudice è l'occhio: vedi la sezione con questo nome).
 
 | Fase | Stato | Controllo |
 |---|---|---|
@@ -325,6 +325,102 @@ gravi… soprattutto gastrointestinali" unisce due cose che le fonti tengono dis
 - Voce vera e riconoscimento della voce: non provati (servono sul Mac). Strada gratuita vista in OpenMontage:
   Piper per la voce, WhisperX per il controllo "detto = scritto".
 
+## Il giudice è l'occhio (17/11/2026, seconda parte)
+
+Indicazione di Francesco: prima si guarda, poi si misura. Sette punti; qui cosa è fatto, cosa no, e cosa si vede.
+
+| Punto | Stato | Guardato a fotogrammi |
+|---|---|---|
+| 1 · `npm run affianca` | fatto | sì: il foglio è il controllo di tutto il resto |
+| 2 · Movimento con oggetti grandi in primo piano | fatto: 3,43% sul video intero (soglia 2,98%) | sì, dodici coppie e i passaggi a 0,2 s |
+| 3 · Narratore: metro, poi pose | metro corretto; pose: 42,7 cambi al minuto; resta fuori la posa più lunga | solo in parte: vedi sotto |
+| 4 · `npm run prova-cieca` | costruita; **nessuna persona l'ha ancora fatta** | la pagina sì, il verdetto no |
+| 5 · Chiudere la fase 3 | **non fatto**: pulsante unico, formati 1:1 e 16:9, B12, B17. Chiusi B18, B19, B20 | — |
+| 6 · Illustrazioni vere, senza spendere | fatto: foglio di stile, elenco, comandi, costo stimato | il foglio di stile è scritto sui fotogrammi di riferimento |
+| 7 · `BRIEF_AGENTE.md` | aggiornato | — |
+
+### Cosa ha detto il primo foglio affiancato
+
+`reta-testo` accanto a `rif3.mp4` (il riferimento sullo stesso argomento), dodici momenti. Il kit perdeva su cinque
+cose, tutte visibili senza metro:
+
+1. **Soggetto.** Di là un oggetto grande e illustrato per momento; di qua blocchi piccoli da cruscotto e molto vuoto.
+2. **Continuità.** Di là tornano gli stessi oggetti (due ginocchia, due batterie); di qua ogni scena cambiava grafica.
+3. **Scritte.** Di là solo etichette a pillola; di qua elenchi e righe da leggere.
+4. **Fondo.** Di là una nebbia uniforme; di qua i luoghi disegnati al tratto facevano concorrenza al contenuto.
+5. **Narratore.** Di là più grande e con un gesto diverso a ogni momento; di qua più piccolo e quasi sempre col dito.
+
+### Cosa è cambiato
+
+- **`bloccoSoggetti`** (`libreria/Soggetti.tsx`): da uno a tre soggetti larghi da 360 a 800 pixel (ginocchio,
+  quadrante, batteria, stomaco, riflettori, foglio, scale, un'icona, o un'illustrazione generata), con bagliore che
+  respira, scintille in orbita, un riflesso che li attraversa, un colpo di luce a ogni cambio di stato, e
+  un'etichetta a pillola. È tutto primo piano: al fondo non è stato aggiunto movimento.
+- **`reta-testo` rifatto attorno ai soggetti**: tredici scene, dieci con soggetti. Le due ginocchia Reta/Placebo
+  aprono e chiudono; quadrante, due quadranti, riflettori, due batterie, stomaco, pagina dello studio, ginocchio e scale.
+- **I luoghi disegnati sono stati tolti da questo reel** (`"luogo": "vuoto"` in tutte le scene). Guardando il foglio
+  facevano peggio: i riferimenti non hanno luoghi, hanno una nebbia. Il lavoro della fase 2 sui luoghi resta nel kit
+  ma, onestamente, a occhio non serve così com'è.
+- **Narratore**: una posa nuova a ogni inizio di frase, dopo ogni virgola, su ogni segno e a metà dei tratti lunghi
+  (prima: una per frase, tenuta almeno 2,2 secondi). La posa chiesta dalla regia è la posa di casa della scena.
+
+### I numeri, dopo aver guardato (`reta-testo`, video intero, tempi stimati)
+
+| Misura | prima (piano di regia a blocchi) | adesso (soggetti) | soglia |
+|---|---|---|---|
+| Movimento sul palco | 1,74% | **3,43%** | almeno 2,98% |
+| Secondi tra due novità (mediana) | 1,93 | 1,95 | al massimo 2,01 |
+| Secondi tra due novità (9 su 10) | 2,83 | 3,5 | al massimo 4,16 |
+| Sottotitoli con altro nella loro fascia | 52,4% | **32,7%** | al massimo 51,75% |
+| Narratore: cambi di posa al minuto | 12,3 | **42,7** | almeno 34,9 (metro 2) |
+| Narratore: stessa posa, mediana | 4,3 s | **1,2 s** | al massimo 1,61 s |
+| Narratore: posa più lunga | 14,8 s | 6,9 s nel video intero; 4,5 s dopo la correzione (fuori) | al massimo 3,34 s (metro 2) |
+| Misure dentro le soglie | 18 su 23 | **22 su 23** | — |
+
+Come leggerli, senza farsi belli:
+
+- **Il foglio affiancato è migliorato insieme ai numeri**, e si vede: stessi oggetti dei riferimenti, alla stessa
+  scala, con la stessa etichetta. Non è migliorato in tre cose che il metro non vede: il colore (più freddo), il
+  narratore (più piccolo), la materia dei soggetti (disegno piatto contro illustrazione con volume).
+- **Le novità erano peggiorate a metà strada.** Con i soggetti ma senza il colpo di luce sui cambi di stato la
+  mediana era salita a 2,45 s e i 9 su 10 a 4,27 s: fuori soglia tutte e due. Un quadrante che scivola da 6 a 2 non
+  "compare", cambia piano. Il colpo (anello di luce e scatto) ha riportato le misure dentro, e a fotogrammi si vede.
+- **Posa più lunga del narratore: ancora fuori.** Il video intero è stato misurato prima dell'ultima correzione e
+  dava 6,9 s: era il dito in alto tenuto per tutto l'invito finale. Dopo la correzione, misurato solo il tratto
+  finale (da 98 s alla fine): 4,5 s contro 3,34. Sono le ultime parole più il secondo e mezzo di coda in silenzio,
+  con il dito in alto. Il video intero non è stato rifatto dopo quella correzione.
+- **Costo:** il render è passato da 11 min 49 s a 13 min 39 s su questo computer (ogni soggetto si disegna due
+  volte, per il riflesso). Sul Mac del 2017 non è misurato.
+- Verifica: passata, 3 avvisi (tempi stimati, durata oltre 90 secondi, prima frase di 20 parole).
+
+### Il metro del narratore (versione 2)
+
+Con il fondo in movimento la versione 1 contava i contorni dei fili dietro al narratore. Ora, prima di cercare i
+contorni, tutto quello che è più scuro di una soglia (78 su 255) si spegne: resta la figura. Controllo fatto:
+lo stesso tratto di `reta-ginocchio` (da 20 a 50 secondi) reso con il mondo in movimento e con il fondo fermo dà
+**gli stessi 18 cambi di posa**, 36 al minuto, posa più lunga 3,7 s in entrambi (mediana 1,5 e 1,4). Le soglie sono
+state ricalcolate sui tre riferimenti: cambi al minuto da 34 a 34,9; pose diverse da 4,25 a 5,1; posa più lunga da
+3,80 a 3,34 secondi. Le altre non cambiano.
+
+### La prova cieca
+
+`npm run prova-cieca` fa una pagina sola (si apre dal telefono) con dieci spezzoni di cinque secondi, cinque dai
+riferimenti e cinque dal kit resi al momento, solo il palco. **Non l'ha fatta nessuno**: servono tre persone.
+Il mio parere, che non vale come prova: oggi si distinguono. I soggetti del kit sono disegni vettoriali piatti con
+un alone; quelli dei riferimenti sono illustrazioni con volume e materia. E le scritte sono in italiano di qua e
+in inglese di là: chi legge indovina senza guardare.
+
+### Non fatto, e perché
+
+- **Punto 5**: pulsante unico nel pannello, formati 1:1 e 16:9, B12 (lingue senza spazi), B17 (`package-lock.json`:
+  serve la rete, qui non c'è: sul Mac `npm install --package-lock-only` e poi salvarlo). Non iniziati.
+- **Il colore.** Il verde del kit è acqua (160°), quello dei riferimenti è lime (105°): sul foglio il kit è più
+  freddo. È il colore della pagina, decide Francesco (`stile/FOGLIO_IMMAGINI.md`).
+- **Il protagonista** (la catenella in basso a sinistra) nei riferimenti non c'è. Sul foglio sembra un di più. È
+  rimasto perché metà dei momenti "nuovi" del piano erano suoi cambi di stato: toglierlo va fatto con il piano.
+- **Il narratore resta più piccolo** di quello dei riferimenti. Non toccato.
+- **B19** è provato sul calcolo, non su un video in tedesco.
+
 ## Da decidere (Francesco)
 
 1. **Voce vera per misurare un reel del kit** (volume, musica, anticipo dei sottotitoli, parole al minuto): serve
@@ -342,5 +438,7 @@ gravi… soprattutto gastrointestinali" unisce due cose che le fonti tengono dis
 
 ## Prossimo passo
 
-Chiudere la fase 3: formati 1:1 e 16:9, lingue senza spazi (B12), pulsante unico nel pannello con le tappe di
-`fai`. Prima di tutto, però, il numero che resta fuori: il movimento sul palco (vedi tabella della fase 3).
+1. Francesco guarda `affianca` e fa fare la prova cieca a tre persone: è il giudizio che manca.
+2. Punto 5: pulsante unico nel pannello con le tappe di `fai`, formati 1:1 e 16:9, B12, B17 (dal Mac).
+3. Illustrazioni vere: la prima immagine da sola, guardata, poi le altre (`reels/reta-testo/immagini.md`).
+4. Narratore: più grande, e la posa finale.

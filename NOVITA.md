@@ -15,6 +15,15 @@
   scende, gira). Il fondo segue la camera più forte della scena (parallasse); niente esce dalle zone sicure.
 - **Regali a scelta in chiusura** (`npm run regalo`, impostazione `regalo=`): ebook, mappe, PDF, ognuno con la sua
   copertina sul tablet 3D; il tablet può fare un giro su una parola.
+- **`npm run affianca`**: dodici fotogrammi del reel accanto a dodici del riferimento, stessi momenti. È il primo
+  controllo: prima si guarda, poi si misura. **`npm run prova-cieca`**: dieci spezzoni mescolati, tre persone.
+- **`bloccoSoggetti`**: da uno a tre soggetti grandi in primo piano che non si fermano mai (ginocchio, quadrante,
+  batteria, stomaco, riflettori, foglio, scale, un'icona, o un'illustrazione generata) e cambiano stato su una parola.
+- **Narratore**: cambia posa a ogni inciso e a ogni segno (circa 40 volte al minuto, prima 12). Il metro ora guarda
+  solo la figura, non il fondo che si muove dietro.
+- **Illustrazioni**: foglio di stile scritto sui riferimenti (`stile/FOGLIO_IMMAGINI.md`), fondo magenta per i
+  soggetti verdi, elenco e comandi per `reta-testo`.
+- Chiusi B18, B19, B20.
 - **`bloccoParole`**: le parole che contano una alla volta, ognuna sulla sua parola.
 - Il **grassetto** di un testo incollato (`**parola**`) diventa enfasi nei sottotitoli e non viene letto.
 

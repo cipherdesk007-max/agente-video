@@ -300,7 +300,7 @@ export function SoggettoVivo({soggetto, x, y, lato, p, da, indice = 0, colpo = 0
         </svg>
       )}
       {passa < 115 ? (
-        <div style={{position: 'absolute', inset: 0, opacity: 0.6, mixBlendMode: 'plus-lighter', filter: 'brightness(0) invert(1)', WebkitMaskImage: `linear-gradient(108deg, transparent ${(passa - 13).toFixed(1)}%, #000 ${passa.toFixed(1)}%, transparent ${(passa + 13).toFixed(1)}%)`, maskImage: `linear-gradient(108deg, transparent ${(passa - 13).toFixed(1)}%, #000 ${passa.toFixed(1)}%, transparent ${(passa + 13).toFixed(1)}%)`}}>
+        <div style={{position: 'absolute', inset: 0, opacity: 0.5, mixBlendMode: 'plus-lighter', filter: 'brightness(0) invert(1)', WebkitMaskImage: `linear-gradient(108deg, transparent ${(passa - 10).toFixed(1)}%, #000 ${passa.toFixed(1)}%, transparent ${(passa + 10).toFixed(1)}%)`, maskImage: `linear-gradient(108deg, transparent ${(passa - 10).toFixed(1)}%, #000 ${passa.toFixed(1)}%, transparent ${(passa + 10).toFixed(1)}%)`}}>
           {soggetto.tipo === 'immagine' && soggetto.file ? (
             <img src={tempo.risorsa(soggetto.file)} alt="" style={{position: 'absolute', left: '5%', top: '5%', width: '90%', height: '90%', objectFit: 'contain'}} />
           ) : soggetto.tipo === 'icona' && Icona ? (
