@@ -9,6 +9,7 @@ import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {CACHE, ErroreFmlab, RADICE, leggiEnv, leggiJson, rel, scriviJson, sec} from './percorsi.mjs';
 import {cercaFrase, leggiBanca, ritmoMisurato} from './frasi.mjs';
+import {annota} from './registro.mjs';
 import {leggiImpostazioni} from './impostazioni.mjs';
 import {apriReel, estraiVariante} from './reel.mjs';
 import {componiDati, confrontaTesto, leggiCopione, testoDaDire, pausaDopo, pesoParola, stimaTempi, tempiDaCaratteri} from './copione.mjs';
@@ -598,6 +599,8 @@ export async function comandoVoce(slug, argomenti = []) {
   else if (motore === 'mac') esito = await voceMac(copione, reel, scelte);
   else if (motore === 'comando') esito = await voceComando(copione, reel, scelte, {nuova});
   else esito = {tempi: stimaTempi(copione.parole, {ritmo: numeroEnv('FMLAB_RITMO_STIMA') ?? ritmoMisurato(reel.lingua) ?? 1}), voce: null, precisione: 'stimata'};
+  // ogni spesa finisce nel registro: la dashboard dice quanti crediti sono andati, e per quale reel
+  if (motore === 'elevenlabs' && esito.caratteri > 0) annota('spesa', {reel: slug, caratteri: esito.caratteri, motore, frasi: esito.frasi?.elevenlabs ?? null});
 
   // un solo file voce per versione: via quello dell'altro formato, se c'era
   if (esito.voce) {

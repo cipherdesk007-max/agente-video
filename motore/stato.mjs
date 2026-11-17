@@ -35,17 +35,38 @@ function riassunto(slug, variante = null) {
   return {reel, copione, dati, verifica, prossimo};
 }
 
+/** In fondo a ogni stato: dov'è la dashboard (la accende, se serve) e cosa ha chiesto chi la guarda. */
+async function pieDiStato() {
+  const {leggiCoda, segnaRichiesta, stampaRichiesta} = await import('./registro.mjs');
+  const {assicuraDashboard} = await import('./dashboard.mjs');
+  const d = await assicuraDashboard().catch(() => null);
+  if (d) console.log(`Dashboard: ${d.indirizzo}${d.nuova ? '   (accesa adesso: si apre nel browser)' : ''}`);
+  const aperte = leggiCoda().filter((r) => r.stato !== 'fatta');
+  if (aperte.length) {
+    console.log(`\nRichieste dalla dashboard (${aperte.length}): falle in ordine; dopo ognuna  npm run richieste fatta <id>\n`);
+    for (const r of aperte) {
+      stampaRichiesta(r);
+      if (r.stato === 'nuova') segnaRichiesta(r.id, 'vista');
+    }
+  }
+  console.log('');
+}
+
 export async function comandoStato(slug) {
   if (!slug) {
     const tutti = elencoReel();
-    if (!tutti.length) return console.log('\nNessun reel. Per crearne uno:  npm run nuovo   (oppure  npm run pannello)\n');
+    if (!tutti.length) {
+      console.log('\nNessun reel. Per crearne uno:  npm run nuovo   (oppure dalla dashboard)\n');
+      return pieDiStato();
+    }
     console.log('');
     for (const s of tutti) {
       const {dati, verifica, prossimo, reel} = riassunto(s);
       console.log(`  ${s.padEnd(34)} ${dati ? `${sec(dati.durata, 1).padStart(7)} · voce ${dati.motore}` : 'senza tempi'.padEnd(22)}${fs.existsSync(reel.video) ? ' · video' : ''}${verifica ? ` · ${verifica}` : ''}`);
       console.log(`  ${''.padEnd(34)} → ${prossimo}`);
     }
-    return console.log('');
+    console.log('');
+    return pieDiStato();
   }
   const {reel, copione, dati, verifica, prossimo} = riassunto(slug);
   const imp = leggiImpostazioni(slug);
@@ -66,4 +87,5 @@ export async function comandoStato(slug) {
   console.log(`file: ${file.join(', ')}`);
   if (verifica) console.log(`verifica: ${verifica}`);
   console.log(`\nprossimo passo → ${prossimo}\n`);
+  return pieDiStato();
 }

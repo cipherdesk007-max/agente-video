@@ -50,14 +50,34 @@ FMLAB Reel Kit — comandi
   npm run confronta <video|reel>           il metro: misura un video (tagli, novità, palco, sottotitoli, narratore, audio)
                                            e lo confronta con le soglie di riferimenti/misure.json
                                            ("riferimenti" al posto del video: rimisura i riferimenti e riscrive le soglie)
+  npm run richieste [fatta <id>]           le richieste scritte dalla dashboard (npm run stato le mostra da solo)
   npm run riuso [reel]                     a fine reel: cosa è scritto a mano e può entrare in libreria (meno crediti la prossima volta)
 
   Aggiungi "guide" a foto / provini per vedere le zone coperte dall'app.
 `;
 
+// i comandi che non fanno un lavoro sul kit non finiscono nel registro (guardare lo stato non è una notizia)
+const SENZA_REGISTRO = ['stato', 'pannello', 'aiuto', 'richieste', 'anteprima', 'suoni', 'icone', undefined];
+const LUNGHI = ['fai', 'render', 'voce', 'provini', 'verifica', 'confronta', 'affianca', 'prova-cieca', 'collaudo', 'catalogo'];
+let inCorso = null;
+async function chiudiRegistro(ok, errore = null) {
+  if (!inCorso) return;
+  const {annota, adesso} = await import('./registro.mjs');
+  annota('fine', {comando: inCorso.comando, reel: inCorso.reel, ok, secondi: Math.round((Date.now() - inCorso.inizio) / 1000), ...(errore ? {errore} : {})});
+  if (inCorso.lungo) adesso(null);
+  inCorso = null;
+}
+
 async function principale() {
   const [comando, ...argomenti] = process.argv.slice(2);
   leggiEnv();
+  if (!SENZA_REGISTRO.includes(comando)) {
+    const {annota, adesso, senzaSegreti} = await import('./registro.mjs');
+    const reel = argomenti[0] && /^[a-z0-9][a-z0-9-]*$/.test(argomenti[0]) ? argomenti[0] : null;
+    inCorso = {comando, reel, inizio: Date.now(), lungo: LUNGHI.includes(comando)};
+    annota('inizio', {comando, reel, argomenti: argomenti.map(senzaSegreti).join(' ').slice(0, 300)});
+    if (inCorso.lungo) adesso({comando, reel, tappa: null, n: null, di: null, percento: null, da: new Date().toISOString()});
+  }
   switch (comando) {
     case 'voce': {
       const {comandoVoce} = await import('./voce.mjs');
@@ -160,6 +180,10 @@ async function principale() {
       const {comandoFrasi} = await import('./frasi.mjs');
       return comandoFrasi(argomenti);
     }
+    case 'richieste': {
+      const {comandoRichieste} = await import('./registro.mjs');
+      return comandoRichieste(argomenti);
+    }
     case 'regalo': {
       const {comandoRegalo} = await import('./regali.mjs');
       return comandoRegalo(argomenti);
@@ -190,7 +214,8 @@ for (const segnale of ['SIGINT', 'SIGTERM']) {
   });
 }
 
-principale().catch((e) => {
+principale().then(() => chiudiRegistro(true)).catch(async (e) => {
+  await chiudiRegistro(false, fermato ? 'Fermato.' : String(e?.message ?? e).split('\n')[0].slice(0, 400)).catch(() => {});
   if (fermato) {
     console.error('\nFermato.\n');
     process.exitCode = 130;

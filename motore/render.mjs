@@ -1,6 +1,7 @@
 // FMLAB Reel Kit — render: disegna ogni fotogramma in Chrome e lo codifica in un mp4 con la voce.
 // Il video viene diviso in pezzi fatti in parallelo; i pezzi si uniscono senza ricodificare.
 import fs from 'node:fs';
+import {adesso} from './registro.mjs';
 import os from 'node:os';
 import path from 'node:path';
 import {CACHE, ErroreFmlab, FORMATO, RADICE, formatoDi, leggiJson, rel, sec} from './percorsi.mjs';
@@ -89,6 +90,7 @@ export async function rendi(slug, variante = null, opzioni = {}) {
     ultimoAvviso = ora;
     const trascorsi = (ora - inizio) / 1000;
     const velocita = fatti / Math.max(0.001, trascorsi);
+    adesso({percento: Math.round((fatti / totale) * 100), mancano: Math.round((totale - fatti) / velocita)}, {piano: true});
     console.log(`  ${String(Math.round((fatti / totale) * 100)).padStart(3)}%  ·  ${fatti}/${totale} fotogrammi  ·  ${velocita.toFixed(1)} al secondo  ·  mancano ${minuti((totale - fatti) / velocita)}`);
   };
 

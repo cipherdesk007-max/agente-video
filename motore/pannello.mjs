@@ -324,6 +324,10 @@ const AZIONI = {
 // ───────────────────────── il comando ─────────────────────────
 
 export async function comandoPannello(argomenti = []) {
+  if (argomenti.includes('ferma')) {
+    const {fermaDashboard} = await import('./dashboard.mjs');
+    return console.log(fermaDashboard() ? '\nDashboard spenta.\n' : '\nNessuna dashboard accesa.\n');
+  }
   const rete = argomenti.includes('rete');
   const chiave = (process.env.FMLAB_CHIAVE_PANNELLO || nuovaChiave()).toUpperCase();
   const fallimenti = new Map();
@@ -579,5 +583,8 @@ export async function comandoPannello(argomenti = []) {
     }
   }
   if (process.env.FMLAB_PANNELLO_PROVA) return {server, chiave};
+  // così `npm run stato` la ritrova invece di accenderne un'altra
+  const {scriviInfoPannello} = await import('./dashboard.mjs');
+  scriviInfoPannello({porta: server.porta, indirizzo, rete});
   await new Promise(() => {});
 }

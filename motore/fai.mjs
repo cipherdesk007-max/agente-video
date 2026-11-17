@@ -9,6 +9,7 @@
 // scene, tempi stimati, provini), poi si paga il dettaglio (voce vera, video). Ogni tappa riuscita è salvata:
 // se una fallisce si corregge e si rilancia, e le altre non si rifanno. Se cambia il testo, il piano o una
 // scelta, si riparte dal montaggio. Il video è "fatto" solo se la verifica passa.
+import {adesso, annota} from './registro.mjs';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -108,6 +109,7 @@ export async function comandoFai(slug, argomenti = []) {
     voce: async () => {
       const p = await preventivoVoce(slug, dir);
       if (p.motore === 'stima') return 'nessuna voce disponibile su questo computer: il video esce con i tempi stimati e senza voce';
+      if (p.paga) annota('preventivo', {reel: slug, caratteri: p.caratteri, pronte: p.pronte ?? 0});
       if (p.paga && !voceSi) {
         throw new ErroreFmlab(`La voce ElevenLabs di questo testo costa circa ${p.caratteri} crediti (uno per carattere${p.pronte ? `; ${p.pronte} frasi sono già pronte e non si pagano` : ''}). Composizione e provini sono già fatti e controllati.\nPer generarla: npm run fai ${slug} voce=si`);
       }
@@ -144,16 +146,21 @@ export async function comandoFai(slug, argomenti = []) {
     }
     console.log(`\n── ${n + 1}/${TAPPE.length} · ${tappa}${tappa === 'voce' ? '  (da qui in poi si spende: tempo, ed eventualmente crediti)' : ''}`);
     const inizio = Date.now();
+    const fatto = {reel: slug, tappa, n: n + 1, di: TAPPE.length};
+    adesso({comando: 'fai', ...fatto, percento: null});
+    annota('tappa', {...fatto, stato: 'parte'});
     let nota;
     try {
       nota = await tappe[tappa]();
     } catch (e) {
       salva();
+      annota('tappa', {...fatto, stato: 'ferma', motivo: String(e?.message ?? e).split('\n')[0].slice(0, 400)});
       if (e instanceof ErroreFmlab) throw new ErroreFmlab(`${e.message}\n\nFermo alla tappa "${tappa}" (${n + 1} di ${TAPPE.length}). Dopo la correzione: npm run fai ${slug}${bozza ? ' bozza' : ''}`);
       throw e;
     }
     if (nota) console.log(`   ${nota}`);
     console.log(`   fatta in ${((Date.now() - inizio) / 1000).toFixed(0)} s`);
+    annota('tappa', {...fatto, stato: 'fatta', secondi: Math.round((Date.now() - inizio) / 1000), ...(nota ? {nota: String(nota).slice(0, 300)} : {})});
     // la regia scrive il piano: l'impronta cambia per forza, ma non è una modifica di chi lavora
     if (tappa === 'regia') {
       attuale = impronta(dir, bozza);
