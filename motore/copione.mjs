@@ -289,11 +289,47 @@ export function proteggi(testo) {
 }
 
 /**
+ * Il testo dato, pronto da dire. Chi incolla un testo da un'app di scrittura lascia spesso il **grassetto**: i due
+ * asterischi non sono parole, dicono solo che quella parola conta. Si tolgono, e quelle parole diventano enfasi.
+ * Tutto il resto resta com'è, carattere per carattere.
+ * Con {conEnfasi: true} restituisce {testo, enfasi}: `enfasi` sono le posizioni (contate sugli spazi) delle parole in grassetto.
+ */
+export function testoDaDire(testo, {conEnfasi = false} = {}) {
+  const A = '\ue010';
+  const Z = '\ue011';
+  const segnato = String(testo)
+    .replace(/\r\n?/g, '\n')
+    .replace(/[\ue010\ue011]/g, '')
+    .replace(/\*\*(?=\S)([^\n]*?\S)\*\*/g, `${A}$1${Z}`);
+  const enfasi = new Set();
+  let dentro = false;
+  let k = 0;
+  for (const pezzo of segnato.split(/\s+/).filter(Boolean)) {
+    if (pezzo.includes(A)) dentro = true;
+    if (dentro) enfasi.add(k);
+    if (pezzo.includes(Z)) dentro = false;
+    k++;
+  }
+  const pulito = segnato.replace(/[\ue010\ue011]/g, '').trim();
+  return conEnfasi ? {testo: pulito, enfasi} : pulito;
+}
+
+/**
  * Il copione di partenza per un testo già scritto: una scena sola, nessun segno, il testo parola per parola.
  * Chi lavora al reel aggiunge solo [scena:…], [segni], *enfasi* e [suono:…].
  */
 export function copioneDaTesto(testo, {titolo = '', lingua = 'it', scena = 'testo'} = {}) {
-  const corpo = proteggi(String(testo).replace(/\r\n?/g, '\n').trim());
+  // il **grassetto** del testo incollato diventa enfasi (*parola*), le parole restano quelle
+  const {testo: pulito, enfasi} = testoDaDire(testo, {conEnfasi: true});
+  let k = 0;
+  const corpo = pulito
+    .split(/(\s+)/)
+    .map((pezzo) => {
+      if (!pezzo.trim()) return pezzo;
+      const m = /^(.*?[\p{L}\p{N}])([^\p{L}\p{N}]*)$/su.exec(pezzo);
+      return enfasi.has(k++) && m ? `*${proteggi(m[1])}*${proteggi(m[2])}` : proteggi(pezzo);
+    })
+    .join('');
   return [
     `<!-- lingua: ${lingua} -->`,
     `# ${String(titolo).replace(/\s+/g, ' ').trim()}`,

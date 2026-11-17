@@ -5,7 +5,7 @@ import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {ErroreFmlab, leggiJson, rel, sec} from './percorsi.mjs';
 import {estraiVariante} from './reel.mjs';
-import {confrontaTesto, leggiCopione} from './copione.mjs';
+import {confrontaTesto, leggiCopione, testoDaDire} from './copione.mjs';
 import {giudicaDurata} from './durata.mjs';
 import {numeriSenzaFonte} from './fonti.mjs';
 import {avvisiNarratore, leggiImpostazioni} from './impostazioni.mjs';
@@ -85,7 +85,7 @@ export async function comandoVerifica(slug, argomenti = []) {
     // il testo dato dalla persona (testo.txt): il copione deve pronunciare quello, parola per parola
     const fileTesto = path.join(reel.dir, `testo${reel.suffisso}.txt`);
     if (fs.existsSync(fileTesto)) {
-      const diverso = confrontaTesto(fs.readFileSync(fileTesto, 'utf8'), copione.testoParlato);
+      const diverso = confrontaTesto(testoDaDire(fs.readFileSync(fileTesto, 'utf8')), copione.testoParlato);
       if (diverso) R.errore(`Il copione non dice il testo dato: alla parola ${diverso.parola} c'è "${diverso.trovato}" al posto di "${diverso.atteso}"`, `Il testo di ${rel(fileTesto)} va pronunciato parola per parola: nel copione si aggiungono solo scene, segni, enfasi e suoni.`);
       else R.ok(`Il testo del reel è quello dato, parola per parola (${copione.parole.length} parole, ${rel(fileTesto)})`);
     }

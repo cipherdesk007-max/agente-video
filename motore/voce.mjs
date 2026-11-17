@@ -10,7 +10,7 @@ import {spawnSync} from 'node:child_process';
 import {CACHE, ErroreFmlab, RADICE, leggiEnv, leggiJson, rel, scriviJson, sec} from './percorsi.mjs';
 import {leggiImpostazioni} from './impostazioni.mjs';
 import {apriReel, estraiVariante} from './reel.mjs';
-import {componiDati, confrontaTesto, leggiCopione, pausaDopo, pesoParola, stimaTempi, tempiDaCaratteri} from './copione.mjs';
+import {componiDati, confrontaTesto, leggiCopione, testoDaDire, pausaDopo, pesoParola, stimaTempi, tempiDaCaratteri} from './copione.mjs';
 import {leggiWav, scriviWav, silenzio, taglia, trattiDiVoce} from './wav.mjs';
 import {creaSrt} from './comune/pagine.mjs';
 import {trovaFfmpeg} from './ffmpeg.mjs';
@@ -435,7 +435,7 @@ export async function comandoVoce(slug, argomenti = []) {
   // se la persona ha dato il testo del reel (testo.txt), il copione deve pronunciare quello, parola per parola
   const fileTesto = path.join(reel.dir, `testo${reel.suffisso}.txt`);
   if (fs.existsSync(fileTesto)) {
-    const diverso = confrontaTesto(fs.readFileSync(fileTesto, 'utf8'), copione.testoParlato);
+    const diverso = confrontaTesto(testoDaDire(fs.readFileSync(fileTesto, 'utf8')), copione.testoParlato);
     if (diverso) {
       throw new ErroreFmlab(
         `Il copione non dice più il testo dato (${rel(fileTesto)}): alla parola ${diverso.parola} c'è "${diverso.trovato}" al posto di "${diverso.atteso}".\n` +
