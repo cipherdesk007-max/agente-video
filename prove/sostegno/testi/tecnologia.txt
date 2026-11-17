@@ -1,0 +1,3 @@
+Il GPS non sa dove sei. I satelliti mandano solo l'ora esatta, e nient'altro.
+
+È il tuo telefono a fare il conto: ascolta quattro satelliti e misura i ritardi. Un errore di un milionesimo di secondo sposta la posizione di trecento metri.

@@ -13,8 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {ErroreFmlab, cartellaReel, rel} from './percorsi.mjs';
-import {CAMERE, CAMPI, LUOGHI, PAUSA_MASSIMA, controllaPiano, leggiRegali, paroleDelTesto} from './piano.mjs';
-import {PAROLE_AL_SECONDO} from './durata.mjs';
+import {CAMERE, CAMPI, LUOGHI, PAUSA_MASSIMA, RITMO_PRUDENTE, controllaPiano, leggiRegali, paroleDelTesto} from './piano.mjs';
 import {leggiImpostazioni} from './impostazioni.mjs';
 
 const VUOTE = new Set(
@@ -105,7 +104,7 @@ export function dividiInScene(parole) {
 
 /** Sceglie le parole su cui far comparire qualcosa: una ogni due secondi e mezzo circa, mai più di PAUSA_MASSIMA. */
 function scegliAncore(parole, da, a) {
-  const quante = Math.max(1, Math.round((a - da) / PAROLE_AL_SECONDO / 2.3));
+  const quante = Math.max(1, Math.round((a - da) / RITMO_PRUDENTE / 2.3));
   const passo = (a - da) / quante;
   const voto = (p, i) => (numeroDi(p) !== null && p.chiave !== 'uno' && p.chiave !== 'one' ? 6 : 0) + (p.enfasi ? 5 : 0) + (/^\p{Lu}/u.test(p.testo) && i > da && !fineFrase(parole[i - 1]) ? 4 : 0) + Math.min(p.chiave.length, 10) * 0.4 + (pieno(p) || numeroDi(p) !== null ? 3 : -4);
   const scelte = [];
@@ -117,7 +116,7 @@ function scegliAncore(parole, da, a) {
     scelte.push(meglio);
   }
   // nessun buco più lungo della pausa massima, nemmeno verso la fine della scena
-  const limite = Math.floor((PAUSA_MASSIMA - 0.4) * PAROLE_AL_SECONDO);
+  const limite = Math.floor((PAUSA_MASSIMA - 0.3) * RITMO_PRUDENTE);
   const punti = [da, ...scelte, a];
   for (let k = 0; k < punti.length - 1; k++) {
     if (punti[k + 1] - punti[k] > limite) {
@@ -131,24 +130,23 @@ function scegliAncore(parole, da, a) {
   return [...new Set(punti.slice(1, -1))].sort((x, y) => x - y);
 }
 
-/** La scritta che compare su una parola: il numero in cifre con la sua unità, oppure la parola con quella che la completa. */
+/**
+ * La scritta che compare su una parola: la parola con quella che la completa ("Quattro punti", "Effetti collaterali").
+ * I numeri restano scritti come li dice il testo, in lettere: una cifra a schermo è un dato, e un dato vuole la sua
+ * riga in fonti.md. Le cifre le mette chi fa la regia, insieme alla fonte.
+ */
 function scrittaDi(parole, i, a) {
   const p = parole[i];
-  const n = numeroDi(p);
   const dopo = i + 1 < a && !/[,;:.!?…]$/.test(p.testo) ? parole[i + 1] : null;
-  if (n !== null) {
-    const cifre = String(n).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    return {testo: dopo && pieno(dopo) ? `${cifre}${/%$/.test(p.testo) ? '%' : ''} ${pulita(dopo.testo)}` : `${cifre}${/%$/.test(p.testo) ? '%' : ''}`, numero: n};
-  }
   const base = maiuscola(pulita(p.testo));
-  return {testo: dopo && pieno(dopo) && (base + dopo.chiave).length <= 22 ? `${base} ${pulita(dopo.testo)}` : base, numero: null};
+  return {testo: dopo && pieno(dopo) && (base + dopo.chiave).length <= 22 ? `${base} ${pulita(dopo.testo)}` : base, numero: numeroDi(p)};
 }
 
 /**
  * Il piano di serie per un testo.
  * @param {string} testo  il testo dato
  * @param {{titolo?: string, regalo?: string, lingua?: string}} scelte  regalo: 'auto' | 'nessuno' | nome
- * @returns {{piano: object, numeri: {numero: number, frase: string}[]}}  numeri = quelli messi a schermo, da scrivere in fonti.md
+ * @returns {{piano: object}}
  */
 export function regia(testo, {titolo = '', regalo = 'auto'} = {}) {
   const parole = paroleDelTesto(testo);
@@ -167,7 +165,6 @@ export function regia(testo, {titolo = '', regalo = 'auto'} = {}) {
     return nome;
   };
   const scene = [];
-  const numeri = [];
   const suoni = [];
   let luogoPrima = null;
   let enfasiMesse = 0;
@@ -201,10 +198,15 @@ export function regia(testo, {titolo = '', regalo = 'auto'} = {}) {
       const scelto = regalo === 'auto' ? Object.keys(regali).find((k) => (regali[k].parola ?? '').toUpperCase() === parola) : regalo;
       if (regalo !== 'nessuno' && scelto && regali[scelto]) {
         sc.blocco = 'ebook';
-        // il titolo del regalo compare più avanti, su un'altra parola: la chiusura non resta ferma
-        const poi = ancore.filter((i) => i > dove + 2).sort((x, y) => parole[y].chiave.length - parole[x].chiave.length)[0];
-        sc.dati = {regalo: scelto, invito: `${pulita(mie[invito].testo)} ${parola}`.trim(), sotto: regali[scelto].titolo, segno, ...(poi !== undefined ? {segnoSotto: nomeDi.get(poi)} : {})};
-        sc.segni = {[segno]: segni[segno], ...(poi !== undefined ? {[nomeDi.get(poi)]: segni[nomeDi.get(poi)]} : {})};
+        // la chiusura non resta ferma: il titolo del regalo compare più avanti, poi il tablet fa un giro, ognuno su una sua parola
+        const poi = ancore.filter((i) => i > dove + 1);
+        const [uno, due, tre] = poi.length >= 3 ? [poi[0], poi[1], poi[2]] : poi.length === 2 ? [undefined, poi[0], poi[1]] : [undefined, poi[0], undefined];
+        sc.dati = {regalo: scelto, invito: `${pulita(mie[invito].testo)} ${parola}`.trim(), sotto: regali[scelto].titolo, segno};
+        sc.segni = {[segno]: segni[segno]};
+        if (uno !== undefined) Object.assign(sc.dati, {sopra: scrittaDi(parole, uno, t.a).testo, segnoSopra: nomeDi.get(uno)});
+        if (due !== undefined) sc.dati.segnoSotto = nomeDi.get(due);
+        if (tre !== undefined) sc.dati.segnoGiro = nomeDi.get(tre);
+        for (const i of [uno, due, tre]) if (i !== undefined) sc.segni[nomeDi.get(i)] = segni[nomeDi.get(i)];
       } else {
         sc.blocco = 'chiusura';
         sc.dati = {parola: parola || 'INFO', segno};
@@ -238,7 +240,6 @@ export function regia(testo, {titolo = '', regalo = 'auto'} = {}) {
         sc.segni = segni;
         for (const v of voci) {
           if (v.numero === null) continue;
-          if (Math.abs(v.numero) > 10) numeri.push({numero: v.numero, frase: mie.slice(Math.max(0, v.i - t.da - 2), v.i - t.da + 3).map((p) => p.testo).join(' ')});
           suoni.push({scena: scene.length, suono: 'ding', su: segni[v.segno], forza: 6});
         }
       }
@@ -304,7 +305,7 @@ export function regia(testo, {titolo = '', regalo = 'auto'} = {}) {
     protagonista: {tipo: salute ? 'peptide' : 'goccia', colore: '#5CF2C8'},
     scene,
   };
-  return {piano, numeri};
+  return {piano};
 }
 
 /** npm run regia <reel> [nuova] [regalo=nome|nessuno] */
@@ -323,17 +324,10 @@ export async function comandoRegia(slug, argomenti = []) {
   } catch {
     // impostazioni non leggibili: regalo di serie
   }
-  const {piano, numeri} = regia(testo, {titolo: (scritto ?? '').trim(), regalo: regalo ?? 'auto'});
+  const {piano} = regia(testo, {titolo: (scritto ?? '').trim(), regalo: regalo ?? 'auto'});
   const esito = controllaPiano(piano, testo, {cartella: dir});
   if (esito.errori.length) throw new ErroreFmlab(`Il regista di serie ha scritto un piano che non passa il controllo (è un difetto del kit, segnalalo):\n${esito.errori.map((e) => '  ✗ ' + e).join('\n')}`);
   fs.writeFileSync(file, JSON.stringify(piano, null, 2) + '\n');
-  // i numeri che il piano mette a schermo vengono dal testo dato: lo si scrive in fonti.md, da verificare
-  if (numeri.length) {
-    const fileFonti = path.join(dir, 'fonti.md');
-    const fonti = fs.existsSync(fileFonti) ? fs.readFileSync(fileFonti, 'utf8') : `# Fonti · ${piano.titolo}\n`;
-    const righe = numeri.filter((x) => !fonti.includes(`| ${String(x.numero).replace(/\B(?=(\d{3})+(?!\d))/g, '.')} |`)).map((x) => `| ${String(x.numero).replace(/\B(?=(\d{3})+(?!\d))/g, '.')} | "…${x.frase}…" | dal testo dato | DA CONTROLLARE: fonte da aggiungere |`);
-    if (righe.length) fs.writeFileSync(fileFonti, `${fonti.trimEnd()}\n\n## Numeri a schermo presi dal testo dato\n\n| Numero | Dove lo dice il testo | Fonte | Nota |\n|---|---|---|---|\n${righe.join('\n')}\n`);
-  }
   console.log(`Scritto ${rel(file)}: ${piano.scene.length} scene (${piano.scene.map((s) => s.blocco).join(', ')}).`);
   for (const a of esito.avvisi) console.log(`  ! ${a}`);
   console.log(`È il piano di serie, fatto di regole: leggilo e miglioralo scena per scena (npm run piano: i blocchi), poi  npm run monta ${slug}`);

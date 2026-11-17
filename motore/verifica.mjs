@@ -137,7 +137,10 @@ export async function comandoVerifica(slug, argomenti = []) {
       const collegamenti = testo.match(/https?:\/\/[^\s)|>\]]+/g) ?? [];
       // conta solo le righe della tabella, non le istruzioni in cima al file
       const sospesi = testo.split('\n').filter((riga) => riga.trim().startsWith('|') && /DA VERIFICARE/i.test(riga)).length;
-      if (!collegamenti.length) R.errore('fonti.md non contiene nessun indirizzo web');
+      // un testo dato già scritto: le fonti dei fatti le ha chi l'ha scritto. Senza indirizzi è un avviso, non un errore;
+      // i numeri messi a schermo restano obbligati alla loro riga (controllo più sotto).
+      if (!collegamenti.length && fs.existsSync(path.join(reel.dir, `testo${reel.suffisso}.txt`))) R.avviso('fonti.md non contiene nessun indirizzo web', 'Il testo è stato dato già scritto: i fatti restano di chi lo ha scritto. Prima di pubblicare, aggiungi in fonti.md da dove vengono.');
+      else if (!collegamenti.length) R.errore('fonti.md non contiene nessun indirizzo web');
       else R.ok(`fonti.md: ${new Set(collegamenti).size} fonti con indirizzo`);
       if (sospesi) R.errore(`${sospesi} affermazioni segnate "DA VERIFICARE" in fonti.md`, 'Verificale o toglile dal copione prima di pubblicare.');
     }

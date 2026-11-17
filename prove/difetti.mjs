@@ -632,7 +632,7 @@ await prova('piano: ogni errore dice in che scena, in che campo e cosa fare; con
   assert.match(rotto((p) => (p.scene[1].blocco = 'ologramma')), /Scena 2 "domanda": il blocco "ologramma" non esiste\. Blocchi: titolo, domanda/);
   assert.match(rotto((p) => (p.scene[2].segni.mille = 'duemila')), /Scena 3 "studi" · segno "mille": "duemila" non è in questa scena/);
   assert.match(rotto((p) => (p.scene[2].segni.mille = 'placebo')), /nel testo c'è, ma in un'altra scena/);
-  assert.match(rotto((p) => (p.scene[4].dati.sinistra.segno = 'boh')), /il segno "boh" non è tra i segni di questa scena \(quattro, anche, duepunti\)/);
+  assert.match(rotto((p) => (p.scene[4].dati.sinistra.segno = 'boh')), /il segno "boh" non è tra i segni di questa scena \(quattro, anche, duepunti, attivo\)/);
   assert.match(rotto((p) => (p.scene[4].dati.sinistra.valore = '3,96')), /sinistra · valore: serve un numero/);
   assert.match(rotto((p) => (p.scene[3].da = 'Il dolore era valutato')), /non trovo "Il dolore era valutato" nel testo/);
   assert.match(rotto((p) => (p.scene[5].dati.voci[0].icona = 'FaCosaCheNonCe')), /l'icona "FaCosaCheNonCe" non esiste/);
@@ -670,11 +670,7 @@ await prova('piano: le scene scritte dal piano si disegnano senza che nessuno sc
   }
 });
 
-const TESTI_DI_PROVA = {
-  salute: 'Dormire poco fa ingrassare? Uno studio su mille adulti dice di sì.\n\nChi dormiva meno di sei ore mangiava di più il giorno dopo. Non è magia: cambia la fame, e con la fame cambiano le scelte a tavola.\n\nCommenta SONNO per ricevere la guida.',
-  tecnologia: 'Il GPS non sa dove sei. I satelliti mandano solo l\'ora esatta, e nient\'altro.\n\nÈ il tuo telefono a fare il conto: ascolta quattro satelliti e misura i ritardi. Un errore di un milionesimo di secondo sposta la posizione di trecento metri.',
-  economia: 'Perché i prezzi salgono? Quando tutti vogliono comprare e la merce è poca, chi vende alza il prezzo.\n\nSe costa di più anche l\'energia, sale tutto il resto. In un anno il carrello può costare il 10% in più.\n\nMa attenzione: i rischi non sono uguali per tutti.',
-};
+const TESTI_DI_PROVA = Object.fromEntries(['salute', 'tecnologia', 'economia'].map((n) => [n, fs.readFileSync(path.join(K, 'prove/sostegno/testi', `${n}.txt`), 'utf8')]));
 
 await prova('regista di serie: da tre testi lontani (salute, tecnologia, economia) esce un piano valido, senza pause lunghe, con il testo intatto', async () => {
   const {regia} = await carica('motore/regista.mjs');
@@ -695,8 +691,9 @@ await prova('regista di serie: da tre testi lontani (salute, tecnologia, economi
   assert.equal(regia(TESTO_RETA, {regalo: 'nessuno'}).piano.scene.at(-1).blocco, 'chiusura');
   const sonno = regia(TESTI_DI_PROVA.salute).piano.scene.at(-1);
   assert.deepEqual([sonno.blocco, sonno.dati.parola], ['chiusura', 'SONNO']);
-  // i numeri messi a schermo dal testo vengono dichiarati, per fonti.md
-  assert.deepEqual(regia(TESTO_RETA).numeri.map((n) => n.numero), [1000]);
+  // il regista di serie non mette cifre a schermo: una cifra è un dato e vuole la sua fonte, che lui non ha
+  const {numeriNelTesto} = await carica('motore/fonti.mjs');
+  for (const testo of [...Object.values(TESTI_DI_PROVA), TESTO_RETA]) assert.deepEqual(numeriNelTesto(controllaPiano(regia(testo).piano, testo).scritte.join(' ')).filter((n) => !testo.includes(String(n))), []);
 });
 
 await prova('rischio cartelli: una fila di scritte con la camera ferma non arriva al render', async () => {

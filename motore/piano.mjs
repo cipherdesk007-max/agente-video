@@ -46,6 +46,8 @@ export const CAMERE = ['ferma', 'spinta', 'indietro', 'destra', 'sinistra', 'sal
 export const POSE = ['dito', 'alto', 'lato', 'aperto', 'pensa', 'presenta', 'conserte'];
 /** Ogni quanti secondi, al più tardi, sul palco deve comparire qualcosa di nuovo. */
 export const PAUSA_MASSIMA = 3.5;
+/** Parole al secondo per i conti fatti prima di avere i tempi: una voce lenta, così chi rispetta la pausa qui la rispetta anche dopo. */
+export const RITMO_PRUDENTE = 2.6;
 
 const NOME = /^[a-z][a-z0-9_-]*$/;
 const COLORE = /^#[0-9a-f]{6}$/i;
@@ -64,7 +66,7 @@ export const BLOCCHI = {
   parole: {fn: 'bloccoParole', cosa: 'le parole che contano, una alla volta, ognuna sulla sua parola', campi: {parole: [elenco({testo: [T, 1], segno: [S], colore: [C]}), 1], titolo: [T], colore: [C]}},
   numero: {fn: 'bloccoNumero', cosa: 'un numero grande che sale, con unità e fonte', campi: {valore: [N, 1], unita: [T], decimali: [N], prefisso: [X], suffisso: [X], segno: [S], colore: [C], nota: [T], sottoNota: [T], segnoNota: [S], fonte: [T]}},
   confronto: {fn: 'bloccoConfronto', cosa: 'due valori a confronto', campi: {sinistra: [LATO, 1], destra: [LATO, 1], titolo: [T], fonte: [T]}},
-  barre: {fn: 'bloccoBarre', cosa: 'colonne (fino a 12)', campi: {dati: [elenco({etichetta: [T, 1], valore: [N, 1], segno: [S]}), 1], titolo: [T], unita: [T], decimali: [N], fonte: [T]}},
+  barre: {fn: 'bloccoBarre', cosa: 'colonne (fino a 12)', campi: {dati: [elenco({etichetta: [T, 1], valore: [N, 1], segno: [S]}), 1], titolo: [T], unita: [T], decimali: [N], colori: [{colori: 1}], fonte: [T]}},
   anello: {fn: 'bloccoAnello', cosa: 'una percentuale ad anello', campi: {valore: [N, 1], etichetta: [T], segno: [S], colore: [C], fonte: [T]}},
   lista: {fn: 'bloccoLista', cosa: 'un elenco che compare voce per voce', campi: {voci: [elenco({testo: [T, 1], segno: [S]}), 1], titolo: [T], colore: [C]}},
   passi: {fn: 'bloccoPassi', cosa: 'passi numerati in fila', campi: {passi: [elenco({testo: [T, 1], segno: [S]}), 1], titolo: [T], colore: [C]}},
@@ -82,13 +84,13 @@ export const BLOCCHI = {
   tempo: {fn: 'bloccoTempo', cosa: 'tappe su una linea del tempo', campi: {tappe: [elenco({quando: [T, 1], testo: [T], segno: [S], colore: [C]}), 1], titolo: [T], colore: [C], fonte: [T]}},
   sigla: {fn: 'bloccoSigla', cosa: 'il logo della pagina con il nome', campi: {nome: [T], sotto: [T], segno: [S]}},
   chiusura: {fn: 'bloccoChiusura', cosa: 'il cartello finale "Commenta PAROLA"', campi: {parola: [X, 1], sopra: [T], sotto: [T], segno: [S], colore: [C], logo: [B]}},
-  ebook: {fn: 'bloccoEbook', cosa: 'il regalo sul tablet 3D (npm run regalo: elenco)', campi: {regalo: [{regalo: 1}], invito: [T], sopra: [T], sotto: [T], segno: [S], segnoSopra: [S], segnoSotto: [S], gira: [N]}},
+  ebook: {fn: 'bloccoEbook', cosa: 'il regalo sul tablet 3D (npm run regalo: elenco)', campi: {regalo: [{regalo: 1}], invito: [T], sopra: [T], sotto: [T], segno: [S], segnoSopra: [S], segnoSotto: [S], segnoGiro: [S], gira: [N]}},
   oggetto: {fn: 'bloccoOggetto', cosa: 'un oggetto 3D che gira e cambia stato, con etichette', speciale: true},
   mano: {fn: null, cosa: 'una scena scritta a mano in mano.tsx: {"componente": "Nome"}', speciale: true},
 };
 
 /** Gli oggetti 3D pronti e i parametri che si possono dare (e far cambiare su un segno). */
-const POSTO = ['x', 'y', 'z', 'scala', 'giro'];
+const POSTO = ['pos', 'ruota', 'scala'];
 export const OGGETTI = {
   ginocchio: ['dolore', 'piega', 'coloreDolore'],
   fiala: ['liquido', 'livello', 'tappo'],
@@ -221,6 +223,8 @@ function controllaValore(v, tipo, qui, esito) {
     if (typeof v === 'number') esito.numeri.push(v);
     else if (typeof v === 'string') esito.scritte.push(v);
     else esito.errori.push(`${qui}: serve un numero oppure una scritta.`);
+  } else if (tipo.colori) {
+    if (!Array.isArray(v) || v.some((c) => typeof c !== 'string' || !COLORE.test(c))) esito.errori.push(`${qui}: serve un elenco di colori, uno per colonna: ["#5AA8FF", "#5CF2C8"].`);
   } else if (tipo.regalo) {
     if (typeof v !== 'string' || (v !== 'auto' && !esito.regali[v.toLowerCase()])) esito.errori.push(`${qui}: il regalo ${JSON.stringify(v)} non esiste. Ci sono: ${Object.keys(esito.regali).join(', ') || '(nessuno)'} (npm run regalo).`);
   }
@@ -430,7 +434,7 @@ export function controllaPiano(piano, testo, {cartella = null, fonti = null, tem
   if (errori.length) return {errori, avvisi, parole, scene, scritte, numeri};
 
   // ── consigli: non fermano il montaggio, ma dicono dove il reel è debole ──
-  const secondiDi = tempi ?? ((i) => i / PAROLE_AL_SECONDO);
+  const secondiDi = tempi ?? ((i) => i / RITMO_PRUDENTE);
   let quantiSuoni = 0;
   for (const s of scene) {
     quantiSuoni += s.suoni.length;
@@ -657,7 +661,7 @@ export function leggiPiano(slug) {
     try {
       const dati = leggiJson(fileParole);
       const quante = paroleDelTesto(testo).length;
-      if (dati.parole?.length === quante) tempi = (i) => (i >= quante ? dati.durata ?? dati.parole[quante - 1].fine : dati.parole[i].inizio);
+      if (dati.parole?.length === quante) tempi = (i) => (i >= quante ? dati.parole[quante - 1].fine : dati.parole[i].inizio);
     } catch {
       // senza tempi veri si stimano
     }

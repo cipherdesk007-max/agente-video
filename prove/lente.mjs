@@ -272,6 +272,29 @@ await prova('B01 · pannello: testo incollato, durata scritta a mano, ogni pulsa
   }
 });
 
+// ───────────────────────── fase 3 · dal testo al video con un comando ─────────────────────────
+
+for (const argomento of ['salute', 'tecnologia', 'economia']) {
+  await prova(`regista · ${argomento}: dal testo al video con un solo comando e nessun intervento`, () => {
+    const slug = `zz-lente-testo-${argomento}-${process.pid}`;
+    daCancellare.add(slug);
+    const file = path.join(K, 'prove', 'sostegno', 'testi', `${argomento}.txt`);
+    const r = kit(['fai', slug, `testo=${file}`, `Prova ${argomento}`, 'narratore=nessuno', 'voce=stima', 'bozza'], {attesa: 1500000});
+    assert.equal(r.codice, 0, r.testo.split('\n').slice(-12).join('\n'));
+    assert.match(r.testo, /Fatto: tutte le 8 tappe riuscite/);
+    const dir = path.join(REELS, slug);
+    // il testo detto è quello dato, parola per parola
+    const dato = fs.readFileSync(file, 'utf8').split(/\s+/).filter(Boolean).join(' ');
+    const parole = JSON.parse(fs.readFileSync(path.join(dir, 'parole.json'), 'utf8')).parole.map((p) => p.testo).join(' ');
+    assert.equal(parole, dato);
+    assert.ok(fs.readdirSync(dir).some((f) => f.endsWith('.mp4')), 'manca il video');
+    assert.doesNotMatch(fs.readFileSync(path.join(dir, 'verifica.md'), 'utf8'), /✖/);
+    // rilanciato, non rifà niente
+    const di_nuovo = kit(['fai', slug, 'bozza']);
+    assert.equal((di_nuovo.testo.match(/già fatta/g) ?? []).length, 8, di_nuovo.testo);
+  });
+}
+
 cancella();
 const falliti = esiti.filter((e) => !e.ok);
 console.log(`\n${esiti.length - falliti.length} prove lente superate${falliti.length ? `, ${falliti.length} FALLITE` : ''}`);
