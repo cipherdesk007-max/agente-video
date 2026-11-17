@@ -1,0 +1,213 @@
+{
+  "versione": 1,
+  "titolo": "Reta e dolore al ginocchio: quanto è merito del farmaco?",
+  "protagonista": {"tipo": "peptide", "colore": "#5CF2C8"},
+  "scene": [
+    {
+      "nome": "aggancio",
+      "perche": "far vedere il ginocchio che fa meno male anche con il placebo: la sorpresa che apre il reel",
+      "blocco": "oggetto",
+      "dati": {
+        "oggetto": "ginocchio",
+        "parametri": {"dolore": 1, "piega": 14},
+        "cambia": [{"segno": "meno", "parametri": {"dolore": 0.3, "piega": 26}, "durata": 1.2}],
+        "etichette": [
+          {"testo": "Reta", "punto": [0, 150, 30], "segno": "reta"},
+          {"testo": "Placebo", "punto": [0, -120, 30], "segno": "placebo", "colore": "#5AA8FF"},
+          {"testo": "Meno dolore", "punto": [30, 10, 60], "segno": "meno", "colore": "#7CF26B"}
+        ],
+        "titolo": "Dolore al ginocchio"
+      },
+      "segni": {"reta": "Reta", "placebo": "placebo", "meno": "meno dolore"},
+      "enfasi": ["Reta", "placebo"],
+      "luogo": "corpo", "campo": "medio", "camera": "spinta",
+      "protagonista": {"acceso": 0.7, "carica": 0.4, "onda": 0.6}
+    },
+    {
+      "nome": "domanda",
+      "da": "Quindi, quanto di questo",
+      "perche": "fissare la domanda a cui il reel risponde",
+      "blocco": "domanda",
+      "dati": {"domanda": "Quanto è merito della Reta?", "sopra": "Il dolore cala anche con il placebo", "segno": "quanto"},
+      "segni": {"quanto": "quanto", "vediamo": "Vediamo"},
+      "enfasi": ["merito"],
+      "luogo": "corpo", "campo": "stretto", "camera": "indietro",
+      "protagonista": [{"acceso": 0.4, "carica": 0.4, "onda": 1}, {"segno": "vediamo", "acceso": 1, "carica": 0.7}]
+    },
+    {
+      "nome": "studi",
+      "da": "Questo mese sono stati",
+      "perche": "dare peso alla prova: due studi veri, su una rivista importante, su mille persone",
+      "blocco": "studio",
+      "dati": {
+        "rivista": "New England Journal of Medicine",
+        "titolo": "Retatrutide e artrosi del ginocchio",
+        "segno": "pubblicati",
+        "dati": [
+          {"testo": "2 studi sull'uomo", "segno": "due"},
+          {"testo": "tra le riviste più importanti", "segno": "riviste"},
+          {"testo": "1.019 adulti, oltre un anno", "segno": "mille"}
+        ],
+        "fonte": "NEJM, novembre 2026"
+      },
+      "segni": {"pubblicati": "pubblicati", "due": "due", "riviste": "riviste", "mille": "mille", "anno": "anno"},
+      "enfasi": ["due", "mille"],
+      "suoni": [{"suono": "pop", "su": "mille"}],
+      "luogo": "studio", "entra": "destra", "campo": "largo", "camera": "destra",
+      "protagonista": [{"acceso": 1, "carica": 0.7, "onda": 0.4}, {"segno": "anno", "carica": 1}]
+    },
+    {
+      "nome": "scala",
+      "da": "Il dolore veniva valutato",
+      "perche": "spiegare il metro: da zero a dieci, più è alto più fa male",
+      "blocco": "scala",
+      "dati": {
+        "titolo": "Dolore, da 0 a 10",
+        "cursori": [{"etichetta": "Dolore all'inizio", "valore": 6, "da": 0, "segno": "scala"}],
+        "estremi": ["nessun dolore", "il più forte"],
+        "verso": "male"
+      },
+      "segni": {"scala": "scala", "dieci": {"su": "dieci", "volta": 2}},
+      "enfasi": ["scala"],
+      "luogo": "laboratorio", "campo": "medio", "camera": "sale",
+      "protagonista": [{"carica": 0.6, "onda": 0.5}, {"segno": "dieci", "colore": "#FF4D5E", "onda": 1.4}]
+    },
+    {
+      "nome": "risultati",
+      "da": "Con la Reta, il",
+      "perche": "i due numeri uno accanto all'altro: quasi quattro contro circa due",
+      "blocco": "confronto",
+      "dati": {
+        "titolo": "Di quanto è calato il dolore",
+        "sinistra": {"titolo": "Reta", "valore": 3.96, "decimali": 2, "unita": "punti in meno", "segno": "quattro"},
+        "destra": {"titolo": "Placebo", "valore": 2.12, "decimali": 2, "unita": "punti in meno", "segno": "duepunti", "colore": "#5AA8FF"},
+        "fonte": "NEJM 2026, studio TRIUMPH-4"
+      },
+      "segni": {"quattro": "quattro", "anche": "placebo", "duepunti": "due"},
+      "enfasi": ["quattro", "due"],
+      "suoni": [{"suono": "ding", "su": "quattro"}, {"suono": "ding", "su": "due"}],
+      "luogo": "bilancia", "entra": "avanti", "campo": "stretto", "camera": "spinta",
+      "protagonista": [{"colore": "#5CF2C8", "carica": 1, "onda": 0.5}, {"segno": "anche", "colore": "#5AA8FF", "carica": 0.5}]
+    },
+    {
+      "nome": "applauso",
+      "da": "È un po' come",
+      "perche": "la metafora dell'effetto placebo: l'applauso prima che la band salga sul palco",
+      "blocco": "icone",
+      "dati": {
+        "titolo": "Effetto placebo",
+        "voci": [
+          {"icona": "FaUsers", "testo": "Il pubblico applaude", "segno": "pubblico"},
+          {"icona": "FaGuitar", "testo": "prima della band", "segno": "band"},
+          {"icona": "FaFaceSmile", "testo": "Aspettarsi di stare meglio", "segno": "aspettarsi"},
+          {"icona": "FaHeartPulse", "testo": "dà già un po' di sollievo", "segno": "sollievo"}
+        ]
+      },
+      "segni": {"pubblico": "pubblico", "band": "band", "aspettarsi": "aspettarsi", "sollievo": "sollievo"},
+      "enfasi": ["applaudire", "aspettarsi"],
+      "luogo": "palco", "entra": "basso", "campo": "largo", "camera": "gira",
+      "protagonista": {"colore": "#5AA8FF", "acceso": 0.3, "onda": 0.3}
+    },
+    {
+      "nome": "differenza",
+      "da": "Quindi, per capire quanto",
+      "perche": "quello che conta è lo scarto tra le due colonne, non la colonna più alta",
+      "blocco": "barre",
+      "dati": {
+        "titolo": "Calo del dolore, in punti",
+        "dati": [
+          {"etichetta": "Placebo", "valore": 2.12, "segno": "capire"},
+          {"etichetta": "Reta", "valore": 3.96, "segno": "differenza"}
+        ],
+        "decimali": 2,
+        "fonte": "NEJM 2026: tra 1,35 e 1,84 punti di differenza"
+      },
+      "segni": {"capire": "capire", "differenza": "differenza", "unodue": "uno"},
+      "enfasi": ["differenza"],
+      "luogo": "bilancia", "entra": "destra", "campo": "medio", "camera": "sinistra",
+      "protagonista": [{"colore": "#5CF2C8", "acceso": 1, "carica": 0.5, "onda": 0.5}, {"segno": "unodue", "carica": 1, "grandezza": 0.75}]
+    },
+    {
+      "nome": "misura",
+      "da": "Non è un miracolo,",
+      "perche": "dare la misura giusta: né miracolo né caso",
+      "blocco": "parole",
+      "dati": {"parole": [{"testo": "Non è un miracolo", "segno": "miracolo"}, {"testo": "Non è un caso", "segno": "caso", "colore": "#7CF26B"}]},
+      "segni": {"miracolo": "miracolo", "caso": "caso"},
+      "enfasi": ["miracolo"],
+      "luogo": "laboratorio", "campo": "stretto", "camera": "indietro",
+      "protagonista": {"grandezza": 0.62, "onda": 0.4}
+    },
+    {
+      "nome": "rischi",
+      "da": "C'è però un altro",
+      "perche": "il rovescio della medaglia: gli effetti gravi sono più frequenti con il farmaco",
+      "blocco": "avviso",
+      "dati": {
+        "titolo": "Effetti collaterali gravi",
+        "segno": "effetti",
+        "punti": [
+          {"testo": "Più frequenti con la Reta", "segno": "frequenti"},
+          {"testo": "Soprattutto gastrointestinali", "segno": "gastro"}
+        ],
+        "fonte": "NEJM 2026, riportato dagli autori"
+      },
+      "segni": {"altro": "altro", "effetti": "effetti", "frequenti": "frequenti", "gastro": "gastrointestinali"},
+      "enfasi": ["gravi"],
+      "suoni": [{"suono": "errore", "su": "gravi"}],
+      "luogo": "vaso", "tinta": "#E8455A", "entra": "avanti", "campo": "medio", "camera": "scende",
+      "protagonista": [{"onda": 0.6}, {"segno": "altro", "colore": "#FF4D5E", "onda": 1.6, "acceso": 1}],
+      "narratore": {"posa": "conserte"}
+    },
+    {
+      "nome": "conclusione",
+      "da": "In conclusione, due studi",
+      "perche": "tirare le somme in quattro righe, compreso chi ha pagato gli studi",
+      "blocco": "lista",
+      "dati": {
+        "titolo": "In conclusione",
+        "voci": [
+          {"testo": "2 studi sull'uomo", "segno": "duestudi"},
+          {"testo": "La Reta riduce il dolore", "segno": "riduce"},
+          {"testo": "più del placebo", "segno": "piu"},
+          {"testo": "Coinvolta l'azienda che la produce", "segno": "azienda"},
+          {"testo": "I dettagli contano", "segno": "dettagli"}
+        ]
+      },
+      "segni": {"duestudi": "due", "riduce": "riduce", "piu": "più", "azienda": "azienda", "dettagli": "dettagli"},
+      "enfasi": ["più", "dettagli"],
+      "suoni": [{"suono": "successo", "su": "più"}],
+      "luogo": "studio", "entra": "sinistra", "campo": "largo", "camera": "destra",
+      "protagonista": {"colore": "#5CF2C8", "onda": 0.5, "acceso": 1, "carica": 1}
+    },
+    {
+      "nome": "amico",
+      "da": "Manda questo video a",
+      "perche": "l'invito a condividere, con il ginocchio che scricchiola sulle scale",
+      "blocco": "oggetto",
+      "dati": {
+        "oggetto": "ginocchio",
+        "parametri": {"dolore": 0.15, "piega": 8},
+        "cambia": [{"segno": "scricchiolano", "parametri": {"dolore": 0.9, "piega": 46}, "durata": 0.9}, {"segno": "scale", "parametri": {"piega": 12}, "durata": 0.7}],
+        "etichette": [
+          {"testo": "Manda questo video", "punto": [0, 150, 30], "segno": "manda"},
+          {"testo": "a quell'amico", "punto": [0, -120, 30], "segno": "amico", "colore": "#FFD23F"}
+        ]
+      },
+      "segni": {"manda": "Manda", "amico": "amico", "scricchiolano": "scricchiolano", "scale": "scale"},
+      "luogo": "stadio", "entra": "basso", "campo": "stretto", "camera": "sale",
+      "protagonista": {"acceso": 0.6, "onda": 0.9}
+    },
+    {
+      "nome": "chiusura",
+      "da": "Commenta \"MAPPA\" per",
+      "perche": "l'invito finale con il regalo in mano",
+      "blocco": "ebook",
+      "dati": {"regalo": "mappa", "invito": "Commenta MAPPA", "sopra": "Gratis", "sotto": "Il database dei peptidi", "segno": "commenta", "segnoSopra": "gratis", "segnoSotto": "informazioni"},
+      "segni": {"commenta": "Commenta", "gratis": "gratis", "informazioni": "informazioni"},
+      "suoni": [{"suono": "whoosh", "su": "Commenta"}],
+      "luogo": "vuoto", "entra": "avanti", "campo": "medio", "camera": "spinta",
+      "protagonista": false
+    }
+  ]
+}

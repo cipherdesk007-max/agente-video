@@ -11,11 +11,20 @@ FMLAB Reel Kit — comandi
   npm run collaudo                         controlla che il kit funzioni su questo computer
   npm test · npm run prove:lente [nome]    le prove: veloci (a ogni modifica) e lente (browser e render, a fine lavoro)
   npm run nuovo <reel> "Titolo" [modello]  crea un nuovo reel da un modello (senza niente: elenco dei modelli)
+  npm run nuovo <reel> "Titolo" testo=<file.txt> [scelte]   crea un reel da un testo già scritto (non si tocca)
+  npm run fai <reel> [testo=file "Titolo"]  DAL TESTO AL VIDEO, a tappe: regia, monta, tempi, provini | voce, render, verifica,
+                                           confronta. Riparte dalla tappa fallita; si ferma prima di spendere (voce=si per dire sì).
+                                           Con testo=<file.txt> crea il reel; scelte: durata=60 narratore=nessuno regalo=mappa · bozza
+  npm run regia <reel> [nuova]             scrive il piano di regia di serie (piano.json) dal testo: una base da migliorare
+  npm run piano [reel]                     controlla il piano e il suo "rischio cartelli" (senza reel: blocchi, luoghi, camere)
+  npm run monta <reel>                     piano.json → copione.md + scene.tsx (il testo resta parola per parola)
+  npm run regalo [nome file "Titolo" [PAROLA]]  i regali della chiusura (ebook, mappe, PDF): elenco, o ne aggiunge uno
   npm run imposta <reel> [chiave=valore…]  le scelte del reel: narratore=dottore|fmlab|nessuno  grandezza=40…160
                                            lato=destra|sinistra  specchia=si|no  alza=0…600  stile=auto|2d|3d
                                            mano=auto|aperta|alza|giu (la seconda mano)  musica=0…100
                                            voce=auto|elevenlabs|mac|comando|stima
                                            durata=15…180|libera (secondi chiesti: scarto massimo 5, la voce si velocizza)
+                                           regalo=auto|nessuno|<nome> (cosa si regala in chiusura: npm run regalo)
   npm run voce <reel> [lingua] [motore]    voce + tempi parola per parola (motore: elevenlabs | mac | comando | stima)
                                            se il testo non è cambiato riusa la voce già fatta: zero crediti ("nuova" per rifarla)
   npm run foto <reel> [lingua] <dove>…     fotogrammi a piena risoluzione (dove: secondi, segno, scena, "fine")
@@ -117,6 +126,26 @@ async function principale() {
     case 'confronta': {
       const {comandoConfronta} = await import('./confronta.mjs');
       return comandoConfronta(argomenti);
+    }
+    case 'piano': {
+      const {comandoPiano} = await import('./piano.mjs');
+      return comandoPiano(argomenti[0]);
+    }
+    case 'monta': {
+      const {comandoMonta} = await import('./piano.mjs');
+      return comandoMonta(argomenti[0]);
+    }
+    case 'regia': {
+      const {comandoRegia} = await import('./regista.mjs');
+      return comandoRegia(argomenti[0], argomenti.slice(1));
+    }
+    case 'fai': {
+      const {comandoFai} = await import('./fai.mjs');
+      return comandoFai(argomenti[0], argomenti.slice(1));
+    }
+    case 'regalo': {
+      const {comandoRegalo} = await import('./regali.mjs');
+      return comandoRegalo(argomenti);
     }
     case 'riuso': {
       const {comandoRiuso} = await import('./riuso.mjs');

@@ -1,0 +1,341 @@
+// FMLAB Reel Kit — IL REGISTA DI SERIE. Dal testo dato scrive un primo piano di regia (piano.json) completo e
+// valido, senza rete e senza spesa: divide in scene, sceglie una scena pronta per ciascuna, mette i segni sulle
+// parole che contano, luogo, inquadratura, movimento di camera, protagonista, suoni.
+// È una base onesta, fatta di regole: chi fa la regia (la persona o l'agente) la legge e la migliora scena per
+// scena, mettendo numeri, grafici e oggetti dove il testo li chiede. Il testo non lo tocca nessuno.
+//
+//   npm run regia <reel>            scrive piano.json (se c'è già non lo tocca: "nuova" per rifarlo)
+//
+// Il metodo viene da come si descrive una ripresa a un generatore di video (vedi riferimenti/ANALISI.md):
+// ogni scena è un'inquadratura con un compito, un movimento di camera con un nome, un'azione (qualcosa che cambia,
+// non solo qualcosa che si vede), una luce sola; da un'inquadratura all'altra cambia la scala (largo, medio,
+// stretto) e restano uguali il protagonista e i colori dei soggetti.
+import fs from 'node:fs';
+import path from 'node:path';
+import {ErroreFmlab, cartellaReel, rel} from './percorsi.mjs';
+import {CAMERE, CAMPI, LUOGHI, PAUSA_MASSIMA, controllaPiano, leggiRegali, paroleDelTesto} from './piano.mjs';
+import {PAROLE_AL_SECONDO} from './durata.mjs';
+import {leggiImpostazioni} from './impostazioni.mjs';
+
+const VUOTE = new Set(
+  (
+    'il lo la i gli le un uno una di a da in con su per tra fra e ed o ma se che chi cui non più meno come anche già solo sono è era ha hanno ho hai del dello della dei degli delle al allo alla ai agli alle dal dallo dalla dai dagli dalle nel nello nella nei negli nelle sul sullo sulla sui sugli sulle col questo questa questi queste quello quella quelli quelle quell quel cosa cosa quando dove mentre però quindi allora poi ancora sempre mai molto poco tanto tanti tante tutto tutti tutte ogni altro altra altri altre suo sua suoi sue loro nostro nostra essere stato stata stati state viene veniva fare fatto può possono deve bisogna c ci si ne li mi ti vi lui lei noi voi io tu circa quasi oltre davvero proprio prima dopo senza rispetto volta ' +
+    'the a an of to in on at for with by from and or but if that this these those is are was were be been has have had it its as not more less than then so very just also only into over about what when where which who how why their our your his her they we you i do does did can could will would should may might each every all any some no ' +
+    'el los las un una unos unas de del al y o pero si que no más menos como también ya solo es son era ha han por para con sin sobre entre este esta estos estas ese esa eso lo le les se su sus muy cuando donde ' +
+    'le la les un une des du de et ou mais si que qui ne pas plus moins comme aussi déjà seulement est sont était a ont pour par avec sans sur entre ce cette ces il elle ils elles nous vous son sa ses leur très quand où ' +
+    'der die das ein eine einen einem einer und oder aber wenn dass nicht mehr weniger wie auch schon nur ist sind war hat haben für mit ohne auf über zwischen dieser diese dieses er sie es wir ihr sein seine sehr wann wo von zu im am ' +
+    'o os as um uma uns umas do da dos das no na nos nas e ou mas se que não mais menos como também já só é são era tem têm por para com sem sobre entre este esta esse essa ele ela eles elas seu sua muito quando onde'
+  ).split(/\s+/)
+);
+
+/** Le parole che dicono un numero, nelle lingue più usate. "sei" resta fuori: in italiano è quasi sempre il verbo. */
+const NUMERI = {
+  zero: 0, uno: 1, due: 2, tre: 3, quattro: 4, cinque: 5, sette: 7, otto: 8, nove: 9, dieci: 10, venti: 20, trenta: 30, quaranta: 40, cinquanta: 50, cento: 100, mille: 1000, duemila: 2000, milione: 1e6, miliardo: 1e9,
+  one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, twenty: 20, thirty: 30, forty: 40, fifty: 50, hundred: 100, thousand: 1000, million: 1e6, billion: 1e9,
+  dos: 2, tres: 3, cuatro: 4, cinco: 5, siete: 7, ocho: 8, nueve: 9, diez: 10, cien: 100, mil: 1000, deux: 2, trois: 3, quatre: 4, cinq: 5, sept: 7, huit: 8, neuf: 9, dix: 10, cent: 100, zwei: 2, drei: 3, vier: 4, fünf: 5, zehn: 10, hundert: 100, tausend: 1000,
+};
+
+const INVITO = /^(commenta|comment|comenta|commente|kommentiere)$/;
+const FRENA = /^(risch\w*|grav\w*|attenzion\w*|pericol\w*|collateral\w*|danno|danni|avvers\w*|risk\w*|danger\w*|warning|side|harm\w*|riesgo\w*|peligro\w*|risque\w*|gefahr\w*)$/;
+const CHIUDE = /^(conclusione|dimostrato|dimostrano|funziona|risultato|conclusion|proved|shown|works|result|conclusión|resultado|ergebnis)$/;
+
+/** Dove siamo, dalle parole della scena. Il primo luogo che trova una sua parola vince. */
+const DOVE = [
+  ['studio', /^(stud[io]\w*|rivist\w*|ricerc\w*|pubblicat\w*|autor\w*|articol\w*|scienziat\w*|stud(y|ies)|journal\w*|research\w*|paper\w*|author\w*|estudio\w*|étude\w*|studie\w*)$/],
+  ['bilancia', /^(differenz\w*|confront\w*|rispetto|contro|placebo|peso|pesa\w*|costo|costa\w*|prezz\w*|euro|soldi|difference|compar\w*|versus|price\w*|cost\w*|weigh\w*|money)$/],
+  ['palco', /^(pubblico|applau\w*|band|palco|concerto|spettacol\w*|audience|stage|applau\w*|show|crowd)$/],
+  ['stadio', /^(amic\w*|squadra|sport\w*|gara|partita|allen\w*|atlet\w*|scale|corr\w*|friend\w*|team|game|race|athlet\w*|train\w*|run\w*)$/],
+  ['laboratorio', /^(laborator\w*|scala|misur\w*|valutat\w*|test\w*|esperiment\w*|dat[io]|punt[io]|percent\w*|lab\w*|measur\w*|scale|experiment\w*|data|points?)$/],
+  ['vaso', /^(sangue|vas[io]|arter\w*|ven[ae]|circol\w*|pression\w*|effett\w*|blood|vessel\w*|arter\w*|vein\w*|pressure)$/],
+  ['membrana', /^(cellul\w*|recettor\w*|membran\w*|molecol\w*|protein\w*|peptid\w*|compost\w*|cell\w*|receptor\w*|molecul\w*|compound\w*)$/],
+  ['corpo', /^(corpo|dolor\w*|ginocchi\w*|cuore|muscol\w*|ossa|osso|artrosi|pelle|stomaco|cervello|adult\w*|uomo|persone|body|pain|knee\w*|heart|muscle\w*|bone\w*|skin|brain|people)$/],
+];
+
+const SALUTE = /^(dolor\w*|farmac\w*|placebo|peptid\w*|artrosi|studi\w*|medic\w*|effett\w*|salute|terapi\w*|dose|dosi|pain|drug\w*|health|therap\w*|medic\w*|dose\w*)$/;
+
+const senzaAccenti = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '');
+const maiuscola = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+const pulita = (t) => t.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}%]+$/gu, '');
+const fineFrase = (p) => /[.!?…]["”»)]*$/.test(p.testo);
+const pieno = (p) => p.chiave.length >= 4 && !VUOTE.has(p.chiave);
+
+/** Il numero che una parola dice, o null: "mille" → 1000, "45%" → 45. */
+export function numeroDi(parola) {
+  if (/^\d/.test(parola.chiave)) {
+    const n = Number(parola.chiave.replace(/\.(?=\d{3})/g, '').replace(',', '.').replace(/[^\d.]/g, ''));
+    return Number.isFinite(n) ? n : null;
+  }
+  return NUMERI[parola.chiave] ?? null;
+}
+
+/** Divide il testo in scene: a capo, domande e invito finale aprono una scena; quelle troppo corte si uniscono. */
+export function dividiInScene(parole) {
+  // 1 · le frasi
+  const frasi = [];
+  let da = 0;
+  parole.forEach((p, i) => {
+    if (fineFrase(p) || i === parole.length - 1) {
+      frasi.push({da, a: i + 1, capoverso: parole[da].capoverso, domanda: /\?["”»)]*$/.test(p.testo), invito: parole.slice(da, i + 1).some((x) => INVITO.test(x.chiave))});
+      da = i + 1;
+    }
+  });
+  // 2 · le scene: si apre a ogni capoverso, a ogni domanda (che poi tiene con sé la frase dopo, se breve) e all'invito
+  const scene = [];
+  for (const f of frasi) {
+    const ultima = scene[scene.length - 1];
+    const lunga = ultima ? ultima.a - ultima.da : 0;
+    const nuova = !ultima || f.invito || ultima.invito || (f.domanda && lunga >= 6) || (f.capoverso !== ultima.capoverso && (ultima.domanda ? f.a - f.da > 6 : lunga >= 16)) || lunga + (f.a - f.da) > 40;
+    if (nuova) scene.push({...f});
+    else {
+      ultima.a = f.a;
+      ultima.capoverso = f.capoverso;
+      ultima.domanda ||= f.domanda;
+    }
+  }
+  // 3 · una scena di meno di 6 parole (meno di due secondi) si unisce a quella prima, tranne l'invito
+  for (let i = scene.length - 1; i > 0; i--) {
+    if (scene[i].a - scene[i].da < 6 && !scene[i].invito && !scene[i - 1].invito) {
+      scene[i - 1].a = scene[i].a;
+      scene[i - 1].domanda ||= scene[i].domanda;
+      scene.splice(i, 1);
+    }
+  }
+  return scene;
+}
+
+/** Sceglie le parole su cui far comparire qualcosa: una ogni due secondi e mezzo circa, mai più di PAUSA_MASSIMA. */
+function scegliAncore(parole, da, a) {
+  const quante = Math.max(1, Math.round((a - da) / PAROLE_AL_SECONDO / 2.3));
+  const passo = (a - da) / quante;
+  const voto = (p, i) => (numeroDi(p) !== null && p.chiave !== 'uno' && p.chiave !== 'one' ? 6 : 0) + (p.enfasi ? 5 : 0) + (/^\p{Lu}/u.test(p.testo) && i > da && !fineFrase(parole[i - 1]) ? 4 : 0) + Math.min(p.chiave.length, 10) * 0.4 + (pieno(p) || numeroDi(p) !== null ? 3 : -4);
+  const scelte = [];
+  for (let k = 0; k < quante; k++) {
+    const inizio = Math.round(da + k * passo);
+    const fine = Math.max(inizio + 1, Math.round(da + (k + 1) * passo));
+    let meglio = inizio;
+    for (let i = inizio; i < fine && i < a; i++) if (voto(parole[i], i) > voto(parole[meglio], meglio)) meglio = i;
+    scelte.push(meglio);
+  }
+  // nessun buco più lungo della pausa massima, nemmeno verso la fine della scena
+  const limite = Math.floor((PAUSA_MASSIMA - 0.4) * PAROLE_AL_SECONDO);
+  const punti = [da, ...scelte, a];
+  for (let k = 0; k < punti.length - 1; k++) {
+    if (punti[k + 1] - punti[k] > limite) {
+      const meta = Math.round((punti[k] + punti[k + 1]) / 2);
+      let meglio = meta;
+      for (let i = meta - 2; i <= meta + 2; i++) if (i > punti[k] && i < punti[k + 1] && voto(parole[i], i) > voto(parole[meglio], meglio)) meglio = i;
+      punti.splice(k + 1, 0, meglio);
+      k--;
+    }
+  }
+  return [...new Set(punti.slice(1, -1))].sort((x, y) => x - y);
+}
+
+/** La scritta che compare su una parola: il numero in cifre con la sua unità, oppure la parola con quella che la completa. */
+function scrittaDi(parole, i, a) {
+  const p = parole[i];
+  const n = numeroDi(p);
+  const dopo = i + 1 < a && !/[,;:.!?…]$/.test(p.testo) ? parole[i + 1] : null;
+  if (n !== null) {
+    const cifre = String(n).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return {testo: dopo && pieno(dopo) ? `${cifre}${/%$/.test(p.testo) ? '%' : ''} ${pulita(dopo.testo)}` : `${cifre}${/%$/.test(p.testo) ? '%' : ''}`, numero: n};
+  }
+  const base = maiuscola(pulita(p.testo));
+  return {testo: dopo && pieno(dopo) && (base + dopo.chiave).length <= 22 ? `${base} ${pulita(dopo.testo)}` : base, numero: null};
+}
+
+/**
+ * Il piano di serie per un testo.
+ * @param {string} testo  il testo dato
+ * @param {{titolo?: string, regalo?: string, lingua?: string}} scelte  regalo: 'auto' | 'nessuno' | nome
+ * @returns {{piano: object, numeri: {numero: number, frase: string}[]}}  numeri = quelli messi a schermo, da scrivere in fonti.md
+ */
+export function regia(testo, {titolo = '', regalo = 'auto'} = {}) {
+  const parole = paroleDelTesto(testo);
+  if (parole.length < 3) throw new ErroreFmlab('Il testo è troppo corto per farne un reel: servono almeno una frase intera.');
+  const tratti = dividiInScene(parole);
+  const regali = leggiRegali();
+  const salute = parole.filter((p) => SALUTE.test(senzaAccenti(p.chiave))).length >= 2;
+  const nomi = new Set();
+  const nomeLibero = (base) => {
+    let b = senzaAccenti(base).replace(/[^a-z0-9]/g, '') || 'punto';
+    if (/^\d/.test(b)) b = 'n' + b;
+    if (b.startsWith('scena') || b.startsWith('suono')) b = 'p' + b;
+    let nome = b;
+    for (let k = 2; nomi.has(nome); k++) nome = `${b}${k}`;
+    nomi.add(nome);
+    return nome;
+  };
+  const scene = [];
+  const numeri = [];
+  const suoni = [];
+  let luogoPrima = null;
+  let enfasiMesse = 0;
+  const GIRO_LUOGHI = LUOGHI.filter((l) => l !== 'vuoto');
+
+  tratti.forEach((t, n) => {
+    const mie = parole.slice(t.da, t.a);
+    const ultima = n === tratti.length - 1;
+    const invito = mie.findIndex((p) => INVITO.test(p.chiave));
+    const frena = mie.some((p) => FRENA.test(senzaAccenti(p.chiave)));
+    const sc = {nome: nomeLibero(ultima && invito >= 0 ? 'chiusura' : n === 0 ? 'aggancio' : frena ? 'attenzione' : t.domanda ? 'domanda' : `scena${n + 1}`.replace('scena', 'parte')), da: mie.slice(0, Math.min(4, mie.length)).map((p) => p.testo).join(' ')};
+    const ancore = scegliAncore(parole, t.da, t.a);
+    const segni = {};
+    const nomeDi = new Map();
+    for (const i of ancore) {
+      const nome = nomeLibero(parole[i].chiave.split(/['’]/).pop());
+      const chiave = parole[i].chiave.split(/['’]/).pop();
+      // la stessa parola due volte nella scena: si dice quale
+      const uguale = (p) => p.chiave === chiave || p.chiave.split(/['’]/).pop() === chiave;
+      const volta = mie.slice(0, i - t.da).filter(uguale).length + 1;
+      segni[nome] = volta > 1 ? {su: chiave, volta} : chiave;
+      nomeDi.set(i, nome);
+    }
+    // cosa si vede
+    if (invito >= 0 && ultima) {
+      const parola = pulita(mie[invito + 1]?.testo ?? '').toUpperCase();
+      const dove = t.da + invito;
+      const segno = nomeDi.get(dove) ?? nomeLibero('commenta');
+      if (!nomeDi.has(dove)) segni[segno] = parole[dove].chiave;
+      // 'auto': il regalo che si manda a chi commenta proprio quella parola; se non c'è, resta il cartello con la parola
+      const scelto = regalo === 'auto' ? Object.keys(regali).find((k) => (regali[k].parola ?? '').toUpperCase() === parola) : regalo;
+      if (regalo !== 'nessuno' && scelto && regali[scelto]) {
+        sc.blocco = 'ebook';
+        // il titolo del regalo compare più avanti, su un'altra parola: la chiusura non resta ferma
+        const poi = ancore.filter((i) => i > dove + 2).sort((x, y) => parole[y].chiave.length - parole[x].chiave.length)[0];
+        sc.dati = {regalo: scelto, invito: `${pulita(mie[invito].testo)} ${parola}`.trim(), sotto: regali[scelto].titolo, segno, ...(poi !== undefined ? {segnoSotto: nomeDi.get(poi)} : {})};
+        sc.segni = {[segno]: segni[segno], ...(poi !== undefined ? {[nomeDi.get(poi)]: segni[nomeDi.get(poi)]} : {})};
+      } else {
+        sc.blocco = 'chiusura';
+        sc.dati = {parola: parola || 'INFO', segno};
+        sc.segni = {[segno]: segni[segno]};
+      }
+      suoni.push({scena: scene.length, suono: 'whoosh', su: parole[dove].chiave, forza: 9});
+    } else {
+      const voci = ancore.map((i) => ({i, ...scrittaDi(parole, i, t.a), segno: nomeDi.get(i)}));
+      const frase = t.domanda ? (() => {
+        // la domanda: dall'inizio della sua frase al punto interrogativo
+        const fine = mie.findIndex((p) => /\?["”»)]*$/.test(p.testo));
+        let inizio = fine;
+        while (inizio > 0 && !fineFrase(mie[inizio - 1])) inizio--;
+        return {inizio, fine, testo: mie.slice(inizio, fine + 1).map((p) => p.testo).join(' ')};
+      })() : null;
+      if (frase && frase.testo.length <= 78 && frase.inizio <= 2) {
+        // la scena si apre con la domanda: la domanda grande, poi niente altro da leggere
+        const segno = nomeDi.get(t.da + frase.inizio) ?? nomeLibero('domanda');
+        if (!nomeDi.has(t.da + frase.inizio)) segni[segno] = parole[t.da + frase.inizio].chiave;
+        sc.blocco = 'domanda';
+        sc.dati = {domanda: frase.testo, segno};
+        sc.segni = {[segno]: segni[segno]};
+        // dopo la domanda la scena non resta ferma: il protagonista cambia stato sulle parole che seguono
+        sc.poi = ancore.filter((i) => i !== t.da + frase.inizio).map((i) => nomeDi.get(i));
+        for (const nome of sc.poi) sc.segni[nome] = segni[nome];
+      } else {
+        // per non fare quattro scene uguali di fila: con tre o più cose da dire, una volta sì e una no è un elenco
+        const elenco = voci.length >= 3 && scene[scene.length - 1]?.blocco === 'parole';
+        sc.blocco = elenco ? 'lista' : 'parole';
+        sc.dati = elenco ? {voci: voci.map((v) => ({testo: v.testo, segno: v.segno}))} : {parole: voci.map((v) => ({testo: v.testo, segno: v.segno}))};
+        sc.segni = segni;
+        for (const v of voci) {
+          if (v.numero === null) continue;
+          if (Math.abs(v.numero) > 10) numeri.push({numero: v.numero, frase: mie.slice(Math.max(0, v.i - t.da - 2), v.i - t.da + 3).map((p) => p.testo).join(' ')});
+          suoni.push({scena: scene.length, suono: 'ding', su: segni[v.segno], forza: 6});
+        }
+      }
+      const primo = Object.keys(sc.segni)[0];
+      const allarme = mie.find((p) => FRENA.test(senzaAccenti(p.chiave)));
+      if (allarme && sc.blocco !== 'domanda') suoni.push({scena: scene.length, suono: 'errore', su: allarme.chiave, forza: 8});
+      else if (mie.some((p) => CHIUDE.test(senzaAccenti(p.chiave)))) suoni.push({scena: scene.length, suono: 'successo', su: sc.segni[primo], forza: 5});
+      else suoni.push({scena: scene.length, suono: 'pop', su: sc.segni[primo], forza: n === 0 ? 4 : 2});
+    }
+    // enfasi: i numeri e i nomi propri della scena, al più due per scena e otto in tutto
+    const daDire = [];
+    mie.forEach((p, k) => {
+      const proprio = /^\p{Lu}/u.test(p.testo) && k > 0 && !fineFrase(mie[k - 1]) && pieno(p);
+      if ((proprio || (numeroDi(p) !== null && p.chiave.length > 3) || (invito >= 0 && k === invito + 1)) && !daDire.includes(p.chiave) && !p.enfasi) daDire.push(p.chiave);
+    });
+    const scelte = daDire.slice(0, Math.max(0, Math.min(2, 8 - enfasiMesse)));
+    if (scelte.length) sc.enfasi = scelte;
+    enfasiMesse += scelte.length;
+    // dove siamo, come si entra, quanto è larga l'inquadratura, come si muove la camera
+    let luogo = DOVE.find(([, r]) => mie.some((p) => r.test(senzaAccenti(p.chiave))))?.[0] ?? null;
+    if (!luogo || luogo === luogoPrima) luogo = GIRO_LUOGHI.find((l) => l !== luogoPrima && !scene.some((s) => s.luogo === l)) ?? GIRO_LUOGHI[(n + 3) % GIRO_LUOGHI.length];
+    sc.luogo = ultima && invito >= 0 ? 'vuoto' : luogo;
+    luogoPrima = sc.luogo;
+    if (n > 0) sc.entra = ['avanti', 'destra', 'avanti', 'basso', 'avanti', 'sinistra'][n % 6];
+    sc.campo = sc.blocco === 'ebook' || sc.blocco === 'chiusura' ? 'medio' : CAMPI[[0, 1, 2, 1][n % 4]];
+    sc.camera = sc.blocco === 'ebook' || sc.blocco === 'chiusura' ? 'spinta' : frena ? 'indietro' : CAMERE.filter((c) => c !== 'ferma')[n % (CAMERE.length - 1)];
+    if (frena) sc.tinta = '#E8455A';
+    // il protagonista: resta lo stesso, cambia stato con il senso della scena
+    if (ultima && invito >= 0) sc.protagonista = false;
+    else if (frena) sc.protagonista = {colore: '#FF4D5E', onda: 1.6, acceso: 1};
+    else if (sc.blocco === 'domanda') sc.protagonista = [{colore: '#5CF2C8', onda: 0.9, acceso: 0.45, carica: 0.3, grandezza: 0.62}, ...(sc.poi ?? []).map((segno, k) => ({segno, acceso: 1, carica: Math.min(1, 0.5 + 0.25 * k), grandezza: k % 2 ? 0.62 : 0.74}))];
+    else sc.protagonista = {colore: '#5CF2C8', onda: 0.5, acceso: 1, carica: Math.min(1, 0.4 + 0.2 * n)};
+    delete sc.poi;
+    scene.push(sc);
+  });
+
+  // effetti sonori: da 4 a 6 in tutto. Prima i più importanti, uno per scena; se non bastano, un secondo nella stessa
+  // scena; se ancora non bastano, un "pop" sulle altre comparse.
+  const stessa = (x, y) => x.scena === y.scena && JSON.stringify(x.su) === JSON.stringify(y.su);
+  const ordinati = [...suoni].sort((x, y) => y.forza - x.forza);
+  const tenuti = [];
+  for (const s of ordinati) if (tenuti.length < 6 && !tenuti.some((x) => x.scena === s.scena)) tenuti.push(s);
+  for (const s of ordinati) if (tenuti.length < 4 && !tenuti.some((x) => stessa(x, s))) tenuti.push(s);
+  scene.forEach((sc, n) => {
+    for (const su of Object.values(sc.segni ?? {})) {
+      const s = {scena: n, suono: 'pop', su};
+      if (tenuti.length < 4 && !tenuti.some((x) => stessa(x, s))) tenuti.push(s);
+    }
+  });
+  for (const s of tenuti) (scene[s.scena].suoni ??= []).push(typeof s.su === 'string' ? {suono: s.suono, su: s.su} : {suono: s.suono, ...s.su});
+  // se il testo non ha nomi né numeri da mettere in evidenza, l'enfasi va sulla parola più lunga delle prime scene
+  if (!enfasiMesse && !parole.some((p) => p.enfasi)) {
+    for (const sc of scene.slice(0, 4)) {
+      const parola = Object.values(sc.segni ?? {}).map((a) => (typeof a === 'string' ? a : a.su)).sort((x, y) => y.length - x.length)[0];
+      if (parola) sc.enfasi = [parola];
+    }
+  }
+
+  const piano = {
+    versione: 1,
+    regista: 'di serie',
+    titolo: titolo || parole.slice(0, 8).map((p) => p.testo).join(' ').replace(/[,;:.!?…]+$/, ''),
+    protagonista: {tipo: salute ? 'peptide' : 'goccia', colore: '#5CF2C8'},
+    scene,
+  };
+  return {piano, numeri};
+}
+
+/** npm run regia <reel> [nuova] [regalo=nome|nessuno] */
+export async function comandoRegia(slug, argomenti = []) {
+  if (!slug) throw new ErroreFmlab('Quale reel? Esempio: npm run regia reta-ginocchio');
+  const dir = cartellaReel(slug);
+  const file = path.join(dir, 'piano.json');
+  const fileTesto = path.join(dir, 'testo.txt');
+  if (!fs.existsSync(fileTesto)) throw new ErroreFmlab(`In ${rel(dir)} manca testo.txt, il testo del reel. Un reel dal testo si crea con: npm run nuovo ${slug} "Titolo" testo=<file.txt>`);
+  if (fs.existsSync(file) && !argomenti.includes('nuova')) throw new ErroreFmlab(`${rel(file)} c'è già: non lo tocco. Per rifarlo da capo (e perdere le modifiche): npm run regia ${slug} nuova`);
+  const testo = fs.readFileSync(fileTesto, 'utf8');
+  const scritto = fs.existsSync(path.join(dir, 'copione.md')) ? /^#\s+(.+)$/m.exec(fs.readFileSync(path.join(dir, 'copione.md'), 'utf8'))?.[1] : '';
+  let regalo = argomenti.find((a) => a.startsWith('regalo='))?.slice(7);
+  try {
+    regalo ??= leggiImpostazioni(slug).regalo;
+  } catch {
+    // impostazioni non leggibili: regalo di serie
+  }
+  const {piano, numeri} = regia(testo, {titolo: (scritto ?? '').trim(), regalo: regalo ?? 'auto'});
+  const esito = controllaPiano(piano, testo, {cartella: dir});
+  if (esito.errori.length) throw new ErroreFmlab(`Il regista di serie ha scritto un piano che non passa il controllo (è un difetto del kit, segnalalo):\n${esito.errori.map((e) => '  ✗ ' + e).join('\n')}`);
+  fs.writeFileSync(file, JSON.stringify(piano, null, 2) + '\n');
+  // i numeri che il piano mette a schermo vengono dal testo dato: lo si scrive in fonti.md, da verificare
+  if (numeri.length) {
+    const fileFonti = path.join(dir, 'fonti.md');
+    const fonti = fs.existsSync(fileFonti) ? fs.readFileSync(fileFonti, 'utf8') : `# Fonti · ${piano.titolo}\n`;
+    const righe = numeri.filter((x) => !fonti.includes(`| ${String(x.numero).replace(/\B(?=(\d{3})+(?!\d))/g, '.')} |`)).map((x) => `| ${String(x.numero).replace(/\B(?=(\d{3})+(?!\d))/g, '.')} | "…${x.frase}…" | dal testo dato | DA CONTROLLARE: fonte da aggiungere |`);
+    if (righe.length) fs.writeFileSync(fileFonti, `${fonti.trimEnd()}\n\n## Numeri a schermo presi dal testo dato\n\n| Numero | Dove lo dice il testo | Fonte | Nota |\n|---|---|---|---|\n${righe.join('\n')}\n`);
+  }
+  console.log(`Scritto ${rel(file)}: ${piano.scene.length} scene (${piano.scene.map((s) => s.blocco).join(', ')}).`);
+  for (const a of esito.avvisi) console.log(`  ! ${a}`);
+  console.log(`È il piano di serie, fatto di regole: leggilo e miglioralo scena per scena (npm run piano: i blocchi), poi  npm run monta ${slug}`);
+  return piano;
+}

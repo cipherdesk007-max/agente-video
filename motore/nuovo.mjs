@@ -127,6 +127,30 @@ export async function comandoNuovo(slug, parole = []) {
     console.log('');
     return;
   }
+  // testo=<file> : il testo è già scritto. Le altre coppie chiave=valore sono scelte del reel (durata=60 narratore=nessuno regalo=mappa…)
+  const coppie = parole.filter((p) => /^[a-zà]+=/i.test(p));
+  const fileTesto = coppie.find((c) => c.toLowerCase().startsWith('testo='))?.slice(6);
+  if (fileTesto !== undefined) {
+    if (!fs.existsSync(fileTesto)) throw new ErroreFmlab(`Non trovo il file del testo: ${fileTesto}`);
+    const testo = fs.readFileSync(fileTesto, 'utf8');
+    const lingua = coppie.find((c) => c.toLowerCase().startsWith('lingua='))?.slice(7);
+    const titolo = parole.filter((p) => !coppie.includes(p)).join(' ');
+    const dir = await creaReel(slug, titolo, {testo, lingua, silenzioso: true});
+    const scelte = coppie.filter((c) => !/^(testo|lingua)=/i.test(c));
+    if (scelte.length) {
+      const {comandoImposta} = await import('./impostazioni.mjs');
+      const registro = console.log;
+      console.log = () => {};
+      try {
+        await comandoImposta(slug, scelte);
+      } finally {
+        console.log = registro;
+      }
+    }
+    console.log(`Creato il reel "${slug}" in ${rel(dir)} dal testo dato (${testo.trim().split(/\s+/).length} parole): testo.txt è la copia che non si tocca.`);
+    console.log(`Prossimo passo:  npm run regia ${slug}   (il piano di regia di serie, da migliorare)   oppure tutto in una volta:  npm run fai ${slug}`);
+    return;
+  }
   // l'ultima parola, se è il nome di un modello, sceglie il modello
   const resto = [...parole];
   const modello = resto.length && modelli.some((m) => m.id === resto[resto.length - 1].toLowerCase()) ? resto.pop().toLowerCase() : 'spiegazione';

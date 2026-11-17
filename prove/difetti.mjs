@@ -586,6 +586,133 @@ await prova('metro: le soglie si ricavano dai riferimenti con il margine scritto
   }
 });
 
+// ───────────────────────── fase 3 · il piano di regia ─────────────────────────
+
+const TESTO_RETA = fs.readFileSync(path.join(K, 'prove/sostegno/testo-reta.txt'), 'utf8');
+const PIANO_RETA = () => JSON.parse(fs.readFileSync(path.join(K, 'prove/sostegno/piano-reta.json'), 'utf8'));
+
+await prova('testo dato: il **grassetto** incollato diventa enfasi, le parole restano quelle', async () => {
+  const {testoDaDire, copioneDaTesto, leggiCopione, confrontaTesto} = await carica('motore/copione.mjs');
+  const dato = 'Commenta **"MAPPA"** per ricevere * gratis **due cose** insieme.';
+  assert.equal(testoDaDire(dato), 'Commenta "MAPPA" per ricevere * gratis due cose insieme.');
+  assert.deepEqual([...testoDaDire(dato, {conEnfasi: true}).enfasi], [1, 6, 7]);
+  const c = leggiCopione(copioneDaTesto(dato));
+  assert.equal(confrontaTesto(testoDaDire(dato), c.testoParlato), null);
+  assert.deepEqual(c.parole.filter((p) => p.enfasi).map((p) => p.testo), ['"MAPPA"', 'due', 'cose']);
+});
+
+await prova('piano: il copione montato dice il testo dato parola per parola, con scene, segni, enfasi e suoni al loro posto', async () => {
+  const {controllaPiano, montaCopione} = await carica('motore/piano.mjs');
+  const {leggiCopione, confrontaTesto, testoDaDire} = await carica('motore/copione.mjs');
+  const piano = PIANO_RETA();
+  const esito = controllaPiano(piano, TESTO_RETA, {fonti: fs.readFileSync(path.join(K, 'reels/reta-ginocchio/fonti.md'), 'utf8')});
+  assert.deepEqual(esito.errori, []);
+  assert.deepEqual(esito.avvisi, [], 'il piano di esempio non deve avere consigli aperti');
+  assert.equal(esito.rischio.livello, 'basso');
+  const testo = montaCopione(piano, esito);
+  const c = leggiCopione(testo);
+  assert.equal(confrontaTesto(testoDaDire(TESTO_RETA), c.testoParlato), null);
+  assert.deepEqual(c.scene.map((s) => s.nome), piano.scene.map((s) => s.nome));
+  assert.equal(Object.keys(c.segni).length, piano.scene.reduce((n, s) => n + Object.keys(s.segni ?? {}).length, 0));
+  assert.match(testo, /dell'\[azienda\]azienda/, 'un segno su "azienda" va dentro "dell\'azienda"');
+  assert.match(testo, /\[suono:whoosh\]\[commenta\]Commenta \*"MAPPA\*"/);
+  assert.equal(c.suoni.length, 6);
+  // "dieci" compare due volte nella scena: il segno cade sulla seconda
+  assert.equal(c.parole[c.segni.dieci].testo, 'dieci');
+  assert.ok(c.parole.slice(0, c.segni.dieci).some((p) => p.testo === 'dieci,'));
+});
+
+await prova('piano: ogni errore dice in che scena, in che campo e cosa fare; con un errore non si scrive niente', async () => {
+  const {controllaPiano} = await carica('motore/piano.mjs');
+  const rotto = (cambia) => {
+    const piano = PIANO_RETA();
+    cambia(piano);
+    return controllaPiano(piano, TESTO_RETA).errori.join('\n');
+  };
+  assert.match(rotto((p) => (p.scene[1].blocco = 'ologramma')), /Scena 2 "domanda": il blocco "ologramma" non esiste\. Blocchi: titolo, domanda/);
+  assert.match(rotto((p) => (p.scene[2].segni.mille = 'duemila')), /Scena 3 "studi" · segno "mille": "duemila" non è in questa scena/);
+  assert.match(rotto((p) => (p.scene[2].segni.mille = 'placebo')), /nel testo c'è, ma in un'altra scena/);
+  assert.match(rotto((p) => (p.scene[4].dati.sinistra.segno = 'boh')), /il segno "boh" non è tra i segni di questa scena \(quattro, anche, duepunti\)/);
+  assert.match(rotto((p) => (p.scene[4].dati.sinistra.valore = '3,96')), /sinistra · valore: serve un numero/);
+  assert.match(rotto((p) => (p.scene[3].da = 'Il dolore era valutato')), /non trovo "Il dolore era valutato" nel testo/);
+  assert.match(rotto((p) => (p.scene[5].dati.voci[0].icona = 'FaCosaCheNonCe')), /l'icona "FaCosaCheNonCe" non esiste/);
+  assert.match(rotto((p) => (p.scene[0].camera = 'drone')), /"camera" \(come si muove durante la scena\) può essere ferma, spinta/);
+  assert.match(rotto((p) => (p.scene[0].dati.cambia[0].parametri.colore = 3)), /"ginocchio" non ha il parametro "colore"/);
+  assert.match(rotto((p) => (p.scene[11].dati.regalo = 'ricettario')), /il regalo "ricettario" non esiste\. Ci sono: mappa/);
+  assert.match(rotto((p) => (p.scene[6].segni.quattro = 'capire')), /il segno "quattro" c'è già nella scena "risultati"/);
+});
+
+await prova('piano: le scene scritte dal piano si disegnano senza che nessuno scriva codice (oggetto 3D che cambia stato, icone, regalo)', async () => {
+  const {controllaPiano, scriviScene} = await carica('motore/piano.mjs');
+  const piano = PIANO_RETA();
+  const sorgente = scriviScene(piano, controllaPiano(piano, TESTO_RETA));
+  assert.match(sorgente, /ginocchio3d\(\{dolore: mix\(1, 0\.3, rampa\(s\.dopo\("meno"\), 1\.2\)\)/);
+  assert.match(sorgente, /import \{FaFaceSmile, FaGuitar, FaHeartPulse, FaUsers\} from 'react-icons\/fa6';/);
+  assert.match(sorgente, /campo: "stretto",\n\s+camera: "indietro"/);
+  const dir = path.join(K, 'prove', `tmp-piano-${process.pid}`);
+  fs.mkdirSync(dir, {recursive: true});
+  try {
+    fs.writeFileSync(path.join(dir, 'scene.tsx'), sorgente);
+    fs.writeFileSync(path.join(dir, 'prova.tsx'), "export {default as reel} from './scene';\nexport {disegna} from '../sostegno/disegna';\n");
+    const {reel, disegna} = await ts(path.relative(K, path.join(dir, 'prova.tsx')));
+    assert.deepEqual(Object.keys(reel.scene), piano.scene.map((s) => s.nome));
+    const html = Object.fromEntries(Object.entries(reel.scene).map(([nome, def]) => [nome, disegna(def.componente ?? def)]));
+    assert.match(html.risultati, /3,96/);
+    assert.match(html.studi, /1\.019 adulti/);
+    assert.match(html.chiusura, /Commenta MAPPA/);
+    assert.match(html.chiusura, /stile\/ebook\.jpg/);
+    assert.match(html.applauso, /Il pubblico applaude/);
+    assert.match(html.misura, /Non è un caso/);
+    assert.equal(reel.scene.rischi.dottore.posa, 'conserte');
+    assert.equal(reel.scene.chiusura.protagonista, false);
+  } finally {
+    fs.rmSync(dir, {recursive: true, force: true});
+  }
+});
+
+const TESTI_DI_PROVA = {
+  salute: 'Dormire poco fa ingrassare? Uno studio su mille adulti dice di sì.\n\nChi dormiva meno di sei ore mangiava di più il giorno dopo. Non è magia: cambia la fame, e con la fame cambiano le scelte a tavola.\n\nCommenta SONNO per ricevere la guida.',
+  tecnologia: 'Il GPS non sa dove sei. I satelliti mandano solo l\'ora esatta, e nient\'altro.\n\nÈ il tuo telefono a fare il conto: ascolta quattro satelliti e misura i ritardi. Un errore di un milionesimo di secondo sposta la posizione di trecento metri.',
+  economia: 'Perché i prezzi salgono? Quando tutti vogliono comprare e la merce è poca, chi vende alza il prezzo.\n\nSe costa di più anche l\'energia, sale tutto il resto. In un anno il carrello può costare il 10% in più.\n\nMa attenzione: i rischi non sono uguali per tutti.',
+};
+
+await prova('regista di serie: da tre testi lontani (salute, tecnologia, economia) esce un piano valido, senza pause lunghe, con il testo intatto', async () => {
+  const {regia} = await carica('motore/regista.mjs');
+  const {controllaPiano, montaCopione, PAUSA_MASSIMA} = await carica('motore/piano.mjs');
+  const {leggiCopione, confrontaTesto, testoDaDire} = await carica('motore/copione.mjs');
+  for (const [nome, testo] of [...Object.entries(TESTI_DI_PROVA), ['reta', TESTO_RETA]]) {
+    const {piano} = regia(testo, {titolo: nome});
+    const esito = controllaPiano(piano, testo);
+    assert.deepEqual(esito.errori, [], `${nome}: il piano di serie deve passare il controllo`);
+    assert.deepEqual(esito.avvisi.filter((a) => a.includes('senza niente di nuovo')), [], `${nome}: nessuna pausa oltre ${PAUSA_MASSIMA} secondi`);
+    assert.notEqual(esito.rischio.livello, 'alto', `${nome}: rischio cartelli ${esito.rischio.punti}`);
+    assert.equal(confrontaTesto(testoDaDire(testo), leggiCopione(montaCopione(piano, esito)).testoParlato), null, `${nome}: il testo non si tocca`);
+    assert.ok(piano.scene.every((s) => s.camera && s.camera !== 'ferma' && s.campo && s.luogo), `${nome}: ogni scena ha luogo, inquadratura e movimento`);
+    assert.ok(piano.scene.every((s, i) => i === 0 || s.luogo !== piano.scene[i - 1].luogo), `${nome}: mai lo stesso luogo due scene di fila`);
+  }
+  // l'invito finale: con il regalo di quella parola si vede il regalo, altrimenti il cartello con la parola
+  assert.equal(regia(TESTO_RETA).piano.scene.at(-1).blocco, 'ebook');
+  assert.equal(regia(TESTO_RETA, {regalo: 'nessuno'}).piano.scene.at(-1).blocco, 'chiusura');
+  const sonno = regia(TESTI_DI_PROVA.salute).piano.scene.at(-1);
+  assert.deepEqual([sonno.blocco, sonno.dati.parola], ['chiusura', 'SONNO']);
+  // i numeri messi a schermo dal testo vengono dichiarati, per fonti.md
+  assert.deepEqual(regia(TESTO_RETA).numeri.map((n) => n.numero), [1000]);
+});
+
+await prova('rischio cartelli: una fila di scritte con la camera ferma non arriva al render', async () => {
+  const {controllaPiano} = await carica('motore/piano.mjs');
+  const piano = PIANO_RETA();
+  for (const s of piano.scene) {
+    const primo = Object.keys(s.segni)[0];
+    Object.assign(s, {blocco: 'titolo', dati: {titolo: 'Una scritta', segno: primo}, camera: 'ferma', campo: 'medio', perche: undefined, protagonista: undefined});
+  }
+  const esito = controllaPiano(JSON.parse(JSON.stringify(piano)), TESTO_RETA);
+  assert.deepEqual(esito.errori, []);
+  assert.equal(esito.rischio.livello, 'alto');
+  assert.ok(esito.rischio.punti >= 80, `punti ${esito.rischio.punti}`);
+  assert.ok(esito.rischio.voci.some((v) => v.nome === 'camera ferma') && esito.rischio.voci.some((v) => v.nome === 'scene di sole scritte'));
+});
+
 if (pannello) await pannello.server.chiudi();
 cancella();
 const falliti = esiti.filter((e) => !e.ok);
