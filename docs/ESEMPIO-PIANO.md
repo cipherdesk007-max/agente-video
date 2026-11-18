@@ -51,7 +51,7 @@ Tre scelte tengono insieme tutto il piano:
 - **Segni:** `pubblicati` (entra il foglio), `due`, `riviste`, `mondo` (la riga evidenziata cresce), `mille` (entrano
   le persone, con il `pop`), `artrosi` (entra il ginocchio), `anno` (le persone si accendono del tutto).
 - **Perché:** sono due frasi e trentuno parole di prova: sette segni, il numero più alto del piano, perché qui il
-  rischio di fermarsi è più alto. Il numero a schermo arriva sulla parola "mille". La fonte sta sotto.
+  rischio di fermarsi è più alto. Il numero a schermo arriva sulla parola "mille".
 
 ### 4 · scala
 

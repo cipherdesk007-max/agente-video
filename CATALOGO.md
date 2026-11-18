@@ -175,7 +175,7 @@ finale. Per cambiarlo sostituisci il file e aggiorna nome e misure in `stile/sti
 | `Etichetta` | pillola con un nome: `testo`, `piena?` |
 | `Scritta` | una riga semplice |
 | `Cartello` | il cartello finale: `sopra`, `parola`, `sotto` |
-| `Fonte` | la fonte in piccolo (si sposta da sola se il narratore è da quel lato) |
+| `Fonte` | la fonte in piccolo: si vede solo se il reel la chiede (`npm run imposta <reel> fonti=si`); si sposta da sola se il narratore è da quel lato |
 | `Bagliore`, `Lume`, `Onde`, `Faro`, `Linea` | luci, onde che si allargano, un faro, una linea che si disegna |
 | `Globo`, `Orologio`, `Spunta`, `Divieto`, `Segnaposto`, `Satellite`, `Telefono` | oggetti piatti |
 | `Camera`, `vistaA` | movimenti di camera su tutta la scena |

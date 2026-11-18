@@ -138,6 +138,7 @@ video: le scene si riallineano da sole alle parole.
 | `npm run collaudo` | controlla che il kit funzioni su questo computer |
 | `npm run fai ginocchio testo=testo.txt "Titolo"` | dal testo al video in otto tappe; poi `npm run fai ginocchio` riparte da dove serve (`bozza` per fare prima) |
 | `npm run piano ginocchio` | controlla il piano di regia (`piano.json`) e dà il rischio cartelli da 0 a 100 |
+| `npm run consegna ginocchio` | quello che serve per pubblicare: `copertina.jpg`, `pagella.md`, foglio affiancato, e l'elenco di cosa manca |
 | `npm run giudica ginocchio` | la pagella del piano in una schermata: otto righe, ✓ o ✖ con il numero accanto (`docs/OCCHIO.md`) |
 | `npm run regalo` | cosa si può regalare in chiusura (ebook, mappa, PDF) e come aggiungerne uno |
 | `npm run frasi audio.mp3 testo.txt` | taglia una registrazione della voce nelle sue frasi e le mette in banca: nei reel non costano (senza niente: elenco) |
@@ -270,10 +271,22 @@ densa, quanti raggi scendono dall'alto. Lo stile resta quello: fondo scuro, un c
 - Di serie è `auto`: quando il regista di serie scrive il piano (`npm run fai`, `npm run regia`) sceglie l'atmosfera
   dal nome del reel. Lo stesso nome dà sempre la stessa; se è quella del reel che viene prima nella cartella, prende
   la successiva dell'elenco. La scelta resta scritta in `piano.json` (`"atmosfera": "serra"`).
+- Il calcolo usa solo i nomi dei reel, in ordine: non legge gli altri piani e non dipende dall'ordine in cui lanci i
+  comandi. Per questo "quella del reel prima" è quella che il suo nome gli dà: se a quel reel l'hai scelta a mano, o
+  è uno dei reel di prima senza atmosfera, due vicini possono avere lo stesso fondo. Si cambia con `imposta`.
+  Conta anche quali reel ci sono nella cartella in quel momento: un reel aggiunto dopo, con un nome che viene prima,
+  non cambia i piani già scritti.
 - A mano: `npm run imposta <reel> atmosfera=alba`. Vince su quella del piano. Un nome sbagliato dà l'elenco dei nomi.
 - I reel che c'erano già (`gps`, `reta-ginocchio`, `reta-testo`, `mots-c`) non hanno un'atmosfera scritta e restano
   sul fondo di sempre: i loro fotogrammi sono identici a prima.
 - Una scena che chiede il suo colore (il rosso di un "attenzione") lo tiene, in qualunque atmosfera.
+
+**Le fonti non si vedono nel video.** La scritta piccola "Fonte: …" sotto numeri e grafici di serie non compare. Le
+fonti restano dove servono: una riga per ogni numero in `fonti.md`, e `npm run verifica` continua a controllarle.
+Per rimetterla in un reel: `npm run imposta <reel> fonti=si`; per toglierla di nuovo: `fonti=no`.
+
+**Il palco è di chi c'è.** In una scena con più soggetti, chi è entrato da solo sta in mezzo ed è grande; quando
+entra il secondo si fa da parte e si rimpicciolisce, e così con il terzo. Alla fine la fila è quella di sempre.
 
 ## Dove sono le cose
 

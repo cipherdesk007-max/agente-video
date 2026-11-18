@@ -251,11 +251,15 @@ export function Cartello({
   );
 }
 
-/** Fonte in piccolo sotto al palco: dà credibilità e si legge al fermo immagine. */
+/**
+ * Fonte in piccolo sotto al palco. Di serie non si vede: compare solo se il reel lo chiede
+ * (`npm run imposta <reel> fonti=si`). Le fonti stanno comunque in fonti.md.
+ */
 export function Fonte({testo, da, fino, x, y = 1300}: Presenza & {testo: ReactNode; x?: number; y?: number}) {
   const p = presenza({da, fino});
-  const narratore = useTempo().narratore;
-  if (!p.visibile) return null;
+  const tempo = useTempo();
+  const narratore = tempo.narratore;
+  if (!p.visibile || tempo.impostazioni?.fonti !== 'si') return null;
   // Di serie sta in basso a sinistra. Se lì arriva il narratore (messo a sinistra, o molto grande) passa a destra,
   // dentro la parte che l'app non copre. Con una x scritta a mano resta dove gli è stato detto.
   const largo = typeof testo === 'string' ? testo.length * 15 + 12 : 420;

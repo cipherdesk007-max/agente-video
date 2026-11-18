@@ -254,7 +254,8 @@ Scrittura:
 - Usa i colori di `stile.colori`: `luce` per ciò che è protagonista, `accento` per il numero che deve restare,
   `negativo` e `positivo` per sbagliato e giusto.
 - Un elemento che ritorna in tutte le scene (nel reel d'esempio: le onde del segnale) tiene insieme il racconto.
-- Metti la fonte in piccolo con `<Fonte>` quando sul palco c'è un numero.
+- La fonte di ogni numero va in `fonti.md`. Nel video la scritta "Fonte: …" di serie non si vede: `<Fonte>` e il campo
+  `fonte` dei blocchi la mostrano solo se il reel lo chiede (`npm run imposta <reel> fonti=si`).
 
 **Come si scrive il codice**
 

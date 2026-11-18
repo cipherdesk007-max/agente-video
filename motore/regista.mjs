@@ -376,30 +376,16 @@ export function regia(testo, {titolo = '', regalo = 'auto'} = {}) {
 
 /** npm run regia <reel> [nuova] [regalo=nome|nessuno] */
 /** L'atmosfera che un reel ha già: quella scelta a mano, altrimenti quella del suo piano, altrimenti il fondo di sempre. */
-export function atmosferaInUso(slug) {
-  try {
-    const scelta = leggiImpostazioni(slug).atmosfera;
-    if (scelta && scelta !== 'auto') return scelta;
-  } catch {
-    // impostazioni non leggibili: si guarda il piano
-  }
-  try {
-    return JSON.parse(fs.readFileSync(path.join(cartellaReel(slug), 'piano.json'), 'utf8')).atmosfera ?? 'classica';
-  } catch {
-    return 'classica';
-  }
-}
-
 /**
- * L'atmosfera che il regista di serie dà a un reel: dal nome (sempre la stessa), ma diversa da quella del reel che
- * lo precede nella cartella, in ordine di nome.
- * @param {string} slug
- * @param {string[]} reel  i nomi dei reel nella cartella
- * @param {(slug: string) => string} inUso  l'atmosfera di un altro reel
+ * L'atmosfera che il regista di serie dà a un reel. Dipende solo dai nomi: il suo e quelli dei reel che lo
+ * precedono nella cartella, in ordine di nome. Non legge cosa c'è scritto negli altri reel e non guarda quando sono
+ * stati fatti: in qualunque ordine si lancino i comandi esce la stessa. Si parte dal primo nome dell'elenco: ognuno
+ * prende l'atmosfera del suo nome, e se è quella del nome prima passa alla successiva.
  */
-export function atmosferaPerReel(slug, reel = elencoReel(), inUso = atmosferaInUso) {
-  const prima = [...reel].filter((r) => r !== slug && r < slug).sort().pop();
-  return atmosferaDalNome(slug, prima ? inUso(prima) : null);
+export function atmosferaPerReel(slug, reel = elencoReel()) {
+  let precedente = null;
+  for (const nome of [...new Set(reel)].filter((r) => r < slug).sort()) precedente = atmosferaDalNome(nome, precedente);
+  return atmosferaDalNome(slug, precedente);
 }
 
 export async function comandoRegia(slug, argomenti = []) {

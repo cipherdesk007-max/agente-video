@@ -184,6 +184,7 @@ export function schermata(p) {
   const esce = [`\nPagella di "${p.slug}"  ·  ${p.scene} scene, ${p.parole} parole, ${p.tempi}\n`];
   for (const r of p.righe) esce.push(`  ${SEGNO[r.esito]}  ${r.n} ${r.cosa.padEnd(larga)}   ${r.valore}`);
   esce.push(`\n  ${conto('ok')} a posto, ${conto('no')} da sistemare${conto('nd') ? `, ${conto('nd')} che qui non si ${conto('nd') === 1 ? 'può' : 'possono'} dire` : ''}.${p.consigli ? ` Il piano ha ${p.consigli} ${p.consigli === 1 ? 'consiglio' : 'consigli'}: npm run piano ${p.slug}` : ''}`);
+  if (conto('no')) esce.push('  Le ✖ non fermano il comando (esce sempre con esito 0): ognuna si sistema, o si dichiara nella consegna.');
   esce.push(`  Provini: ${p.provini}`);
   if (p.domande.length) {
     esce.push('\n  Prima di consegnare, ad alta voce (docs/OCCHIO.md):');
@@ -192,7 +193,10 @@ export function schermata(p) {
   return esce.join('\n') + '\n';
 }
 
-/** npm run giudica <reel> */
+/**
+ * npm run giudica <reel>. Esce sempre con esito 0, anche con delle ✖: alcune dipendono dal testo della persona, che
+ * non si tocca, e un esito diverso da 0 fermerebbe chi lavora su un reel che non può sistemare. Contano le righe.
+ */
 export async function comandoGiudica(slug) {
   if (!slug) throw new ErroreFmlab('Quale reel? Così: npm run giudica <reel>');
   console.log(schermata(await pagella(slug)));

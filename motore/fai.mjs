@@ -197,5 +197,16 @@ export async function comandoFai(slug, argomenti = []) {
       chiusura = `\nIl diario non è stato scritto (${String(e?.message ?? e).split('\n')[0]}): lancia  npm run riuso ${slug}`;
     }
   }
+  // La consegna: copertina, pagella scritta, foglio affiancato, e l'elenco di quello che resta da sistemare.
+  if (!bozza) {
+    try {
+      const {consegna, riassuntoConsegna} = await import('./consegna.mjs');
+      const c = await consegna(slug);
+      annota('nota', {reel: slug, testo: `consegna: ${c.fatte.length} file pronti, ${c.mancano.length} cose da sistemare`});
+      chiusura += `\n\n${riassuntoConsegna(c)}`;
+    } catch (e) {
+      chiusura += `\nLa consegna non è stata preparata (${String(e?.message ?? e).split('\n')[0]}): lancia  npm run consegna ${slug}`;
+    }
+  }
   console.log(`\nFatto: tutte le ${TAPPE.length} tappe riuscite. Il video è in ${rel(dir)}.${bozza ? ' È una bozza: per il video finale rilancia senza "bozza".' : ''}${chiusura}`);
 }

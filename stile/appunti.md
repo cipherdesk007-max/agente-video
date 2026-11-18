@@ -64,6 +64,18 @@ Lezioni dai reel già fatti. Leggile prima di cominciarne uno nuovo; alla fine a
 - Le braccia conserte stanno bene sulla frase che frena ("Ma anche con il placebo…"): il kit le mette lì da
   solo. Una volta o due per reel bastano: è una posa chiusa, non una posa per spiegare.
 
+## Dai reel "reta-testo" e "mots-c"
+
+- Le fonti non vanno a schermo (scelta di Francesco, 17/11/2026): la scritta "Fonte: …" è spenta di serie. Le fonti
+  restano in `fonti.md`, una riga per numero.
+- Un soggetto entrato da solo deve riempire il palco: piccolo in un angolo ad aspettare gli altri lascia il
+  fotogramma vuoto. Ora lo fa il kit (sta in mezzo, 800 pixel, poi si stringe quando entra il secondo). Movimento
+  sul palco misurato: da 3,32 a 4,37 in `reta-testo`, da 2,86 a 4,29 in `mots-c`.
+- Una scena con una tinta sua si vede solo se anche il soggetto principale ha quel colore: in `mots-c` il fondo
+  rosso e quello ambra non contavano finché i soggetti restavano verdi e azzurri (tinte misurate: da 2 a 4).
+- Il narratore fa un gesto a ogni segno. Con 30,6 segni al minuto (`reta-testo`) cambia 47,3 volte al minuto, come i
+  riferimenti; con 35,8 (`mots-c`) arriva a 55,9, più del riferimento più mosso (54,3).
+
 ## Voce
 
 - La voce dei reel è **Vittorio** (ElevenLabs), stabilità 50, somiglianza 75, modello v4: sono le regolazioni con cui

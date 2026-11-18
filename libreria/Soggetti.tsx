@@ -381,6 +381,55 @@ const DISEGNI: Record<TipoSoggetto, (d: Disegno) => ReactNode> = {
 // ───────────────────────── il soggetto vivo ─────────────────────────
 
 /** Un soggetto grande e vivo: bagliore che respira, scintille in orbita, galleggia. `lato` è il lato della sua scatola in pixel. */
+/** Quanti strati ha lo spessore di un'icona, e di quanto scende ognuno (in frazioni del lato). */
+const SPESSORE = {strati: 9, dx: 0.0055, dy: 0.0085};
+
+/**
+ * Un'icona con il suo volume: lo spessore dietro (strati più scuri, spostati in basso a destra), la faccia, la luce
+ * che la prende dall'alto a sinistra e l'ombra in basso a destra. La forma è sempre quella dell'icona.
+ */
+function IconaSolida({Icona, lato, colore}: {Icona: NonNullable<Soggetto['icona']>; lato: number; colore: string}) {
+  const strato = (k: number) => ({position: 'absolute' as const, left: 0, top: 0, transform: `translate(${(k * SPESSORE.dx * lato).toFixed(2)}px, ${(k * SPESSORE.dy * lato).toFixed(2)}px)`});
+  const sopra = (angolo: number, fine: number) => ({position: 'absolute' as const, left: 0, top: 0, WebkitMaskImage: `linear-gradient(${angolo}deg, #000 0%, transparent ${fine}%)`, maskImage: `linear-gradient(${angolo}deg, #000 0%, transparent ${fine}%)`});
+  return (
+    <div data-fmlab-volume="icona" style={{position: 'relative', width: lato, height: lato, transform: `translate(${(-SPESSORE.strati * SPESSORE.dx * lato * 0.5).toFixed(2)}px, ${(-SPESSORE.strati * SPESSORE.dy * lato * 0.5).toFixed(2)}px)`}}>
+      {Array.from({length: SPESSORE.strati}, (_, i) => {
+        const k = SPESSORE.strati - i;
+        return (
+          <div key={k} style={strato(k)}>
+            <Icona size={lato} color={`color-mix(in srgb, ${colore} ${Math.round(46 - 22 * (k / SPESSORE.strati))}%, #04100c)`} />
+          </div>
+        );
+      })}
+      <div style={strato(0)}>
+        <Icona size={lato} color={colore} />
+      </div>
+      <div style={{...sopra(150, 58), opacity: 0.5}}>
+        <Icona size={lato} color="#ffffff" />
+      </div>
+      <div style={{...sopra(330, 46), opacity: 0.34}}>
+        <Icona size={lato} color="#02110c" />
+      </div>
+    </div>
+  );
+}
+
+/** La pedana sotto il soggetto (ombra di contatto, disco di luce, due anelli in prospettiva) e il cono di luce dall'alto. */
+function Ambiente({lato, colore, battito, cono}: {lato: number; colore: string; battito: number; cono: boolean}) {
+  const larga = lato * 1.04;
+  const alta = lato * 0.2;
+  const ellisse = (scala: number) => ({position: 'absolute' as const, left: (lato - larga * scala) / 2, top: lato * 0.9 - (alta * scala) / 2, width: larga * scala, height: alta * scala, borderRadius: '50%'});
+  return (
+    <div data-fmlab-ambiente="pedana" style={{position: 'absolute', inset: 0, pointerEvents: 'none'}}>
+      {cono ? <div style={{position: 'absolute', left: -lato * 0.06, top: -lato * 0.1, width: lato * 1.12, height: lato * 1.02, clipPath: 'polygon(41% 0, 59% 0, 100% 100%, 0 100%)', background: `linear-gradient(180deg, ${alfa(colore, 0.2 + 0.05 * battito)} 0%, ${alfa(colore, 0.07)} 55%, transparent 100%)`, filter: 'blur(10px)'}} /> : null}
+      <div style={{...ellisse(1.12), background: 'radial-gradient(closest-side, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.28) 55%, transparent 100%)'}} />
+      <div style={{...ellisse(1), background: `radial-gradient(closest-side, ${alfa(colore, 0.42 + 0.14 * battito)} 0%, ${alfa(colore, 0.16)} 52%, transparent 100%)`}} />
+      <div style={{...ellisse(0.86), border: `2px solid ${alfa(colore, 0.5)}`, boxShadow: `0 0 18px ${alfa(colore, 0.35)}`}} />
+      <div style={{...ellisse(0.52), border: `1.5px solid ${alfa(colore, 0.32)}`}} />
+    </div>
+  );
+}
+
 export function SoggettoVivo({soggetto, x, y, lato, p, da, indice = 0, colpo = 0}: {soggetto: Soggetto; x: number; y: number; lato: number; p: Record<string, number>; da: number; indice?: number; /** Da 1 a 0 nel mezzo secondo dopo un cambio di stato: il soggetto dà un colpo, così il cambio si vede. */ colpo?: number}) {
   const tempo = useTempo();
   const t = tempo.ora + indice * 1.37;
@@ -402,13 +451,15 @@ export function SoggettoVivo({soggetto, x, y, lato, p, da, indice = 0, colpo = 0
     <div style={{position: 'absolute', left: x - lato / 2, top: y - lato / 2, width: lato, height: lato, opacity: rampa(da, 0.25), transform: `translate(${deriva.toFixed(2)}px, ${((1 - entra) * 90 + galleggia).toFixed(2)}px) rotate(${dondola.toFixed(3)}deg) scale(${(mix(0.7, 1, entra) * respira * (1 + 0.09 * colpo)).toFixed(4)})`}}>
       {/* il colpo: un anello di luce che si allarga dal soggetto quando cambia stato */}
       {colpo > 0.02 ? <div style={{position: 'absolute', inset: `${(-lato * 0.32 * (1 - colpo)).toFixed(1)}px`, borderRadius: '50%', border: `${(3 + 9 * colpo).toFixed(1)}px solid ${alfa(colore, 0.85 * colpo)}`, boxShadow: `0 0 ${Math.round(50 * colpo)}px ${alfa(colore, 0.7 * colpo)}`}} /> : null}
+      {/* l'ambiente: una pedana di luce sotto il soggetto e un cono che scende dall'alto, così non galleggia nel vuoto */}
+      <Ambiente lato={lato} colore={colore} battito={battito} cono={soggetto.tipo !== 'riflettori'} />
       {/* il bagliore dietro, che respira */}
       <div style={{position: 'absolute', inset: -lato * 0.18, borderRadius: '50%', background: `radial-gradient(circle, ${alfa(colore, 0.3 + 0.22 * battito)} 0%, ${alfa(colore, 0.1 + 0.08 * battito)} 38%, transparent 68%)`}} />
       {soggetto.tipo === 'immagine' && soggetto.file ? (
         <img src={tempo.risorsa(soggetto.file)} alt="" style={{position: 'absolute', left: '5%', top: '5%', width: '90%', height: '90%', objectFit: 'contain', filter: `drop-shadow(0 0 ${Math.round(16 + 14 * battito)}px ${alfa(colore, 0.8)})`, opacity: 0.55 + 0.45 * limita(p.acceso ?? 1)}} />
       ) : soggetto.tipo === 'icona' && Icona ? (
         <div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', filter: `drop-shadow(0 0 ${Math.round(18 + 16 * battito)}px ${alfa(colore, 0.85)})`, opacity: 0.55 + 0.45 * limita(p.acceso ?? 1)}}>
-          <Icona size={lato * 0.72} color={colore} />
+          <IconaSolida Icona={Icona} lato={lato * 0.72} colore={colore} />
         </div>
       ) : (
         <svg width={lato} height={lato} viewBox="-100 -100 200 200" style={{position: 'absolute', inset: 0, overflow: 'visible'}}>
@@ -467,6 +518,9 @@ export function statoSoggetto(soggetto: Soggetto, dopo: (q: Quando) => number): 
   return p;
 }
 
+/** In quanti secondi il palco si riassetta quando entra un soggetto. */
+const INGRESSO = 0.7;
+
 /**
  * Da uno a tre soggetti grandi sul palco, ognuno con la sua etichetta a pillola sotto. È la scena di base di un
  * reel illustrato: il soggetto mostra la cosa, lo stato che cambia racconta cosa le succede.
@@ -478,12 +532,22 @@ export function bloccoSoggetti({soggetti, titolo, fonte}: {soggetti: Soggetto[];
     const tempo = useTempo();
     const dice = (testo?: Testo): string => (testo === undefined ? '' : typeof testo === 'string' ? testo : testo[tempo.lingua] ?? Object.values(testo)[0] ?? '');
     const dopo = (q: Quando | undefined): number => (q === undefined ? s.t + 0.01 : typeof q === 'string' ? s.dopo(q) : s.t - q);
-    const n = soggetti.length;
-    const lato = n === 1 ? 800 : n === 2 ? 520 : 360;
-    const passo = n === 2 ? 500 : 340;
+    // Il palco è di chi c'è. Un soggetto da solo sta in mezzo, grande; quando ne entra un altro si fa da parte e si
+    // rimpicciolisce quanto serve, e così con il terzo. `presenti` va da 1 al numero dei soggetti, con la virgola
+    // mentre uno sta entrando: misure e posti si muovono con lui, senza scatti.
+    // Chi entra per primo (da solo o insieme ad altri) trova il palco vuoto e prende subito il suo posto: il palco si
+    // riassetta solo quando qualcuno arriva dopo.
+    const daQuanto = soggetti.map((sg) => dopo(sg.segno));
+    const primo = Math.max(...daQuanto);
+    const entrato = daQuanto.map((da) => (da <= 0 ? 0 : da >= primo - 0.2 ? 1 : limita(da / INGRESSO, 0, 1)));
+    const peso = entrato.map((k) => k * k * (3 - 2 * k));
+    const presenti = Math.max(1, peso.reduce((a, b) => a + b, 0));
+    const tra = (uno: number, due: number, tre: number) => (presenti <= 2 ? mix(uno, due, presenti - 1) : mix(due, tre, presenti - 2));
+    const lato = tra(800, 520, 360);
+    const passo = tra(500, 500, 340);
     // tre soggetti stanno più in alto: così le loro etichette finiscono sopra la colonna delle icone dell'app e non
     // devono stringersi una contro l'altra per evitarla
-    const yCentro = CY - (n === 1 ? 50 : n === 2 ? 40 : 170);
+    const yCentro = CY - tra(50, 40, 170);
     // Etichette e note restano dentro le zone sicure anche quando la camera scorre (fino a 26 pixel per parte); in
     // basso a destra c'è la colonna delle icone dell'app, e lì il limite è più stretto. Se la scritta non ci sta
     // sotto il suo soggetto, si sposta di lato quanto basta: meglio un'etichetta un po' fuori asse che una coperta.
@@ -492,8 +556,8 @@ export function bloccoSoggetti({soggetti, titolo, fonte}: {soggetti: Soggetto[];
       const sinistra = stile.zone.sinistra + 40;
       return Math.max(sinistra + larga / 2, Math.min(destra - larga / 2, x));
     };
-    const largaEtichetta = (testo: string) => testo.length * (n === 3 ? 28 : 36) * 0.76 + 60;
-    const largaNota = (testo: string) => testo.length * (n === 3 ? 26 : 32) * 0.56;
+    const largaEtichetta = (testo: string) => testo.length * tra(36, 36, 28) * 0.76 + 60;
+    const largaNota = (testo: string) => testo.length * tra(32, 32, 26) * 0.56;
     return (
       <>
         {titolo ? (
@@ -502,7 +566,9 @@ export function bloccoSoggetti({soggetti, titolo, fonte}: {soggetti: Soggetto[];
           </div>
         ) : null}
         {soggetti.map((sg, i) => {
-          const x = CX + (i - (n - 1) / 2) * passo;
+          // il suo posto nella fila: quanti soggetti già entrati ha alla sua sinistra
+          const posto = peso.slice(0, i).reduce((a, b) => a + b, 0);
+          const x = CX + (posto - (presenti - 1) / 2) * passo;
           const da = dopo(sg.segno);
           const colore = sg.colore ?? C.luce;
           const etichetta = dice(sg.etichetta);
@@ -511,19 +577,19 @@ export function bloccoSoggetti({soggetti, titolo, fonte}: {soggetti: Soggetto[];
             <div key={i}>
               <SoggettoVivo soggetto={sg} x={x} y={yCentro} lato={lato} p={statoSoggetto(sg, dopo)} da={da} indice={i} colpo={colpoSoggetto(sg, dopo)} />
               {etichetta && da > 0 ? (
-                <div data-fmlab-zona="testo" style={{position: 'absolute', left: dentro(x, largaEtichetta(etichetta), yCentro + lato / 2 + (n === 1 ? 14 : n === 2 ? 30 : 44)), top: yCentro + lato / 2 + (n === 1 ? 14 : n === 2 ? 30 : 44), transform: `translate(-50%, -50%) scale(${mix(0.7, 1, molla(da - 0.15, {rigidita: 200, smorzamento: 16})).toFixed(3)})`, opacity: rampa(da - 0.15, 0.2), padding: '10px 26px', borderRadius: 999, border: `3px solid ${colore}`, background: alfa('#06090D', 0.82), boxShadow: `0 0 22px ${alfa(colore, 0.55)}`, whiteSpace: 'nowrap', fontFamily: stile.font.titoli, fontWeight: 900, fontSize: n === 3 ? 28 : 36, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#fff'}}>
+                <div data-fmlab-zona="testo" style={{position: 'absolute', left: dentro(x, largaEtichetta(etichetta), yCentro + lato / 2 + tra(14, 30, 44)), top: yCentro + lato / 2 + tra(14, 30, 44), transform: `translate(-50%, -50%) scale(${mix(0.7, 1, molla(da - 0.15, {rigidita: 200, smorzamento: 16})).toFixed(3)})`, opacity: rampa(da - INGRESSO * 0.6, 0.2), padding: '10px 26px', borderRadius: 999, border: `3px solid ${colore}`, background: alfa('#06090D', 0.82), boxShadow: `0 0 22px ${alfa(colore, 0.55)}`, whiteSpace: 'nowrap', fontFamily: stile.font.titoli, fontWeight: 900, fontSize: tra(36, 36, 28), letterSpacing: '0.12em', textTransform: 'uppercase', color: '#fff'}}>
                   {etichetta}
                 </div>
               ) : null}
               {nota && da > 0 ? (
-                <div data-fmlab-zona="testo" style={{position: 'absolute', left: dentro(x, largaNota(nota), yCentro + lato / 2 + (n === 1 ? 72 : n === 2 ? 88 : 100)), top: yCentro + lato / 2 + (n === 1 ? 72 : n === 2 ? 88 : 100), transform: 'translate(-50%, -50%)', opacity: rampa(da - 0.3, 0.3), whiteSpace: 'nowrap', fontFamily: stile.font.titoli, fontWeight: 800, fontSize: n === 3 ? 26 : 32, color: colore}}>
+                <div data-fmlab-zona="testo" style={{position: 'absolute', left: dentro(x, largaNota(nota), yCentro + lato / 2 + tra(72, 88, 100)), top: yCentro + lato / 2 + tra(72, 88, 100), transform: 'translate(-50%, -50%)', opacity: rampa(da - INGRESSO * 0.8, 0.3), whiteSpace: 'nowrap', fontFamily: stile.font.titoli, fontWeight: 800, fontSize: tra(32, 32, 26), color: colore}}>
                   {nota}
                 </div>
               ) : null}
             </div>
           );
         })}
-        {fonte ? (
+        {fonte && tempo.impostazioni?.fonti === 'si' ? (
           <div data-fmlab-zona="testo" style={{position: 'absolute', left: 70, top: stile.palco.basso - 30, fontFamily: stile.font.testo, fontSize: 22, color: alfa('#FFFFFF', 0.5), opacity: rampa(s.t - 0.6, 0.4)}}>
             {dice(fonte)}
           </div>

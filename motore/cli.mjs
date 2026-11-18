@@ -22,6 +22,7 @@ FMLAB Reel Kit — comandi
                                            solo il palco: tre persone dicono "riferimento" o "kit". Passata fino a 6 su 10
   npm run regia <reel> [nuova]             scrive il piano di regia di serie (piano.json) dal testo: una base da migliorare
   npm run piano [reel]                     controlla il piano e il suo "rischio cartelli" (senza reel: blocchi, luoghi, camere)
+  npm run consegna <reel>                  quello che serve per pubblicare: copertina.jpg, pagella.md, foglio affiancato, e cosa manca ancora
   npm run giudica <reel>                   la pagella del piano in una schermata: otto righe con il numero accanto (docs/OCCHIO.md)
   npm run monta <reel>                     piano.json → copione.md + scene.tsx (il testo resta parola per parola)
   npm run regalo [nome file "Titolo" [PAROLA]]  i regali della chiusura (ebook, mappe, PDF): elenco, o ne aggiunge uno
@@ -188,6 +189,10 @@ async function principale() {
     case 'piano': {
       const {comandoPiano} = await import('./piano.mjs');
       return comandoPiano(argomenti[0]);
+    }
+    case 'consegna': {
+      const {comandoConsegna} = await import('./consegna.mjs');
+      return comandoConsegna(argomenti[0], argomenti.slice(1));
     }
     case 'giudica': {
       const {comandoGiudica} = await import('./giudica.mjs');

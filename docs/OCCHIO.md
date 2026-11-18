@@ -4,6 +4,10 @@ Cosa deve avere un piano fatto bene. Ogni voce dice come si controlla. I numeri 
 controlli (`motore/piano.mjs`, `motore/verifica.mjs`, `motore/durata.mjs`, `riferimenti/misure.json`).
 `npm run giudica <reel>` stampa questa pagella per un reel, senza render e senza voce.
 
+**Il comando esce sempre con esito 0, anche con delle ✖.** "Il comando è passato" non vuol dire niente: contano le
+righe. Ogni ✖ si sistema nel piano. Se non si può (per esempio viene dal testo della persona, che non si tocca), si
+scrive nella consegna quale riga resta ✖ e perché.
+
 | # | Cosa | Come si controlla |
 |---|---|---|
 | 1 | **Aggancio**: la prima frase ha meno di 12 parole. | Si conta in `copione.md`. `npm run verifica` avvisa quando la prima frase supera le 14. |

@@ -1,5 +1,31 @@
 # Novità
 
+## 2.7 · la consegna, e lo screenshot nel piano
+
+- **`npm run fai` chiude con la consegna** (`motore/consegna.mjs`, anche da solo: `npm run consegna <reel>`): fa
+  `copertina.jpg` (la fine della prima scena; `copertina=12` per scegliere il secondo), scrive `pagella.md`, fa il
+  foglio affiancato se in `riferimenti/` ci sono i video, e stampa l'elenco di quello che resta da sistemare: le ✖
+  della pagella e la didascalia ancora vuota (B43).
+- **Scena `schermo` nel piano**: uno screenshot di un'app o di un sito dentro il telefono, con fino a tre note.
+  L'immagine sta nella cartella del reel; se manca, il piano lo dice (B42). Le registrazioni video restano per le
+  scene scritte a mano (`npm run clip`).
+
+## 2.6 · fonti fuori dal video, palco pieno
+
+- **La scritta "Fonte: …" non si vede più nel video.** Di serie è spenta per tutti i reel, anche quelli che c'erano
+  già. `fonti.md` e i suoi controlli non cambiano. Per rimetterla: `npm run imposta <reel> fonti=si` (B40).
+- **Il palco è di chi c'è** (`libreria/Soggetti.tsx`): un soggetto entrato da solo sta in mezzo, grande (800 pixel);
+  quando ne entra un altro si sposta e si stringe in 0,7 secondi (520 in due, 360 in tre). Prima un soggetto
+  restava piccolo nel suo angolo ad aspettare gli altri, con il palco vuoto (B41).
+- **Misure prima e dopo** (`npm run confronta`, video con tempi stimati): movimento sul palco da 3,32 a 4,37 in
+  `reta-testo` e da 2,86 a 4,29 in `mots-c` (riferimenti: da 3,51 a 4,95); dettaglio di `mots-c` da 5,09 a 6,3.
+  Tutte le misure che si possono fare senza voce sono dentro le soglie; quelle ancora fuori dall'intervallo dei
+  riferimenti sono in `docs/TARGETS.md`.
+- **Sottotitoli 3 pixel più in basso** (`stile/stile.ts`, da 356 a 359): misurati stanno a 0,189 dell'altezza, come
+  i riferimenti.
+- **`mots-c`, il piano**: nelle scene `sangue` e `cyclette`, che hanno una tinta loro, il primo soggetto ha preso
+  quel colore. Le tinte lungo il video passano da 2 a 4. Il testo non è cambiato.
+
 ## 2.5 · l'occhio del regista
 
 - **`npm run giudica <reel>`**: la pagella di un piano in una schermata. Otto righe (aggancio, ritmo delle novità,
@@ -26,6 +52,7 @@
   combinazioni di colore della foschia, densità e raggi: niente di nuovo da disegnare (`motore/comune/atmosfere.mjs`).
 - **`atmosfera` nelle impostazioni del reel**, `auto` di serie: il regista di serie la sceglie dal nome del reel
   (stesso nome, stessa atmosfera) evitando quella del reel che lo precede nella cartella, e la scrive nel piano.
+  Il calcolo usa solo i nomi dei reel in ordine: l'ordine in cui si lanciano i comandi non lo cambia.
   A mano: `npm run imposta <reel> atmosfera=<nome>`.
 - I reel esistenti non cambiano: un fotogramma per ognuno dei quattro, prima e dopo, è identico.
 

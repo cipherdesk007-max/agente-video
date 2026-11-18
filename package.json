@@ -20,6 +20,7 @@
     "regia": "node motore/cli.mjs regia",
     "piano": "node motore/cli.mjs piano",
     "giudica": "node motore/cli.mjs giudica",
+    "consegna": "node motore/cli.mjs consegna",
     "monta": "node motore/cli.mjs monta",
     "regalo": "node motore/cli.mjs regalo",
     "musiche": "node motore/cli.mjs musiche",

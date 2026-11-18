@@ -51,6 +51,8 @@ export type Impostazioni = {
   musica?: number;
   /** L'atmosfera del fondo: "auto" (quella del piano, o il fondo di sempre) o un nome di motore/comune/atmosfere.mjs. */
   atmosfera?: string;
+  /** La scritta "Fonte: …" sotto numeri e grafici: "si" la mostra, "no" (di serie) non la mostra. Le fonti restano in fonti.md. */
+  fonti?: 'si' | 'no';
   /** La trama musicale scelta: "auto" o un nome di motore/musiche.mjs. */
   trama?: string;
   /** Il formato del video: verticale (di serie), quadrato, orizzontale. */

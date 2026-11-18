@@ -1047,7 +1047,7 @@ await prova('B24 · regista di serie: mai più di 4 secondi senza un segno (anch
 
 await prova('B27 · atmosfera: dal nome del reel esce sempre la stessa, diversa da quella del reel che lo precede; i reel esistenti restano com\'erano', async () => {
   const {atmosferaDalNome, NOMI_ATMOSFERE} = await carica('motore/comune/atmosfere.mjs');
-  const {atmosferaPerReel, atmosferaInUso} = await carica('motore/regista.mjs');
+  const {atmosferaPerReel} = await carica('motore/regista.mjs');
   const nomi = Array.from({length: 200}, (_, i) => `reel-di-prova-${i}`);
   for (const n of nomi) {
     assert.equal(atmosferaDalNome(n), atmosferaDalNome(n), 'lo stesso nome dà la stessa atmosfera');
@@ -1057,14 +1057,17 @@ await prova('B27 · atmosfera: dal nome del reel esce sempre la stessa, diversa 
   assert.deepEqual([...new Set(nomi.map((n) => atmosferaDalNome(n)))].sort(), [...NOMI_ATMOSFERE].sort(), 'su molti nomi escono tutte');
   // nella cartella: conta il reel che viene subito prima, in ordine di nome
   const sua = atmosferaDalNome('b-reel');
-  const altra = NOMI_ATMOSFERE.find((a) => a !== sua);
-  assert.equal(atmosferaPerReel('b-reel', ['b-reel'], () => sua), sua, 'da solo nella cartella: quella del suo nome');
-  assert.equal(atmosferaPerReel('b-reel', ['a-reel', 'b-reel', 'c-reel'], (r) => (r === 'a-reel' ? altra : sua)), sua, 'il reel dopo non conta');
-  assert.notEqual(atmosferaPerReel('b-reel', ['a-reel', 'b-reel'], () => sua), sua, 'il reel prima ha la stessa: se ne prende un\'altra');
-  assert.equal(atmosferaPerReel('b-reel', ['a-reel', 'b-reel'], () => sua), atmosferaPerReel('b-reel', ['a-reel', 'b-reel'], () => sua), 'e resta quella');
+  assert.equal(atmosferaPerReel('b-reel', ['b-reel']), sua, 'da solo nella cartella: quella del suo nome');
+  assert.equal(atmosferaPerReel('b-reel', ['b-reel', 'c-reel', 'z-reel']), sua, 'i reel che vengono dopo non contano');
+  // due nomi vicini con la stessa atmosfera di nome: il secondo ne prende un'altra, e resta quella
+  const coppia = nomi.map((n) => [n, `${n}-bis`]).find(([a, b]) => atmosferaDalNome(a) === atmosferaDalNome(b));
+  assert.ok(coppia, 'tra 200 nomi ce n\'è uno che ha la stessa atmosfera del suo vicino');
+  assert.notEqual(atmosferaPerReel(coppia[1], coppia), atmosferaPerReel(coppia[0], coppia), 'il reel prima ha la stessa: se ne prende un\'altra');
+  assert.equal(atmosferaPerReel(coppia[1], coppia), atmosferaPerReel(coppia[1], [...coppia].reverse()), 'e resta quella');
   // i reel che c'erano già non hanno un'atmosfera scritta: restano sul fondo di sempre
   for (const reel of ['gps', 'reta-ginocchio', 'reta-testo', 'mots-c']) {
-    assert.equal(atmosferaInUso(reel), 'classica', reel);
+    const filePiano = path.join(K, 'reels', reel, 'piano.json');
+    if (fs.existsSync(filePiano)) assert.equal(JSON.parse(fs.readFileSync(filePiano, 'utf8')).atmosfera, undefined, `${reel}: il piano non ha un'atmosfera scritta`);
     assert.doesNotMatch(fs.readFileSync(path.join(K, 'reels', reel, 'impostazioni.json'), 'utf8'), /atmosfera/, `${reel}: le impostazioni non sono state toccate`);
   }
 });
@@ -1391,6 +1394,206 @@ await prova('B37 · la riga "Prima di consegnare un piano…" è una sola, ident
   // quello che la riga nomina c'è davvero
   assert.ok(fs.existsSync(path.join(K, 'docs/OCCHIO.md')));
   assert.equal(JSON.parse(leggi('package.json')).scripts.giudica, 'node motore/cli.mjs giudica');
+});
+
+// ───────────────────────── B38 · l'atmosfera non dipende dall'ordine dei comandi ─────────────────────────
+
+await prova('B38 · atmosfera: viene solo dai nomi dei reel nella cartella, non da cosa c\'è scritto negli altri reel né dall\'ordine dei comandi; due vicini non hanno mai la stessa', async () => {
+  const {atmosferaDalNome} = await carica('motore/comune/atmosfere.mjs');
+  const regista = await carica('motore/regista.mjs');
+  const {atmosferaPerReel} = regista;
+  assert.equal(atmosferaPerReel.length, 1, 'la funzione riceve il nome e l\'elenco dei nomi: nient\'altro da cui farsi cambiare');
+  assert.equal(regista.atmosferaInUso, undefined, 'non si legge più cosa c\'è scritto negli altri reel');
+  const sorgente = fs.readFileSync(path.join(K, 'motore/regista.mjs'), 'utf8');
+  const corpo = sorgente.slice(sorgente.indexOf('export function atmosferaPerReel'), sorgente.indexOf('export async function comandoRegia'));
+  assert.doesNotMatch(corpo, /readFileSync|leggiImpostazioni|Date|random/, 'niente file, niente orologio, niente caso');
+  const nomi = Array.from({length: 60}, (_, i) => `reel-${String(i).padStart(2, '0')}`);
+  // a parità di cartella (gli stessi nomi), calcolarle in tre ordini diversi dà a ognuno sempre la stessa atmosfera:
+  // la funzione non tiene memoria di quello che ha già risposto
+  const fatti = (ordine) => Object.fromEntries(ordine.map((n) => [n, atmosferaPerReel(n, nomi)]));
+  const dritto = fatti(nomi);
+  assert.deepEqual(fatti([...nomi].reverse()), dritto);
+  assert.deepEqual(fatti([...nomi].sort((a, b) => atmosferaDalNome(a).localeCompare(atmosferaDalNome(b)) || a.localeCompare(b))), dritto);
+  // l'elenco arriva in disordine o con doppioni: uguale
+  assert.equal(atmosferaPerReel('reel-30', [...nomi].reverse()), dritto['reel-30']);
+  assert.equal(atmosferaPerReel('reel-30', [...nomi, ...nomi]), dritto['reel-30']);
+  // i reel che vengono dopo nell'elenco non la cambiano
+  assert.equal(atmosferaPerReel('reel-30', nomi.slice(0, 31)), dritto['reel-30']);
+  // due vicini non hanno mai la stessa, e almeno una volta la regola è servita davvero
+  nomi.forEach((n, i) => i && assert.notEqual(dritto[n], dritto[nomi[i - 1]], `${nomi[i - 1]} e ${n}`));
+  assert.ok(nomi.some((n) => dritto[n] !== atmosferaDalNome(n)), 'in 60 nomi almeno uno ha dovuto cambiare per non ripetere il vicino');
+});
+
+// ───────────────────────── B39 · la pagella dice che il suo esito non conta ─────────────────────────
+
+await prova('B39 · giudica: esce con esito 0 anche con delle ✖, e lo dice sia la schermata sia docs/OCCHIO.md; TARGETS.md dichiara in testa cosa non si può rifare', async () => {
+  const {pagella, schermata} = await carica('motore/giudica.mjs');
+  const p = await pagella('reta-testo');
+  assert.ok(p.righe.some((r) => r.esito === 'no'));
+  assert.match(schermata(p), /Le ✖ non fermano il comando \(esce sempre con esito 0\)/);
+  assert.doesNotMatch(schermata({...p, righe: p.righe.map((r) => ({...r, esito: 'ok'}))}), /non fermano il comando/, 'senza ✖ la riga non serve');
+  const occhio = fs.readFileSync(path.join(K, 'docs/OCCHIO.md'), 'utf8');
+  assert.match(occhio.split('\n').slice(0, 10).join('\n'), /esce sempre con esito 0, anche con delle ✖/);
+  assert.match(occhio, /contano le\s+righe/);
+  const bersagli = fs.readFileSync(path.join(K, 'docs/TARGETS.md'), 'utf8').split('\n').slice(0, 6).join('\n');
+  assert.match(bersagli, /non si possono rifare dal repository/);
+  assert.match(bersagli, /non stanno in Git/);
+});
+
+// ───────────────────────── B40 · la scritta della fonte non si vede più nel video ─────────────────────────
+
+await prova('B40 · fonti: la scritta "Fonte: …" di serie non compare nel video (né nei blocchi né nei soggetti); torna solo con fonti=si; fonti.md resta', async () => {
+  const {bloccoSoggetti, disegna, blocchi} = await ts('prove/sostegno/soggetti.tsx'); // un solo pacchetto: scene e disegno usano lo stesso React
+  const {sistema} = await carica('motore/impostazioni.mjs');
+  assert.equal(sistema({}, {}).fonti, 'no', 'di serie non si vede');
+  assert.equal(sistema({fonti: 'si'}, {}).fonti, 'si');
+  assert.throws(() => sistema({fonti: 'forse'}, {}, 'x'), /"fonti" può essere si .* o no/);
+  const scene = {
+    numero: blocchi.bloccoNumero({valore: 3.96, decimali: 2, unita: 'punti', fonte: 'NEJM 2026, studio di prova'}),
+    confronto: blocchi.bloccoConfronto({sinistra: {titolo: 'A', valore: 4}, destra: {titolo: 'B', valore: 2}, fonte: 'NEJM 2026, studio di prova'}),
+    soggetti: bloccoSoggetti({soggetti: [{tipo: 'foglio', etichetta: 'Lo studio'}], fonte: 'NEJM 2026, studio di prova'}),
+  };
+  for (const [nome, scena] of Object.entries(scene)) {
+    const spenta = disegna(scena, {t: 6});
+    assert.ok(!spenta.includes('NEJM 2026'), `${nome}: di serie la fonte non si vede`);
+    assert.ok(!disegna(scena, {t: 6, impostazioni: {fonti: 'no'}}).includes('NEJM 2026'), `${nome}: con fonti=no non si vede`);
+    assert.ok(disegna(scena, {t: 6, impostazioni: {fonti: 'si'}}).includes('NEJM 2026'), `${nome}: con fonti=si torna`);
+    assert.ok(spenta.length > 400, `${nome}: il resto della scena c'è`);
+  }
+  // quello che è a schermo resta controllato dietro le quinte: la regola di fonti.md non è cambiata
+  assert.match(fs.readFileSync(path.join(K, 'motore/piano.mjs'), 'utf8'), /non ha una riga in fonti\.md/);
+  for (const reel of ['reta-testo', 'mots-c']) assert.ok(fs.existsSync(path.join(K, 'reels', reel, 'fonti.md')), reel);
+  // dalla riga di comando, su una copia
+  const {comandoImposta, leggiImpostazioni} = await carica('motore/impostazioni.mjs');
+  const slug = `zz-difetti-fonti-${process.pid}`;
+  daCancellare.add(slug);
+  const registro = path.join(os.tmpdir(), `fmlab-b40-${process.pid}`);
+  const creato = spawnSync(process.execPath, [path.join(K, 'motore/cli.mjs'), 'nuovo', slug, 'Prova fonti', 'spiegazione'], {cwd: K, encoding: 'utf8', env: {...process.env, FMLAB_REGISTRO: registro, FMLAB_DASHBOARD: 'no'}});
+  fs.rmSync(registro, {recursive: true, force: true});
+  assert.equal(creato.status, 0, creato.stderr);
+  const zitto = console.log;
+  console.log = () => {};
+  try {
+    assert.equal(leggiImpostazioni(slug).fonti, 'no');
+    await comandoImposta(slug, ['fonti=si']);
+    assert.equal(leggiImpostazioni(slug).fonti, 'si');
+    await comandoImposta(slug, ['fonti=no']);
+    assert.equal(leggiImpostazioni(slug).fonti, 'no');
+  } finally {
+    console.log = zitto;
+  }
+});
+
+// ───────────────────────── B41 · il palco è di chi c'è ─────────────────────────
+
+await prova('B41 · soggetti: chi è solo sul palco sta in mezzo ed è grande; quando ne entra un altro si fa da parte e si rimpicciolisce, senza scatti; alla fine la fila è quella di sempre', async () => {
+  const {bloccoSoggetti, disegna} = await ts('prove/sostegno/soggetti.tsx');
+  const scena = bloccoSoggetti({soggetti: [{tipo: 'foglio', etichetta: 'Primo', segno: 'a'}, {tipo: 'batteria', etichetta: 'Secondo', segno: 'b'}, {tipo: 'stomaco', etichetta: 'Terzo', segno: 'c'}]});
+  const segni = {a: 0.5, b: 4, c: 7};
+  // i soggetti sul palco in un istante: lato della scatola e centro (la scatola è messa con left/top e translate -50%)
+  const sulPalco = (t) => [...disegna(scena, {t, durata: 12, segni}).matchAll(/left:(-?[\d.]+)px;top:(-?[\d.]+)px;width:([\d.]+)px;height:\3px/g)].map((m) => ({x: Math.round((Number(m[1]) + Number(m[3]) / 2) * 100) / 100, lato: Math.round(Number(m[3]) * 100) / 100}));
+  const solo = sulPalco(3);
+  assert.equal(solo.length, 1, 'al secondo 3 c\'è solo il primo');
+  assert.equal(solo[0].lato, 800, 'da solo è grande come un soggetto unico');
+  assert.equal(solo[0].x, 540, 'e sta in mezzo');
+  const due = sulPalco(6.5);
+  assert.deepEqual(due.map((s) => s.lato), [520, 520], 'in due: la misura della coppia');
+  assert.deepEqual(due.map((s) => s.x), [290, 790]);
+  const tre = sulPalco(11);
+  assert.deepEqual(tre.map((s) => s.lato), [360, 360, 360], 'in tre: la fila di sempre');
+  assert.deepEqual(tre.map((s) => s.x), [200, 540, 880]);
+  // mentre il secondo entra, il primo si sposta e si stringe un po' alla volta: mai un salto
+  let prima = sulPalco(3.9)[0];
+  for (let t = 4; t <= 4.9; t += 1 / 30) {
+    const ora = sulPalco(t)[0];
+    assert.ok(Math.abs(ora.lato - prima.lato) < 40 && Math.abs(ora.x - prima.x) < 40, `al secondo ${t.toFixed(2)} il primo soggetto salta (${prima.lato}→${ora.lato} px)`);
+    assert.ok(ora.lato <= prima.lato + 1e-6 && ora.x <= prima.x + 1e-6, 'si stringe e va a sinistra, non torna indietro');
+    prima = ora;
+  }
+  assert.equal(prima.lato, 520);
+  // l'etichetta di chi non è ancora entrato non c'è; quella di chi entra arriva quando ha preso posto
+  assert.ok(!disegna(scena, {t: 3, durata: 12, segni}).includes('>Secondo<'));
+  assert.ok(disegna(scena, {t: 6.5, durata: 12, segni}).includes('>Secondo<'));
+  // soggetti senza segno, o che entrano insieme: prendono posto subito, senza passare dal centro
+  const insieme = bloccoSoggetti({soggetti: [{tipo: 'batteria'}, {tipo: 'stomaco'}]});
+  assert.deepEqual([...disegna(insieme, {t: 0.1}).matchAll(/width:([\d.]+)px;height:\1px/g)].map((m) => Number(m[1])).slice(0, 2), [520, 520]);
+  const coppia = bloccoSoggetti({soggetti: [{tipo: 'batteria', segno: 'x'}, {tipo: 'stomaco', segno: 'x'}]});
+  const appena = [...disegna(coppia, {t: 0.55}).matchAll(/left:(-?[\d.]+)px;top:(-?[\d.]+)px;width:([\d.]+)px;height:\3px/g)].map((m) => [Number(m[1]) + Number(m[3]) / 2, Number(m[3])]);
+  assert.deepEqual(appena, [[290, 520], [790, 520]]);
+});
+
+// ───────────────────────── B42 · lo screenshot di un'app nel piano ─────────────────────────
+
+await prova('B42 · piano: la scena "schermo" mostra uno screenshot nel telefono; il nome dev\'essere un\'immagine e il file deve stare nella cartella del reel', async () => {
+  const {controllaPiano, BLOCCHI} = await carica('motore/piano.mjs');
+  assert.equal(BLOCCHI.schermo.fn, 'bloccoSchermo');
+  assert.ok(fs.readFileSync(path.join(K, 'CATALOGO.md'), 'utf8').includes('bloccoSchermo'));
+  const testo = 'Apri la app e guarda la prima pagina. Qui trovi tutti i tuoi dati.';
+  const scena = (file) => ({nome: 'app', blocco: 'schermo', dati: {file, titolo: 'La prima pagina', segno: 'app', note: [{testo: 'I tuoi dati', segno: 'dati'}]}, segni: {app: 'app', dati: 'dati'}, camera: 'spinta'});
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fmlab-b42-'));
+  try {
+    const senza = controllaPiano({versione: 1, titolo: 'Demo', scene: [scena('home.png')]}, testo, {cartella: tmp});
+    assert.match(senza.errori.join('\n'), /l'immagine "home\.png" non c'è nella cartella del reel/);
+    fs.writeFileSync(path.join(tmp, 'home.png'), 'x');
+    assert.deepEqual(controllaPiano({versione: 1, titolo: 'Demo', scene: [scena('home.png')]}, testo, {cartella: tmp}).errori, []);
+    for (const sbagliato of ['../segreto.png', 'home', 'video.mp4', 12]) {
+      assert.match(controllaPiano({versione: 1, titolo: 'Demo', scene: [scena(sbagliato)]}, testo, {cartella: tmp}).errori.join('\n'), /serve il nome di un'immagine nella cartella del reel/, String(sbagliato));
+    }
+    // uno screenshot non è un cartello di scritte
+    assert.equal(controllaPiano({versione: 1, titolo: 'Demo', scene: [scena('home.png')]}, testo, {cartella: tmp}).scene[0].definizione.blocco, 'schermo');
+  } finally {
+    fs.rmSync(tmp, {recursive: true, force: true});
+  }
+});
+
+// ───────────────────────── B43 · la consegna ─────────────────────────
+
+await prova('B43 · consegna: la copertina è la fine della prima scena; una didascalia ancora vuota e le ✖ della pagella finiscono nell\'elenco delle cose da sistemare; npm run fai la prepara da solo', async () => {
+  const c = await carica('motore/consegna.mjs');
+  assert.equal(c.istanteCopertina({durata: 60, scene: [{inizio: 0, fine: 5.4}, {inizio: 5.4, fine: 12}]}), 5.15);
+  assert.equal(c.istanteCopertina({durata: 3, scene: [{inizio: 0, fine: 9}]}), 2.75, 'mai oltre la fine del video');
+  assert.equal(c.istanteCopertina({durata: 10, scene: []}), 0);
+  const modello = fs.readFileSync(path.join(K, 'reels/reta-testo/didascalia.md'), 'utf8');
+  assert.ok(c.didascaliaVuota(modello), 'il modello appena creato è vuoto');
+  assert.ok(!c.didascaliaVuota(modello.replace(/\(2-3 righe[^)]*\)/, 'Anche il placebo ha tolto due punti di dolore. Ecco quanto è merito del farmaco. Commenta MAPPA.')));
+  assert.ok(c.didascaliaVuota('# Testo del post\n\n**Didascalia**\n\n**Hashtag**\n'));
+  const testo = c.riassuntoConsegna({slug: 'x', dir: path.join(K, 'reels/x'), fatte: ['copertina.jpg', 'pagella.md'], mancano: ['didascalia.md è ancora vuota']});
+  assert.ok(testo.includes('✓ x.mp4') && testo.includes('✓ copertina.jpg') && testo.includes('✖ didascalia.md è ancora vuota') && testo.includes('Da sistemare prima di consegnare (1)'));
+  assert.ok(c.riassuntoConsegna({slug: 'x', dir: K, fatte: [], mancano: []}).includes('Niente da sistemare.'));
+  // senza video non inventa niente: lo dice
+  await assert.rejects(c.faCopertina('gps'), /Il video di "gps" non c'è ancora/);
+  // npm run fai la chiama alla fine (non in bozza), e quello che scrive non finisce in Git
+  const fai = fs.readFileSync(path.join(K, 'motore/fai.mjs'), 'utf8');
+  assert.match(fai.slice(fai.lastIndexOf('if (!bozza)')), /consegna\(slug\)/);
+  const ignorati = fs.readFileSync(path.join(K, '.gitignore'), 'utf8');
+  assert.ok(ignorati.includes('reels/*/copertina.jpg') && ignorati.includes('reels/*/pagella.md'));
+  assert.equal(JSON.parse(fs.readFileSync(path.join(K, 'package.json'), 'utf8')).scripts.consegna, 'node motore/cli.mjs consegna');
+});
+
+// ───────────────────────── B44 · i soggetti hanno volume e un ambiente ─────────────────────────
+
+await prova('B44 · soggetti: un\'icona non è una sagoma piatta (spessore, faccia, luce e ombra) e ogni soggetto poggia su una pedana illuminata', async () => {
+  const {bloccoSoggetti, disegna} = await ts('prove/sostegno/soggetti.tsx');
+  const {FaDna} = await ts('prove/sostegno/icone.tsx').catch(() => ({}));
+  const sorgente = fs.readFileSync(path.join(K, 'libreria/Soggetti.tsx'), 'utf8');
+  const strati = Number(/const SPESSORE = \{strati: (\d+)/.exec(sorgente)[1]);
+  assert.ok(strati >= 6, 'lo spessore ha abbastanza strati da leggersi come un solido');
+  // la pedana c'è per ogni tipo di soggetto, il cono no per i riflettori (hanno già le loro luci)
+  for (const tipo of ['batteria', 'stomaco', 'foglio', 'ginocchio']) {
+    const html = disegna(bloccoSoggetti({soggetti: [{tipo}]}), {t: 3});
+    assert.equal((html.match(/data-fmlab-ambiente="pedana"/g) ?? []).length, 1, tipo);
+    assert.ok(html.includes('clip-path:polygon('), `${tipo}: il cono di luce`);
+  }
+  assert.ok(!disegna(bloccoSoggetti({soggetti: [{tipo: 'riflettori'}]}), {t: 3}).includes('clip-path:polygon('));
+  // un'icona: tante copie quanti gli strati, più faccia, luce e ombra (e una per il riflesso che passa)
+  if (FaDna) {
+    const html = disegna(bloccoSoggetti({soggetti: [{tipo: 'icona', icona: FaDna, colore: '#5AA8FF'}]}), {t: 3});
+    assert.ok(html.includes('data-fmlab-volume="icona"'));
+    const dentro = html.slice(html.indexOf('data-fmlab-volume="icona"'));
+    assert.ok((dentro.match(/<svg/g) ?? []).length >= strati + 3, 'strati + faccia + luce + ombra');
+    assert.ok(dentro.includes('color-mix(in srgb, #5AA8FF') && dentro.includes('mask-image:linear-gradient(150deg'));
+  }
+  assert.match(sorgente, /<IconaSolida Icona=\{Icona\}/, 'le icone dei soggetti passano dal solido');
 });
 
 if (pannello) await pannello.server.chiudi();

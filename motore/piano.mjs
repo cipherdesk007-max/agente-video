@@ -57,7 +57,8 @@ const COLORE = /^#[0-9a-f]{6}$/i;
 // ───────────────────────── le scene pronte, come le vede il piano ─────────────────────────
 // T testo a schermo · N numero · S segno (nome di un segno della scena, o secondi dall'inizio) · X scritta breve
 // C colore #RRGGBB · I icona · [tipo, 1] = obbligatorio · {elenco}/{oggetto} = voci con i loro campi
-const T = 'testo', N = 'numero', S = 'segno', X = 'scritta', C = 'colore', I = 'icona', B = 'si-no';
+// F un'immagine (png, jpg, webp) che sta nella cartella del reel
+const T = 'testo', N = 'numero', S = 'segno', X = 'scritta', C = 'colore', I = 'icona', B = 'si-no', F = 'file';
 const elenco = (campi, min = 1) => ({elenco: campi, min});
 const oggetto = (campi) => ({oggetto: campi});
 const LATO = oggetto({titolo: [T, 1], valore: [N, 1], decimali: [N], unita: [T], segno: [S], colore: [C]});
@@ -80,6 +81,7 @@ export const BLOCCHI = {
   scala: {fn: 'bloccoScala', cosa: 'cursori su una scala (es. dolore da 0 a 10)', campi: {cursori: [elenco({etichetta: [T, 1], valore: [N, 1], da: [N], segno: [S], colore: [C]}), 1], titolo: [T], minimo: [N], massimo: [N], estremi: [{coppia: T}], verso: [{uno: ['male', 'bene']}], decimali: [N], fonte: [T]}},
   schede: {fn: 'bloccoSchede', cosa: '2 o 3 schede con un valore, e un totale', campi: {schede: [elenco({sopra: [T], valore: [{oppure: [N, X]}, 1], unita: [T], sotto: [T], colore: [C], segno: [S]}, 2), 1], totale: [oggetto({valore: [N, 1], etichetta: [T], segno: [S], decimali: [N]})], titolo: [T], fonte: [T]}},
   avviso: {fn: 'bloccoAvviso', cosa: 'un "attenzione": titolo e fino a 3 punti', campi: {titolo: [T, 1], sotto: [T], punti: [elenco({testo: [T, 1], segno: [S]})], segno: [S], colore: [C], fonte: [T]}},
+  schermo: {fn: 'bloccoSchermo', cosa: 'uno screenshot dentro il telefono, per mostrare un\'app, un sito o un prodotto: l\'immagine sta nella cartella del reel', campi: {file: [F, 1], titolo: [T], segno: [S], note: [elenco({testo: [T, 1], segno: [S]})], colore: [C]}},
   citazione: {fn: 'bloccoCitazione', cosa: 'una frase tra virgolette', campi: {testo: [T, 1], autore: [T], segno: [S], colore: [C]}},
   studio: {fn: 'bloccoStudio', cosa: 'la pagina di uno studio: rivista, titolo, dati', campi: {rivista: [T, 1], titolo: [T, 1], dati: [elenco({testo: [T, 1], segno: [S]})], pagato: [T], segno: [S], segnoPagato: [S], colore: [C], fonte: [T]}},
   persone: {fn: 'bloccoPersone', cosa: '"2 su 10": omini accesi e spenti', campi: {accese: [N, 1], quante: [N], etichetta: [T], titolo: [T], segno: [S], colore: [C], fonte: [T]}},
@@ -230,6 +232,9 @@ function controllaValore(v, tipo, qui, esito) {
   } else if (tipo === S) {
     if (typeof v === 'string') esito.segniUsati.push({nome: v, dove: qui});
     else if (typeof v !== 'number' || v < 0) esito.errori.push(`${qui}: serve il nome di un segno della scena, oppure i secondi dall'inizio della scena.`);
+  } else if (tipo === F) {
+    if (typeof v !== 'string' || !/^[\w.-]+\.(png|jpe?g|webp)$/i.test(v)) esito.errori.push(`${qui}: serve il nome di un'immagine nella cartella del reel, es. "schermata.png" (png, jpg o webp, senza cartelle davanti). Trovato: ${JSON.stringify(v)}.`);
+    else esito.file.push({nome: v, dove: qui});
   } else if (tipo === I) {
     if (typeof v !== 'string' || !/^[A-Z][A-Za-z0-9]+$/.test(v)) esito.errori.push(`${qui}: serve il nome di un'icona, es. "FaHeartPulse" (npm run icone cuore).`);
     else esito.icone.push({nome: v, dove: qui});
@@ -452,7 +457,7 @@ export function controllaPiano(piano, testo, {cartella = null, fonti = null, tem
       if (t) s.suoni.push({nome, indice: t.indice, dentro: t.dentro});
     }
     // blocco e dati
-    const esito = {errori, scritte: [], numeri: [], segniUsati: [], icone: [], regali};
+    const esito = {errori, scritte: [], numeri: [], segniUsati: [], icone: [], file: [], regali};
     const blocco = BLOCCHI[sc.blocco];
     if (!blocco) errori.push(`${dove}: il blocco ${JSON.stringify(sc.blocco)} non esiste. Blocchi: ${Object.keys(BLOCCHI).join(', ')}.`);
     else if (sc.blocco === 'oggetto') controllaOggetto(sc.dati, dove, esito);
@@ -492,6 +497,7 @@ export function controllaPiano(piano, testo, {cartella = null, fonti = null, tem
     }
     for (const i of esito.icone) if (!raccoltaDi(i.nome)) errori.push(`${i.dove}: l'icona "${i.nome}" non esiste. Cercala con: npm run icone <parola>.`);
     s.icone = esito.icone.map((i) => i.nome);
+    for (const f of esito.file) if (cartella && !fs.existsSync(path.join(cartella, f.nome))) errori.push(`${f.dove}: l'immagine "${f.nome}" non c'è nella cartella del reel. Mettila lì (uno screenshot dell'app o del sito) e rilancia.`);
     s.usati = new Set(esito.segniUsati.map((u) => u.nome));
     scritte.push(...esito.scritte);
     numeri.push(...esito.numeri);

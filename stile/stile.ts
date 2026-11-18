@@ -55,8 +55,8 @@ export const stile = {
   palco: {centroX: 540, centroY: 880, alto: 470, basso: 1320},
 
   sottotitoli: {
-    /** Centro verticale dei sottotitoli (in alto, come nei reel di riferimento). */
-    y: 356,
+    /** Centro verticale dei sottotitoli (in alto, come nei reel di riferimento: misurati stanno a 0,189-0,190 dell'altezza). */
+    y: 359,
     dimensione: 60,
     maxParole: 5,
     maxCaratteri: 26,

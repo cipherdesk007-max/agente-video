@@ -106,7 +106,7 @@ export default definisciReel({
             tipo: "foglio",
             etichetta: "Studio 2020",
             nota: "Nuova Zelanda",
-            colore: "#5CF2C8",
+            colore: "#FF8FA0",
             stato: {evidenzia: 0},
             cambia: [
               {segno: "studio4", stato: {evidenzia: 0.4}},
@@ -287,7 +287,7 @@ export default definisciReel({
             tipo: "icona",
             icona: FaBicycle,
             etichetta: "Cyclette",
-            colore: "#5AA8FF",
+            colore: "#FFB347",
             stato: {acceso: 0.5},
             cambia: [
               {segno: "umani9", stato: {acceso: 0.75}},
@@ -297,7 +297,7 @@ export default definisciReel({
           {
             tipo: "batteria",
             etichetta: "Muscoli",
-            colore: "#5CF2C8",
+            colore: "#FFB347",
             segno: "aumentare9",
             stato: {livello: 0.25},
             cambia: [
